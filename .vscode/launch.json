@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build",
+        "program": "Godot",
+        "logging": {
+          "logging.diagnosticsLog.protocolMessages": false,
+          "moduleLoad": false,
+          "exceptions": false,
+          "browserStdOut": false
+        },
+        "cwd": "${workspaceFolder}",
+        "stopAtEntry": false,
+      }
+    ]
+}

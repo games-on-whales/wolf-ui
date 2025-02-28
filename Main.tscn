@@ -1,0 +1,76 @@
+[gd_scene load_steps=6 format=3 uid="uid://cj111e8qqvul4"]
+
+[ext_resource type="Script" path="res://Main.cs" id="1_lcnak"]
+[ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://exit.svg" id="1_pv5nl"]
+[ext_resource type="Texture2D" uid="uid://crrypmci753r5" path="res://options.svg" id="1_xai13"]
+[ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Components/AppEntry.tscn" id="2_ctmw6"]
+[ext_resource type="Script" path="res://Components/ExitButton.cs" id="3_plt17"]
+
+[node name="Control" type="Control" node_paths=PackedStringArray("ExitButton", "OptionsButton", "AppGrid")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lcnak")
+ExitButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/ExitButton")
+OptionsButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/OptionsButton")
+AppGrid = NodePath("VBoxContainer/AppList/ScrollContainer/GridContainer")
+AppEntryScene = ExtResource("2_ctmw6")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="OptionsButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+focus_neighbor_right = NodePath("../ExitButton")
+icon = ExtResource("1_xai13")
+vertical_icon_alignment = 0
+expand_icon = true
+
+[node name="ExitButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 10
+focus_neighbor_left = NodePath("../OptionsButton")
+icon = ExtResource("1_pv5nl")
+vertical_icon_alignment = 0
+expand_icon = true
+script = ExtResource("3_plt17")
+
+[node name="AppList" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 15
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/AppList"]
+layout_mode = 2
+size_flags_horizontal = 3
+follow_focus = true
+horizontal_scroll_mode = 3
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/AppList/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+columns = 6

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="WolfConfig" load_steps=2 format=3 uid="uid://pvvtp2jl5ete"]
+
+[ext_resource type="Script" path="res://Components/WolfConfig.cs" id="1_jamin"]
+
+[resource]
+script = ExtResource("1_jamin")
+ConfigPath = "/etc/wolf/cfg/config.toml"
