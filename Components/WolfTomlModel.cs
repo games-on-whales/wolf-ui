@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 class WolfTomlModel
 {
-    public int? Config_version {get;set;}
+    public int Config_version {get;set;}
     public string Hostname {get;set;}
     public string Uuid {get;set;}
     public WolfGstreamer Gstreamer {get;set;}
