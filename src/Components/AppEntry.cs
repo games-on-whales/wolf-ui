@@ -1,6 +1,5 @@
 using Godot;
-using System;
-using WolfManagement.Components;
+using WolfManagement.Resources;
 
 namespace UI
 {
@@ -57,7 +56,6 @@ namespace UI
 			{
 				var image = wolfApp.Runner.Image.Split(":");
 				await docker.PullImage(image[0], image[1], AppProgress, AppButton);
-				//TODO: Lock button
 			}
 		}
 

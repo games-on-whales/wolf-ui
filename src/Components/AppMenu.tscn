@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://cnikdy0rfhss"]
+[gd_scene load_steps=3 format=3 uid="uid://cnikdy0rfhss"]
 
 [ext_resource type="Script" path="res://Components/AppMenu.cs" id="1_3wvk8"]
+[ext_resource type="Theme" uid="uid://c8iryxjcgtnm6" path="res://theme.tres" id="2_7471y"]
 
 [node name="AppMenu" type="CenterContainer" node_paths=PackedStringArray("StartButton", "UpdateButton", "CancelButton")]
 anchors_preset = 15
@@ -11,20 +12,27 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_3wvk8")
-StartButton = NodePath("VBoxContainer/ButtonStart")
-UpdateButton = NodePath("VBoxContainer/ButtonUpdate")
-CancelButton = NodePath("VBoxContainer/ButtonCancle")
+StartButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonStart")
+UpdateButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonUpdate")
+CancelButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonCancle")
 
-[node name="Container" type="MarginContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 2
+theme = ExtResource("2_7471y")
 
-[node name="ColorRect" type="ColorRect" parent="Container"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
-[node name="ButtonStart" type="Button" parent="VBoxContainer"]
+[node name="ButtonStart" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../ButtonCancle")
 focus_neighbor_bottom = NodePath("../ButtonUpdate")
@@ -32,7 +40,7 @@ focus_next = NodePath("../ButtonUpdate")
 focus_previous = NodePath("../ButtonCancle")
 text = "Start"
 
-[node name="ButtonUpdate" type="Button" parent="VBoxContainer"]
+[node name="ButtonUpdate" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../ButtonStart")
 focus_neighbor_bottom = NodePath("../ButtonCancle")
@@ -40,7 +48,7 @@ focus_next = NodePath("../ButtonCancle")
 focus_previous = NodePath("../ButtonStart")
 text = "Check for Update"
 
-[node name="ButtonCancle" type="Button" parent="VBoxContainer"]
+[node name="ButtonCancle" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../ButtonUpdate")
 focus_neighbor_bottom = NodePath("../ButtonStart")

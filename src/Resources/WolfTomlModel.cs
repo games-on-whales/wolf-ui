@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace WolfManagement.Components
+namespace WolfManagement.Resources
 {
     public class WolfTomlModel
     {

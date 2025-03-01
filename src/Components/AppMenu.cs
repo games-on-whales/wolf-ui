@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using UI;
 
 public partial class AppMenu : CenterContainer
@@ -27,7 +26,6 @@ public partial class AppMenu : CenterContainer
 		CancelButton.Pressed += OnCancelPressed;
 		StartButton.GrabFocus();
 	}
-
 
 	private void OnCancelPressed()
 	{
