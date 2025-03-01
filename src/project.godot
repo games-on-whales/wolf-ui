@@ -13,13 +13,15 @@ config_version=5
 config/name="Wolf Management"
 run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
-run/low_processor_mode=true
-config/icon="res://icon.svg"
+run/max_fps=30
+boot_splash/show_image=false
+boot_splash/fullsize=false
+config/icon="res://Icons/icon.svg"
 
 [display]
 
+window/size/resizable=false
 window/size/borderless=true
-window/size/always_on_top=true
 window/stretch/mode="canvas_items"
 
 [dotnet]

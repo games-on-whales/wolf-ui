@@ -10,7 +10,7 @@
         ],
         "problemMatcher": "$msCompile",
         "options": {
-          "cwd": "${workspaceFolder}"
+          "cwd": "${workspaceFolder}/src"
         },
         "presentation": {
           "echo": true,

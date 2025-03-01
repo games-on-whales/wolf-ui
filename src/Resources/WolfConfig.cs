@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Tomlyn;
 using Tomlyn.Model;
+using WolfManagement.Components;
 
 [GlobalClass]
 public partial class WolfConfig : Resource
@@ -14,17 +15,11 @@ public partial class WolfConfig : Resource
         get{
             return Toml.ToModel<WolfTomlModel>(FileAccess.Open(ConfigPath, FileAccess.ModeFlags.Read).GetAsText());
         }
-        set{
-
-        }
+        set{}
     }
 
-    public void GetApps()
+    public List<WolfApp> GetApps()
     {
-        foreach(var app in ConfigToml.Apps)
-        {
-            GD.Print(app.Title);
-        }
-        
+        return ConfigToml.Apps;
     }
 }

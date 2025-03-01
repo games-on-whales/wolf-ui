@@ -1,10 +1,15 @@
-[gd_scene load_steps=6 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=9 format=3 uid="uid://cj111e8qqvul4"]
 
-[ext_resource type="Script" path="res://Main.cs" id="1_lcnak"]
-[ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://exit.svg" id="1_pv5nl"]
-[ext_resource type="Texture2D" uid="uid://crrypmci753r5" path="res://options.svg" id="1_xai13"]
-[ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Components/AppEntry.tscn" id="2_ctmw6"]
-[ext_resource type="Script" path="res://Components/ExitButton.cs" id="3_plt17"]
+[ext_resource type="Script" path="res://Main.cs" id="1_xobeq"]
+[ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Components/AppEntry.tscn" id="2_rsqs3"]
+[ext_resource type="Script" path="res://Resources/DockerController.cs" id="3_kxedh"]
+[ext_resource type="Resource" uid="uid://pvvtp2jl5ete" path="res://Resources/WolfConfig.tres" id="4_s4hcf"]
+[ext_resource type="Texture2D" uid="uid://crrypmci753r5" path="res://Icons/options.svg" id="4_s7oif"]
+[ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
+[ext_resource type="Script" path="res://Components/ExitButton.cs" id="6_5bwue"]
+
+[sub_resource type="Resource" id="Resource_tl3on"]
+script = ExtResource("3_kxedh")
 
 [node name="Control" type="Control" node_paths=PackedStringArray("ExitButton", "OptionsButton", "AppGrid")]
 layout_mode = 3
@@ -13,11 +18,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_lcnak")
+script = ExtResource("1_xobeq")
 ExitButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/ExitButton")
 OptionsButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/OptionsButton")
 AppGrid = NodePath("VBoxContainer/AppList/ScrollContainer/GridContainer")
-AppEntryScene = ExtResource("2_ctmw6")
+AppEntryScene = ExtResource("2_rsqs3")
+docker = SubResource("Resource_tl3on")
+config = ExtResource("4_s4hcf")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -42,7 +49,7 @@ size_flags_vertical = 0
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 focus_neighbor_right = NodePath("../ExitButton")
-icon = ExtResource("1_xai13")
+icon = ExtResource("4_s7oif")
 vertical_icon_alignment = 0
 expand_icon = true
 
@@ -51,10 +58,10 @@ custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 10
 focus_neighbor_left = NodePath("../OptionsButton")
-icon = ExtResource("1_pv5nl")
+icon = ExtResource("5_tqvkx")
 vertical_icon_alignment = 0
 expand_icon = true
-script = ExtResource("3_plt17")
+script = ExtResource("6_5bwue")
 
 [node name="AppList" type="MarginContainer" parent="VBoxContainer"]
 layout_mode = 2

@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://cnikdy0rfhss"]
+
+[ext_resource type="Script" path="res://Components/AppMenu.cs" id="1_3wvk8"]
+
+[node name="AppMenu" type="CenterContainer" node_paths=PackedStringArray("StartButton", "UpdateButton", "CancelButton")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_3wvk8")
+StartButton = NodePath("VBoxContainer/ButtonStart")
+UpdateButton = NodePath("VBoxContainer/ButtonUpdate")
+CancelButton = NodePath("VBoxContainer/ButtonCancle")
+
+[node name="Container" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="Container"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ButtonStart" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../ButtonCancle")
+focus_neighbor_bottom = NodePath("../ButtonUpdate")
+focus_next = NodePath("../ButtonUpdate")
+focus_previous = NodePath("../ButtonCancle")
+text = "Start"
+
+[node name="ButtonUpdate" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../ButtonStart")
+focus_neighbor_bottom = NodePath("../ButtonCancle")
+focus_next = NodePath("../ButtonCancle")
+focus_previous = NodePath("../ButtonStart")
+text = "Check for Update"
+
+[node name="ButtonCancle" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../ButtonUpdate")
+focus_neighbor_bottom = NodePath("../ButtonStart")
+focus_next = NodePath("../ButtonStart")
+focus_previous = NodePath("../ButtonUpdate")
+text = "Cancel"

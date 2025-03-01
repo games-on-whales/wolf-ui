@@ -13,7 +13,7 @@
           "exceptions": false,
           "browserStdOut": false
         },
-        "cwd": "${workspaceFolder}",
+        "cwd": "${workspaceFolder}/src",
         "stopAtEntry": false,
       }
     ]

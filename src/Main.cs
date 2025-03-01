@@ -1,5 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using WolfManagement.Components;
 
 namespace UI
 {
@@ -13,23 +16,31 @@ namespace UI
 		GridContainer AppGrid;
 		[Export]
 		PackedScene AppEntryScene;
+		[Export]
+		DockerController docker;
+		[Export]
+		WolfConfig config;
 
 		// Called when the node enters the scene tree for the first time.
 		public override void _Ready()
 		{
-			DirContents("/etc/wolf");
-			var cfg = new WolfConfig();
-			cfg.GetApps();
+			List<WolfApp> Apps = config.GetApps();
 
-
-			for(int i = 0; i < 15; i++)
+			int i = 1;
+			foreach(var app in Apps)
 			{
 				MarginContainer appEntry = AppEntryScene.Instantiate<MarginContainer>();
-				if(appEntry is AppEntry app)
+				if(appEntry is AppEntry entry)
 				{
-					app.Name = $"AppEntry {i}";
-					app.AppImage = Image.LoadFromFile("/etc/wolf/covers/kodi.png");
-					AddAppEntry(app);
+					entry.Name = $"App {i}";
+					entry.Title = app.Title;
+					entry.wolfApp = app;
+					if(app.Icon_png_path != null)
+					{
+						entry.AppImage = Image.LoadFromFile(app.Icon_png_path);
+					}
+					AddAppEntry(entry);
+					i++;
 				}
 			}
 
@@ -89,8 +100,35 @@ namespace UI
 		}
 
 		// Called every frame. 'delta' is the elapsed time since the previous frame.
-		public override void _Process(double delta)
+		public async override void _Process(double delta)
 		{
+			var Images = await docker.ListImages();
+			HashSet<string> existingImages = new();
+			foreach(var image in Images)
+			{
+				if(image.RepoTags.Count > 0)
+				{
+					existingImages.Add(image.RepoTags.First<string>());
+				}
+			}
+
+			foreach(var child in AppGrid.GetChildren())
+			{
+				if(child is AppEntry app)
+				{
+					string imagename = app.wolfApp.Runner.Image;
+					if(!imagename.Contains(':'))
+						imagename = $"{imagename}:latest";
+					if(existingImages.Contains(imagename))
+					{
+						app.ImageOnDisc = true;
+						app.DownloadIcon.Visible = false;
+					} else {
+						app.ImageOnDisc = false;
+						app.DownloadIcon.Visible = true;
+					}
+				}
+			}
 		}
 	}
 }

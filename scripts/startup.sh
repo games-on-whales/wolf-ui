@@ -14,4 +14,4 @@ done
 
 gow_log "Starting Manager"
 source /opt/gow/launch-comp.sh
-launcher Godot --path /src
+launcher Godot --path /src -t -f
