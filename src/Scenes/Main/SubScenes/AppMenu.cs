@@ -42,6 +42,7 @@ public partial class AppMenu : CenterContainer
 
 	private void OnStartPressed()
 	{
+		var img = appEntry.wolfApp.Runner.Image;
 		//TODO: Start the Image and Close the app
 	}
 

@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://cnikdy0rfhss"]
+[gd_scene load_steps=2 format=3 uid="uid://cnikdy0rfhss"]
 
 [ext_resource type="Script" path="res://Scenes/Main/SubScenes/AppMenu.cs" id="1_3wvk8"]
-[ext_resource type="Theme" uid="uid://c8iryxjcgtnm6" path="res://theme.tres" id="2_7471y"]
 
 [node name="AppMenu" type="CenterContainer" node_paths=PackedStringArray("StartButton", "UpdateButton", "CancelButton")]
 anchors_preset = 15
@@ -18,7 +17,6 @@ CancelButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonCanc
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 2
-theme = ExtResource("2_7471y")
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2

@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://uoxljgmqchf5"]
 
 [ext_resource type="Script" path="res://Scenes/Config/ConfigureApp.cs" id="1_lummr"]
-[ext_resource type="Resource" uid="uid://pvvtp2jl5ete" path="res://Resources/WolfConfig.tres" id="2_p0p8b"]
+[ext_resource type="Resource" uid="uid://pvvtp2jl5ete" path="res://Resources/Toml/WolfConfig.tres" id="2_p0p8b"]
 [ext_resource type="Script" path="res://addons/onscreenkeyboard/onscreen_keyboard.gd" id="3_26jox"]
 [ext_resource type="PackedScene" uid="uid://bs8hi6b3rts25" path="res://Scenes/Config/SubScenes/StringArrayContainer.tscn" id="4_1rmao"]
 
