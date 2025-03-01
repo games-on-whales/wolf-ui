@@ -11,7 +11,6 @@ for file in /opt/gow/startup.d/* ; do
     fi
 done
 
-
-gow_log "Starting Manager"
+gow_log "Starting Wolf-UI"
 source /opt/gow/launch-comp.sh
 launcher Godot --path /src -t -f
