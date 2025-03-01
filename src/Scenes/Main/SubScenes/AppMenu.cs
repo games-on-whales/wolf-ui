@@ -43,7 +43,7 @@ public partial class AppMenu : CenterContainer
 	private void OnStartPressed()
 	{
 		var img = appEntry.wolfApp.Runner.Image;
-		//TODO: Start the Image and Close the app
+		//TODO: Request Wolf to start the Streaming app, and Close this app
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

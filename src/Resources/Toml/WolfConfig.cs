@@ -23,6 +23,11 @@ namespace WolfManagement.Resources
             return ConfigToml.Apps;
         }
 
+        public List<WolfClient> GetUser()
+        {
+            return ConfigToml.Paired_clients;
+        }
+
         public void Add(WolfApp app)
         {
             ConfigToml.Apps.Add(app);

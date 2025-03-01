@@ -4,7 +4,7 @@ using WolfManagement.Resources;
 namespace UI
 {
 	[GlobalClass]
-	public partial class AppEntry : MarginContainer
+	public partial class AppEntry : Button
 	{
 		[Export]
 		public Button AppButton;
@@ -32,7 +32,7 @@ namespace UI
 			AppLabel.Text = Title;
 			DownloadIcon.Visible = false;
 			AppProgress.Hide();
-			AppButton.Pressed+= OnPressed;
+			Pressed+= OnPressed;
 		}
 
 		private void OnPressed()
@@ -63,9 +63,6 @@ namespace UI
 		{
 			foreach(Node child in parent.GetChildren())
 			{
-				if(child is Button d)
-					AppButton = d;
-
 				if(child is ProgressBar c)
 					AppProgress = c;
 
@@ -81,13 +78,8 @@ namespace UI
 			if(AppImage != null)
 			{
 				var texture = ImageTexture.CreateFromImage(AppImage);
-				AppButton.Icon = texture;
+				Icon = texture;
 			}
-		}
-
-		public void SetFocus()
-		{
-			AppButton.GrabFocus();
 		}
 
 		public string GetFocusPath()

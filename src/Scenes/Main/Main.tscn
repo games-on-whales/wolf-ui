@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=11 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Scenes/Main/SubScenes/AppEntry.tscn" id="2_rsqs3"]
@@ -6,13 +6,14 @@
 [ext_resource type="Resource" uid="uid://pvvtp2jl5ete" path="res://Resources/Toml/WolfConfig.tres" id="4_s4hcf"]
 [ext_resource type="Texture2D" uid="uid://crrypmci753r5" path="res://Icons/options.svg" id="4_s7oif"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
-[ext_resource type="Script" path="res://Scenes/Main/ExitButton.cs" id="6_5bwue"]
-[ext_resource type="PackedScene" uid="uid://dte2g43vuikmq" path="res://Scenes/Main/SubScenes/AddAppEntry.tscn" id="8_vosff"]
+[ext_resource type="Script" path="res://Scenes/Main/TitleBar.cs" id="6_pifck"]
+[ext_resource type="Script" path="res://Scenes/Main/UserList.cs" id="6_u8v04"]
+[ext_resource type="Script" path="res://Scenes/Main/AppList.cs" id="10_b2kb5"]
 
 [sub_resource type="Resource" id="Resource_tl3on"]
 script = ExtResource("3_kxedh")
 
-[node name="Control" type="Control" node_paths=PackedStringArray("ExitButton", "OptionsButton", "AppGrid")]
+[node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,11 +21,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xobeq")
-ExitButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/ExitButton")
-OptionsButton = NodePath("VBoxContainer/MarginContainer/HBoxContainer/OptionsButton")
-AppGrid = NodePath("VBoxContainer/AppList/ScrollContainer/GridContainer")
-AppEntryScene = ExtResource("2_rsqs3")
-AddAppScene = ExtResource("8_vosff")
 docker = SubResource("Resource_tl3on")
 config = ExtResource("4_s4hcf")
 
@@ -36,18 +32,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+[node name="TitleBar" type="MarginContainer" parent="VBoxContainer" node_paths=PackedStringArray("ExitButton", "UserButton")]
 layout_mode = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 15
+script = ExtResource("6_pifck")
+ExitButton = NodePath("HBoxContainer/ExitButton")
+UserButton = NodePath("HBoxContainer/OptionsButton")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TitleBar"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="OptionsButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="OptionsButton" type="Button" parent="VBoxContainer/TitleBar/HBoxContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 focus_neighbor_right = NodePath("../ExitButton")
@@ -55,7 +54,7 @@ icon = ExtResource("4_s7oif")
 vertical_icon_alignment = 0
 expand_icon = true
 
-[node name="ExitButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="ExitButton" type="Button" parent="VBoxContainer/TitleBar/HBoxContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -63,22 +62,78 @@ focus_neighbor_left = NodePath("../OptionsButton")
 icon = ExtResource("5_tqvkx")
 vertical_icon_alignment = 0
 expand_icon = true
-script = ExtResource("6_5bwue")
 
-[node name="AppList" type="MarginContainer" parent="VBoxContainer"]
+[node name="Menus" type="Control" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 15
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/AppList"]
+[node name="UserList" type="Control" parent="VBoxContainer/Menus" node_paths=PackedStringArray("AppMenu", "UserMenu", "AppGrid", "UserContainer")]
 layout_mode = 2
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 584.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_u8v04")
+AppMenu = NodePath("../AppList")
+UserMenu = NodePath(".")
+AppGrid = NodePath("../AppList/ScrollContainer/GridContainer")
+UserContainer = NodePath("ScrollContainer/MarginContainer/UserList")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/UserList"]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/UserList/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 3
+theme_override_constants/margin_bottom = 3
+
+[node name="UserList" type="VBoxContainer" parent="VBoxContainer/Menus/UserList/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="AppList" type="Control" parent="VBoxContainer/Menus" node_paths=PackedStringArray("AppContainer")]
+visible = false
+layout_mode = 2
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 584.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+script = ExtResource("10_b2kb5")
+AppContainer = NodePath("ScrollContainer/GridContainer")
+AppEntryScene = ExtResource("2_rsqs3")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/AppList"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 follow_focus = true
 horizontal_scroll_mode = 3
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/AppList/ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Menus/AppList/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
