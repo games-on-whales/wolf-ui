@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=14 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Scenes/Main/SubScenes/AppEntry.tscn" id="2_rsqs3"]
@@ -9,6 +9,9 @@
 [ext_resource type="Script" path="res://Scenes/Main/TitleBar.cs" id="6_pifck"]
 [ext_resource type="Script" path="res://Scenes/Main/UserList.cs" id="6_u8v04"]
 [ext_resource type="Script" path="res://Scenes/Main/AppList.cs" id="10_b2kb5"]
+[ext_resource type="Script" path="res://Scenes/Main/SoundEffects.cs" id="10_ykwdk"]
+[ext_resource type="AudioStream" uid="uid://c7e7c53qiijki" path="res://Audio/click.ogg" id="11_ecuro"]
+[ext_resource type="AudioStream" uid="uid://csnwuih5mmn5g" path="res://Audio/accept.ogg" id="11_hdjvh"]
 
 [sub_resource type="Resource" id="Resource_tl3on"]
 script = ExtResource("3_kxedh")
@@ -78,10 +81,9 @@ script = ExtResource("6_u8v04")
 AppMenu = NodePath("../AppList")
 UserMenu = NodePath(".")
 AppGrid = NodePath("../AppList/ScrollContainer/GridContainer")
-UserContainer = NodePath("ScrollContainer/MarginContainer/UserList")
+UserContainer = NodePath("PanelContainer/VBoxContainer/ScrollContainer/MarginContainer/UserList")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/UserList"]
-custom_minimum_size = Vector2(400, 400)
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/Menus/UserList"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -89,13 +91,18 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -200.0
+offset_top = -95.5
 offset_right = 200.0
-offset_bottom = 200.0
+offset_bottom = 95.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/UserList/ScrollContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Menus/UserList/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer/Menus/UserList/PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -104,7 +111,33 @@ theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 3
 theme_override_constants/margin_bottom = 3
 
-[node name="UserList" type="VBoxContainer" parent="VBoxContainer/Menus/UserList/ScrollContainer/MarginContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/Menus/UserList/PanelContainer/VBoxContainer/MarginContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Menus/UserList/PanelContainer/VBoxContainer/MarginContainer2/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Select User"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/Menus/UserList/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/UserList/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/UserList/PanelContainer/VBoxContainer/ScrollContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 3
+theme_override_constants/margin_bottom = 3
+
+[node name="UserList" type="VBoxContainer" parent="VBoxContainer/Menus/UserList/PanelContainer/VBoxContainer/ScrollContainer/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -138,3 +171,8 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 columns = 6
+
+[node name="SoundEffects" type="Node" parent="."]
+script = ExtResource("10_ykwdk")
+AcceptSound = ExtResource("11_hdjvh")
+HoverSound = ExtResource("11_ecuro")

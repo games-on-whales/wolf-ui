@@ -29,14 +29,14 @@ public partial class AppMenu : CenterContainer
 
 	private void OnCancelPressed()
 	{
-		QueueFree();
-		appEntry.AppButton.GrabFocus();
+		CallDeferred(MethodName.QueueFree);
+		appEntry.GrabFocus();
 	}
 
 	private void OnUpdatePressed()
 	{
-		QueueFree();
-		appEntry.AppButton.GrabFocus();
+		CallDeferred(MethodName.QueueFree);
+		appEntry.GrabFocus();
 		appEntry.PullImage();
 	}
 
@@ -54,7 +54,7 @@ public partial class AppMenu : CenterContainer
 		if(Input.IsActionPressed("ui_cancel"))
 		{
 			QueueFree();
-			appEntry.AppButton.GrabFocus();
-		}	
+			appEntry.GrabFocus();
+		}
 	}
 }
