@@ -120,39 +120,6 @@ namespace WolfManagement.Resources
             return null;
         }
 
-        public async void StartNewMapServer(Dictionary<string, string> lables, params string[] Envs)
-        {
-            string sql_user = System.Environment.GetEnvironmentVariable("SQL_USER");
-            string sql_pw = System.Environment.GetEnvironmentVariable("SQL_PW");
-            List<string> env = new()
-            {
-                $"SQL_USER={sql_user}",
-                $"SQL_PW={sql_pw}"
-            };
-            foreach(var e in Envs)
-            {
-                env.Add(e);
-            }
-            var response = await client.Containers.CreateContainerAsync(new CreateContainerParameters()
-            {
-                Image = "mmoserver_masterserver",
-                HostConfig = new HostConfig()
-                {
-                    AutoRemove = true,
-                    NetworkMode = "backend"
-                },
-                Env = env,
-                Labels = lables,
-                //Volumes = new Dictionary<string, EmptyStruct>(){ {"", new() }}
-            });
-
-            await client.Containers.StartContainerAsync(
-                response.ID,
-                new ContainerStartParameters()
-            );
-
-        }
-
         private async void ReactToDockerEvent(Message msg)
         {
             var actor = msg.Actor;
