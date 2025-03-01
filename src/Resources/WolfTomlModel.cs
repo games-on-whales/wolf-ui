@@ -58,8 +58,6 @@ namespace WolfManagement.Resources
 
     public class WolfApp
     {
-        public WolfApp() {}
-
         public string Icon_png_path {get;set;}
         public bool Start_virtual_compositor {get;set;}
         public string Title {get;set;}

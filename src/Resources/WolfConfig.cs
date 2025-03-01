@@ -22,5 +22,11 @@ namespace WolfManagement.Resources
         {
             return ConfigToml.Apps;
         }
+
+        public void Add(WolfApp app)
+        {
+            ConfigToml.Apps.Add(app);
+            //TODO: SAVE!!!
+        }
     }
 }

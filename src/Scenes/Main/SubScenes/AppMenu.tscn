@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cnikdy0rfhss"]
 
-[ext_resource type="Script" path="res://Components/AppMenu.cs" id="1_3wvk8"]
+[ext_resource type="Script" path="res://Scenes/Main/SubScenes/AppMenu.cs" id="1_3wvk8"]
 [ext_resource type="Theme" uid="uid://c8iryxjcgtnm6" path="res://theme.tres" id="2_7471y"]
 
 [node name="AppMenu" type="CenterContainer" node_paths=PackedStringArray("StartButton", "UpdateButton", "CancelButton")]

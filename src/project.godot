@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Wolf Management"
-run/main_scene="res://Main.tscn"
+run/main_scene="res://Scenes/Main/Main.tscn"
 config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
 run/max_fps=30
 boot_splash/show_image=false
@@ -27,6 +27,10 @@ window/stretch/mode="canvas_items"
 [dotnet]
 
 project/assembly_name="Wolf Management"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/onscreenkeyboard/plugin.cfg")
 
 [input]
 

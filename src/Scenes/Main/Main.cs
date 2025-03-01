@@ -17,6 +17,9 @@ namespace UI
 		[Export]
 		PackedScene AppEntryScene;
 		[Export]
+		PackedScene AddAppScene;
+
+		[Export]
 		DockerController docker;
 		[Export]
 		WolfConfig config;
@@ -43,6 +46,9 @@ namespace UI
 					i++;
 				}
 			}
+
+			MarginContainer addAppEntry = AddAppScene.Instantiate<MarginContainer>();
+			AppGrid.AddChild(addAppEntry);
 
 			if(AppGrid.GetChildCount() > 0)
 				AppGrid.GetChild<AppEntry>(0).SetFocus();
