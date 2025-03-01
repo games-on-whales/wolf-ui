@@ -18,8 +18,8 @@ public partial class AppMenu : CenterContainer
 		if(parent is AppEntry app)
 		{
 			appEntry = app;
-			GD.Print(app.Title);
 		}
+
 
 		StartButton.Pressed += OnStartPressed;
 		UpdateButton.Pressed += OnUpdatePressed;
@@ -49,6 +49,11 @@ public partial class AppMenu : CenterContainer
 	public override void _Process(double delta)
 	{
 		if(!StartButton.HasFocus() && !UpdateButton.HasFocus() && !CancelButton.HasFocus())
-			QueueFree();		
+			QueueFree();
+		if(Input.IsActionPressed("ui_cancel"))
+		{
+			QueueFree();
+			appEntry.AppButton.GrabFocus();
+		}	
 	}
 }

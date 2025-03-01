@@ -15,7 +15,7 @@ namespace UI
 		[Export]
 		DockerController docker;
 		[Export]
-		public TextureRect DownloadIcon;
+		public Control DownloadIcon;
 		[Export]
 		PackedScene AppMenu;
 
@@ -30,7 +30,7 @@ namespace UI
 			SetChildRefrence(this);
 			SetIcon();
 			AppLabel.Text = Title;
-			DownloadIcon.Hide();
+			DownloadIcon.Visible = false;
 			AppProgress.Hide();
 			AppButton.Pressed+= OnPressed;
 		}
@@ -71,9 +71,6 @@ namespace UI
 
 				if(child is Label b)
 					AppLabel = b;
-
-				if(child is TextureRect a)
-					DownloadIcon = a;
 
 				SetChildRefrence(child);
 			}

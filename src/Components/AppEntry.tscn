@@ -19,7 +19,7 @@ AppButton = NodePath("Button")
 AppProgress = NodePath("LoadingMargin/Loading")
 AppLabel = NodePath("NameMargin/Name")
 docker = ExtResource("2_n8cfi")
-DownloadIcon = NodePath("LoadingMargin/Download")
+DownloadIcon = NodePath("LoadingMargin/PanelContainer")
 AppMenu = ExtResource("3_goyyk")
 
 [node name="NameMargin" type="MarginContainer" parent="."]
@@ -59,10 +59,25 @@ size_flags_vertical = 8
 mouse_filter = 2
 show_percentage = false
 
-[node name="Download" type="TextureRect" parent="LoadingMargin"]
+[node name="PanelContainer" type="PanelContainer" parent="LoadingMargin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="LoadingMargin/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Download" type="TextureRect" parent="LoadingMargin/PanelContainer/MarginContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("3_4vl0r")
 expand_mode = 4

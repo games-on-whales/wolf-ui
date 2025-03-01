@@ -29,24 +29,23 @@ namespace WolfManagement.Resources
             return true;
         }
 
-        private void PullProgressCallback(JSONMessage msg, ProgressBar progressBar = null, Button button = null)
+        private static void PullProgressCallback(JSONMessage msg, ProgressBar progressBar = null, Button button = null)
         {
-            GD.Print(msg.Aux);
             if(msg.Error != null)
-                GD.Print($"{msg.Error} : {msg.ErrorMessage}");
-            if(msg.ProgressMessage != null)
-                GD.Print(msg.ProgressMessage);
+                GD.Print($"{msg.Error} - {msg.ErrorMessage}");
             if(msg.Progress != null)
             {
                 if(msg.Progress.Total != 0)
                 {
+                    GD.Print(msg.ProgressMessage);
                     if(progressBar != null)
                         progressBar.Value = 100 * (float)msg.Progress.Current / (float)msg.Progress.Total;
                 }
+                return;
             }
             if(msg.Status != null)
             {
-                //GD.Print(msg.Status);
+                GD.Print(msg.Status);
                 if(msg.Status.Contains("Downloaded") || msg.Status.Contains("Image is up to date"))
                 {
                     progressBar?.Hide();
