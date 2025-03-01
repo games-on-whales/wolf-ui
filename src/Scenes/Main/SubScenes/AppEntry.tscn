@@ -1,21 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://chspw2lt1qcuc"]
+[gd_scene load_steps=4 format=3 uid="uid://chspw2lt1qcuc"]
 
 [ext_resource type="Script" path="res://Scenes/Main/SubScenes/AppEntry.cs" id="1_pyonv"]
-[ext_resource type="Resource" uid="uid://3uu0v8l30oi5" path="res://Resources/Docker/DockerController.tres" id="2_n8cfi"]
 [ext_resource type="Texture2D" uid="uid://bqo00nildd0cw" path="res://Icons/download-button-svgrepo-com.svg" id="3_4vl0r"]
 [ext_resource type="PackedScene" uid="uid://cnikdy0rfhss" path="res://Scenes/Main/SubScenes/AppMenu.tscn" id="3_goyyk"]
 
-[node name="AppEntry" type="Button" node_paths=PackedStringArray("AppButton", "AppProgress", "AppLabel", "DownloadIcon")]
+[node name="AppEntry" type="Button" node_paths=PackedStringArray("AppProgress", "AppLabel", "DownloadIcon")]
 custom_minimum_size = Vector2(180, 240)
 offset_right = 180.0
 offset_bottom = 240.0
-mouse_filter = 2
+mouse_filter = 1
 expand_icon = true
 script = ExtResource("1_pyonv")
-AppButton = NodePath(".")
 AppProgress = NodePath("LoadingMargin/Loading")
 AppLabel = NodePath("NameMargin/Name")
-docker = ExtResource("2_n8cfi")
 DownloadIcon = NodePath("LoadingMargin/PanelContainer")
 AppMenu = ExtResource("3_goyyk")
 
@@ -25,6 +22,7 @@ offset_left = 3.0
 offset_top = 3.0
 offset_right = 177.0
 offset_bottom = 237.0
+mouse_filter = 2
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 3

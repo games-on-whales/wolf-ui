@@ -7,13 +7,9 @@ namespace UI
 	public partial class AppEntry : Button
 	{
 		[Export]
-		public Button AppButton;
-		[Export]
 		ProgressBar AppProgress;
 		[Export]
 		Label AppLabel;
-		[Export]
-		DockerController docker;
 		[Export]
 		public Control DownloadIcon;
 		[Export]
@@ -24,15 +20,30 @@ namespace UI
 		public WolfApp wolfApp;
 		public bool ImageOnDisc = true;
 
+		private DockerController docker;
+
 		// Called when the node enters the scene tree for the first time.
 		public override void _Ready()
 		{
-			SetChildRefrence(this);
+			var Main = GetNode<Main>("/root/Main");
+			docker = Main.docker;
+
+			SoundEffects soundEffects = null;
+			foreach(var child in Main.GetChildren())
+			{
+				if(child is SoundEffects effects)
+					soundEffects = effects;
+			}
+			
 			SetIcon();
 			AppLabel.Text = Title;
 			DownloadIcon.Visible = false;
 			AppProgress.Hide();
 			Pressed+= OnPressed;
+
+			ChildEnteredTree += (child) => { 
+				soundEffects?.ApplySoundEffects(child); 
+			};
 		}
 
 		private void OnPressed()
@@ -55,7 +66,7 @@ namespace UI
 			if(wolfApp.Runner.Image.Contains(':'))
 			{
 				var image = wolfApp.Runner.Image.Split(":");
-				await docker.PullImage(image[0], image[1], AppProgress, AppButton);
+				await docker.PullImage(image[0], image[1], AppProgress, this);
 			}
 		}
 
@@ -84,7 +95,7 @@ namespace UI
 
 		public string GetFocusPath()
 		{
-			return AppButton.GetPath();
+			return GetPath();
 		}
 
 		// Called every frame. 'delta' is the elapsed time since the previous frame.
