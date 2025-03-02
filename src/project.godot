@@ -14,6 +14,7 @@ config/name="Wolf-UI"
 run/main_scene="res://Scenes/Main/Main.tscn"
 config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
 run/max_fps=30
+run/low_processor_mode=true
 boot_splash/show_image=false
 boot_splash/fullsize=false
 config/icon="res://Icons/icon.svg"
