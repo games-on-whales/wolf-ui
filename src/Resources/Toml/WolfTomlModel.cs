@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Godot;
 
 namespace WolfManagement.Resources
 {
@@ -58,6 +60,7 @@ namespace WolfManagement.Resources
 
     public class WolfApp
     {
+        public string Raw_Json {get;set;}
         public string Icon_png_path {get;set;}
         public bool Start_virtual_compositor {get;set;}
         public string Title {get;set;}
@@ -74,10 +77,39 @@ namespace WolfManagement.Resources
         public string Name {get;set;}
         public List<string> Ports {get;set;}
         public string Type {get;set;}
+        public string ToJson()
+        {
+            string MountsString = "";
+            foreach(var s in Mounts)
+            {
+                MountsString += $"\"{s}\", ";
+            }
+            MountsString = MountsString.Length > 0 ? MountsString.TrimSuffix(", ") : "";
+            string EnvString = "";
+            foreach(var s in Env)
+            {
+                EnvString += $"\"{s}\", ";
+            }
+            EnvString = EnvString.Length > 0 ? EnvString.TrimSuffix(", ") : "";
+            string DevicesString = "";
+            foreach(var s in Devices)
+            {
+                DevicesString += $"\"{s}\", ";
+            }
+            DevicesString = DevicesString.Length > 0 ? DevicesString.TrimSuffix(", ") : "";
+            string PortsString = "";
+            foreach(var s in Ports)
+            {
+                PortsString += $"\"{s}\", ";
+            }
+            PortsString = PortsString.Length > 0 ? PortsString.TrimSuffix(", ") : "";
+            return $@"{{ ""type"":""{Type}"", ""name"":""{Name}"", ""image"":""{Image}"", ""mounts"": [{MountsString}], ""env"": [{EnvString}], ""devices"": [{DevicesString}], ""ports"": [{PortsString}], ""base_create_json"": ""{Base_create_json.Replace("\"", "\\\"").Replace("\n", "")}""}}";
+        }
     }
 
     public class WolfClient
     {
+        public string Client_id {get;set;}
         public string App_state_folder {get;set;}
         public string Client_cert {get;set;}
         public WolfClientSettings Settings {get;set;}
