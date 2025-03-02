@@ -1,10 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=14 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Scenes/Main/SubScenes/AppEntry.tscn" id="2_rsqs3"]
 [ext_resource type="Script" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
 [ext_resource type="Resource" uid="uid://81qforug05j7" path="res://Resources/WolfAPI.tres" id="4_12uqu"]
-[ext_resource type="Resource" uid="uid://pvvtp2jl5ete" path="res://Resources/Toml/WolfConfig.tres" id="4_s4hcf"]
 [ext_resource type="Texture2D" uid="uid://crrypmci753r5" path="res://Icons/options.svg" id="4_s7oif"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
 [ext_resource type="Script" path="res://Scenes/Main/TitleBar.cs" id="6_pifck"]
@@ -26,7 +25,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xobeq")
 docker = SubResource("Resource_tl3on")
-config = ExtResource("4_s4hcf")
 wolfAPI = ExtResource("4_12uqu")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]

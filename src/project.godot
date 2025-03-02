@@ -20,9 +20,9 @@ config/icon="res://Icons/icon.svg"
 
 [display]
 
-window/size/resizable=false
 window/size/borderless=true
 window/stretch/mode="canvas_items"
+display_server/driver.linuxbsd="wayland"
 
 [dotnet]
 
