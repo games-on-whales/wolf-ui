@@ -12,11 +12,38 @@ namespace UI
 		[Export]
 		public DockerController docker;
 		[Export]
-		public WolfConfig config;
+		public WolfAPI wolfAPI;
+		public WolfClient SelectedClient = null;
 
 		// Called when the node enters the scene tree for the first time.
 		public override void _Ready()
 		{
+			SoundEffects soundEffects = null;
+			foreach(var child in GetChildren())
+			{
+				if(child is SoundEffects effects)
+					soundEffects = effects;
+			}
+
+			soundEffects.CallDeferred(SoundEffects.MethodName.ApplySoundEffects, this);
+
+			var time = new Timer();
+			time.WaitTime = 0.2;
+			time.OneShot = false;
+			time.Autostart = true;
+			time.Timeout += () => {
+				soundEffects.ApplySoundEffects(this);
+			};
+
+			AddChild(time);
+
+			var width = System.Environment.GetEnvironmentVariable("GAMESCOPE_WIDTH");
+			var height = System.Environment.GetEnvironmentVariable("GAMESCOPE_HEIGHT");
+			if(width != null && height != null)
+			{
+				GetWindow().Position = new Vector2I(0,0);
+				GetWindow().Size = new Vector2I(Int32.Parse(width), Int32.Parse(height));
+			}
 		}
-	}
+    }
 }

@@ -27,23 +27,12 @@ namespace UI
 		{
 			var Main = GetNode<Main>("/root/Main");
 			docker = Main.docker;
-
-			SoundEffects soundEffects = null;
-			foreach(var child in Main.GetChildren())
-			{
-				if(child is SoundEffects effects)
-					soundEffects = effects;
-			}
 			
 			SetIcon();
 			AppLabel.Text = Title;
 			DownloadIcon.Visible = false;
 			AppProgress.Hide();
 			Pressed+= OnPressed;
-
-			ChildEnteredTree += (child) => { 
-				soundEffects?.ApplySoundEffects(child); 
-			};
 		}
 
 		private void OnPressed()

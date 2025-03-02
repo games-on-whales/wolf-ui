@@ -11,17 +11,17 @@ public partial class AppList : Control
 	Container AppContainer;
 	[Export]
 	PackedScene AppEntryScene;
-	private WolfConfig config;
 	private DockerController docker;
+	private WolfAPI wolfAPI;
 
 	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		var Main = GetNode<Main>("/root/Main");
-		config = Main.config;
 		docker = Main.docker;
+		wolfAPI = Main.wolfAPI;
 
-		List<WolfApp> Apps = Main.config.GetApps();
+		List<WolfApp> Apps = await wolfAPI.GetApps();//Main.config.GetApps();
 
 		int i = 1;
 		foreach(var app in Apps)
@@ -32,7 +32,7 @@ public partial class AppList : Control
 				entry.Name = $"App {i}";
 				entry.Title = app.Title;
 				entry.wolfApp = app;
-				if(app.Icon_png_path != null)
+				if(app.Icon_png_path != "")
 				{
 					entry.AppImage = Image.LoadFromFile(app.Icon_png_path);
 				}

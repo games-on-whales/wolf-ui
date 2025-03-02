@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UI;
 using WolfManagement.Resources;
 
@@ -15,20 +16,23 @@ public partial class UserList : Control
 	[Export]
 	Container UserContainer;
 	private WolfConfig config;
+	private WolfAPI wolfAPI;
 
 	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		var Main = GetNode<Main>("/root/Main");
-		config = Main.config;
+		wolfAPI = Main.wolfAPI;
 
-		var UserList = config.GetUser();
+		var UserList = await wolfAPI.GetClients();
 
 		foreach(var User in UserList)
 		{
 			Button button = new(){ Text = User.App_state_folder.Left(6) };
 			button.Pressed += () => {
 				GD.Print($"Set Selected user to {button.Text}");
+				var Main = GetNode<Main>("/root/Main");
+				Main.SelectedClient = User;
 				UserMenu.Visible = false;
 				AppMenu.Visible = true;
 			};
