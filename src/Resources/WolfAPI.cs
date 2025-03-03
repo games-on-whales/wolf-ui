@@ -3,9 +3,13 @@ using Godot;
 using Godot.Collections;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WolfManagement.Resources;
 
@@ -24,6 +28,38 @@ public partial class WolfAPI : Resource
             return new NetworkStream(socket, ownsSocket: true);
         }
     });
+
+    private static bool StartedListening = false;
+    public async void StartListenToAPIEvents()
+    {
+        if(StartedListening)
+            return;
+
+        StartedListening = true;
+
+		ThreadPool.QueueUserWorkItem(new(async (Object obj)=>{
+            var stream = await _httpClient.GetStreamAsync("http://localhost/api/v1/events");
+            string eventType = "";
+            using(var reader = new StreamReader(stream))
+            {
+                while(!reader.EndOfStream)
+                {
+                    var line = await reader.ReadLineAsync();
+                    if(line == ":keepalive")
+                        continue;
+
+                    if(line.StartsWith("event:"))
+                        eventType = line.TrimPrefix("event: ");
+
+                    if(line.StartsWith("data:"))
+                    {
+                        var data = line.TrimPrefix("data: ");
+                        EmitSignal(SignalName.APIEvent, eventType, data);
+                    }
+                }
+            }
+        }));
+    }
 
     public async Task Testcall(string url)
     {
@@ -128,4 +164,7 @@ public partial class WolfAPI : Resource
 
         return apps;
     }
+
+	[Signal]
+	public delegate void APIEventEventHandler(string eventType, string data);
 }
