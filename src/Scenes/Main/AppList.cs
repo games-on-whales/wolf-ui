@@ -5,6 +5,7 @@ using System.Linq;
 using UI;
 using WolfManagement.Resources;
 
+[Tool]
 public partial class AppList : Control
 {
 	[Export]
@@ -17,6 +18,12 @@ public partial class AppList : Control
 	// Called when the node enters the scene tree for the first time.
 	public override async void _Ready()
 	{
+		if(Engine.IsEditorHint())
+		{
+			EditorMockupReady();
+			return;
+		}
+
 		var Main = GetNode<Main>("/root/Main");
 		docker = Main.docker;
 		wolfAPI = Main.wolfAPI;
@@ -50,6 +57,25 @@ public partial class AppList : Control
 		};
 	}
 
+	private void EditorMockupReady()
+	{
+		List<WolfApp> Apps = new(){};
+
+		for(int n = 0; n < 23; n++)
+		{
+			Apps.Add(new());
+		}
+
+		foreach(var app in Apps)
+		{
+			Control appEntry = AppEntryScene.Instantiate<Control>();
+			if(appEntry is AppEntry entry)
+			{
+				AppContainer.AddChild(entry);
+			}
+		}
+	}
+
 	private void AddAppEntry(AppEntry NewAppEntry)
 	{
 		if(AppContainer is GridContainer gridContainer)
@@ -78,6 +104,9 @@ public partial class AppList : Control
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public async override void _Process(double delta)
 	{
+		if(Engine.IsEditorHint())
+			return;
+
 		var Images = await docker.ListImages();
 		HashSet<string> existingImages = new();
 		foreach(var image in Images)

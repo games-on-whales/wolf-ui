@@ -3,7 +3,7 @@ using WolfManagement.Resources;
 
 namespace UI
 {
-	[GlobalClass]
+	[GlobalClass][Tool]
 	public partial class AppEntry : Button
 	{
 		[Export]
@@ -25,6 +25,11 @@ namespace UI
 		// Called when the node enters the scene tree for the first time.
 		public override void _Ready()
 		{
+			if(Engine.IsEditorHint())
+			{
+				return;
+			}
+
 			var Main = GetNode<Main>("/root/Main");
 			docker = Main.docker;
 			
