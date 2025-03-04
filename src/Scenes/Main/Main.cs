@@ -13,6 +13,8 @@ namespace UI
 		public DockerController docker;
 		[Export]
 		public WolfAPI wolfAPI;
+		[Export]
+		public ControllerMap controllerMap;
 		public WolfClient SelectedClient = null;
 
 		// Called when the node enters the scene tree for the first time.
@@ -49,7 +51,7 @@ namespace UI
 			*/
 			//DisplayServer.WindowSetMode(DisplayServer.WindowMode.ExclusiveFullscreen);
 
-			wolfAPI.StartListenToAPIEvents();
+			//wolfAPI.StartListenToAPIEvents();
 			wolfAPI.APIEvent += (e, d) => {
 				GD.Print($"{e}: {d}");
 			};

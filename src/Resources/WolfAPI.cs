@@ -57,28 +57,6 @@ public partial class WolfAPI : Resource
                 }
             }
         }));
-/*
-		ThreadPool.QueueUserWorkItem(new(async (Object obj)=>{
-            var stream = await _httpClient.GetStreamAsync("http://localhost/api/v1/events");
-            string eventType = "";
-            using var reader = new StreamReader(stream);
-            while (!reader.EndOfStream)
-            {
-                var line = await reader.ReadLineAsync();
-                if (line == ":keepalive")
-                    continue;
-
-                if (line.StartsWith("event:"))
-                    eventType = line.TrimPrefix("event: ");
-
-                if (line.StartsWith("data:"))
-                {
-                    var data = line.TrimPrefix("data: ");
-                    EmitSignal(SignalName.APIEvent, eventType, data);
-                }
-            }
-        }));
-*/
     }
 
     public async Task Testcall(string url)

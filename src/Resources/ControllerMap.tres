@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="ControllerMap" load_steps=26 format=3 uid="uid://badu7abuxt6we"]
+
+[ext_resource type="Script" uid="uid://bmervjm6ji7x3" path="res://Resources/ControllerMap.cs" id="1_7n7qm"]
+[ext_resource type="Texture2D" uid="uid://bws5jryfpf1mh" path="res://Icons/Controller/Switch/Switch_A.png" id="1_sh03k"]
+[ext_resource type="Texture2D" uid="uid://brf23fh4rtots" path="res://Icons/Controller/XBox/XboxOne_A.png" id="2_y1p6q"]
+[ext_resource type="Texture2D" uid="uid://dhwbgb23nbi8m" path="res://Icons/Controller/PS5/PS5_Cross.png" id="3_7p6gc"]
+[ext_resource type="Texture2D" uid="uid://bqmbshokjcw3n" path="res://Icons/Controller/Keyboard/Keyboard_Black_Enter.png" id="4_mcfce"]
+[ext_resource type="Texture2D" uid="uid://ck34xmo2jkl2y" path="res://Icons/Controller/Switch/Switch_B.png" id="5_hixsa"]
+[ext_resource type="Texture2D" uid="uid://co1y5gj0ryg5c" path="res://Icons/Controller/XBox/XboxOne_B.png" id="6_kh6cs"]
+[ext_resource type="Texture2D" uid="uid://chsgb316tb6rg" path="res://Icons/Controller/PS5/PS5_Circle.png" id="7_k8bs2"]
+[ext_resource type="Texture2D" uid="uid://dru6vbmje5lxu" path="res://Icons/Controller/Keyboard/Keyboard_Black_Esc.png" id="8_3gfmb"]
+[ext_resource type="Texture2D" uid="uid://cuapxjag3w5ry" path="res://Icons/Controller/Keyboard/Keyboard_Black_Arrow_Down.png" id="9_ql3hh"]
+[ext_resource type="Texture2D" uid="uid://bh1rgb356ugow" path="res://Icons/Controller/Switch/Switch_Dpad_Down.png" id="10_iw7ox"]
+[ext_resource type="Texture2D" uid="uid://bphas4aarecvl" path="res://Icons/Controller/XBox/XboxOne_Dpad_Down.png" id="11_h3k74"]
+[ext_resource type="Texture2D" uid="uid://c78b0jamiey3w" path="res://Icons/Controller/PS5/PS5_Dpad_Down.png" id="12_g2swq"]
+[ext_resource type="Texture2D" uid="uid://bs2jav8wcln6a" path="res://Icons/Controller/Keyboard/Keyboard_Black_Arrow_Left.png" id="13_m81ut"]
+[ext_resource type="Texture2D" uid="uid://gy2qpoywy0s6" path="res://Icons/Controller/Switch/Switch_Dpad_Left.png" id="14_fs77t"]
+[ext_resource type="Texture2D" uid="uid://qnptn3l77kbe" path="res://Icons/Controller/XBox/XboxOne_Dpad_Left.png" id="15_sdfyu"]
+[ext_resource type="Texture2D" uid="uid://ddo6p5vm4ok6a" path="res://Icons/Controller/PS5/PS5_Dpad_Left.png" id="16_ho1lk"]
+[ext_resource type="Texture2D" uid="uid://b2uf21j7tgoy7" path="res://Icons/Controller/Keyboard/Keyboard_Black_Arrow_Right.png" id="17_5hub4"]
+[ext_resource type="Texture2D" uid="uid://dlmbvy826ebtm" path="res://Icons/Controller/Switch/Switch_Dpad_Right.png" id="18_1ugrh"]
+[ext_resource type="Texture2D" uid="uid://b20d8050sqqbt" path="res://Icons/Controller/XBox/XboxOne_Dpad_Right.png" id="19_gs0d8"]
+[ext_resource type="Texture2D" uid="uid://dhhtlb6hyo286" path="res://Icons/Controller/PS5/PS5_Dpad_Right.png" id="20_cuugd"]
+[ext_resource type="Texture2D" uid="uid://iehe3cu45i3w" path="res://Icons/Controller/Keyboard/Keyboard_Black_Arrow_Up.png" id="21_yuur0"]
+[ext_resource type="Texture2D" uid="uid://cd62cnimkdbv6" path="res://Icons/Controller/Switch/Switch_Dpad_Up.png" id="22_77p2h"]
+[ext_resource type="Texture2D" uid="uid://ch3wkw7anokig" path="res://Icons/Controller/XBox/XboxOne_Dpad_Up.png" id="23_48vk4"]
+[ext_resource type="Texture2D" uid="uid://dwef5jxep43yc" path="res://Icons/Controller/PS5/PS5_Dpad_Up.png" id="24_qsaw5"]
+
+[resource]
+script = ExtResource("1_7n7qm")
+Accept = Dictionary[int, Texture2D]({
+0: ExtResource("1_sh03k"),
+1: ExtResource("2_y1p6q"),
+2: ExtResource("3_7p6gc"),
+3: ExtResource("4_mcfce")
+})
+Cancel = Dictionary[int, Texture2D]({
+0: ExtResource("5_hixsa"),
+1: ExtResource("6_kh6cs"),
+2: ExtResource("7_k8bs2"),
+3: ExtResource("8_3gfmb")
+})
+Up = {
+0: ExtResource("22_77p2h"),
+1: ExtResource("23_48vk4"),
+2: ExtResource("24_qsaw5"),
+3: ExtResource("21_yuur0")
+}
+Down = {
+0: ExtResource("10_iw7ox"),
+1: ExtResource("11_h3k74"),
+2: ExtResource("12_g2swq"),
+3: ExtResource("9_ql3hh")
+}
+Left = {
+0: ExtResource("14_fs77t"),
+1: ExtResource("15_sdfyu"),
+2: ExtResource("16_ho1lk"),
+3: ExtResource("13_m81ut")
+}
+Right = {
+0: ExtResource("18_1ugrh"),
+1: ExtResource("19_gs0d8"),
+2: ExtResource("20_cuugd"),
+3: ExtResource("17_5hub4")
+}
+metadata/_custom_type_script = "uid://bmervjm6ji7x3"
