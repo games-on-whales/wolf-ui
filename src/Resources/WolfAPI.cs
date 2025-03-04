@@ -37,28 +37,48 @@ public partial class WolfAPI : Resource
 
         StartedListening = true;
 
-		ThreadPool.QueueUserWorkItem(new(async (Object obj)=>{
+        await Task.Run(new(async () => { 
             var stream = await _httpClient.GetStreamAsync("http://localhost/api/v1/events");
             string eventType = "";
-            using(var reader = new StreamReader(stream))
+            using var reader = new StreamReader(stream);
+            while (!reader.EndOfStream)
             {
-                while(!reader.EndOfStream)
+                var line = await reader.ReadLineAsync();
+                if (line == ":keepalive")
+                    continue;
+
+                if (line.StartsWith("event:"))
+                    eventType = line.TrimPrefix("event: ");
+
+                if (line.StartsWith("data:"))
                 {
-                    var line = await reader.ReadLineAsync();
-                    if(line == ":keepalive")
-                        continue;
-
-                    if(line.StartsWith("event:"))
-                        eventType = line.TrimPrefix("event: ");
-
-                    if(line.StartsWith("data:"))
-                    {
-                        var data = line.TrimPrefix("data: ");
-                        EmitSignal(SignalName.APIEvent, eventType, data);
-                    }
+                    var data = line.TrimPrefix("data: ");
+                    EmitSignal(SignalName.APIEvent, eventType, data);
                 }
             }
         }));
+/*
+		ThreadPool.QueueUserWorkItem(new(async (Object obj)=>{
+            var stream = await _httpClient.GetStreamAsync("http://localhost/api/v1/events");
+            string eventType = "";
+            using var reader = new StreamReader(stream);
+            while (!reader.EndOfStream)
+            {
+                var line = await reader.ReadLineAsync();
+                if (line == ":keepalive")
+                    continue;
+
+                if (line.StartsWith("event:"))
+                    eventType = line.TrimPrefix("event: ");
+
+                if (line.StartsWith("data:"))
+                {
+                    var data = line.TrimPrefix("data: ");
+                    EmitSignal(SignalName.APIEvent, eventType, data);
+                }
+            }
+        }));
+*/
     }
 
     public async Task Testcall(string url)
@@ -103,10 +123,10 @@ public partial class WolfAPI : Resource
     {
         string runner = app.Runner.ToJson();
         string data = $@"{{
-""stop_stream_when_over"": {(stop_stream_when_over ? "true" : "false")}, 
-""session_id"": ""{session_id}"", 
-""runner"": {runner} 
-}}";
+                            ""stop_stream_when_over"": {(stop_stream_when_over ? "true" : "false")}, 
+                            ""session_id"": ""{session_id}"", 
+                            ""runner"": {runner} 
+                        }}";
         StringContent content = new(data.ToString());
         //GD.Print(data);
 
