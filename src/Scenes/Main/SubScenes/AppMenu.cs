@@ -57,10 +57,7 @@ public partial class AppMenu : CenterContainer
 			session_id = Main.SelectedClient.Client_id;
 		}
 
-		await wolfAPI.StartApp(appEntry.wolfApp, true, session_id);
-		GetTree().CreateTimer(1.0).Timeout += () => {
-			GetTree().Quit();
-		};
+		await wolfAPI.StartApp(appEntry.wolfApp, false, session_id);
 		//TODO: Request Wolf to start the Streaming app, and Close this app
 	}
 
