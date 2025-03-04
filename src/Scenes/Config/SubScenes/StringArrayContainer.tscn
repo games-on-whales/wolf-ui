@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bs8hi6b3rts25"]
 
-[ext_resource type="Script" path="res://Scenes/Config/SubScenes/StringArrayContainer.cs" id="1_os4gr"]
+[ext_resource type="Script" uid="uid://cwqtnl4es33td" path="res://Scenes/Config/SubScenes/StringArrayContainer.cs" id="1_os4gr"]
 [ext_resource type="PackedScene" uid="uid://b03w3aotoy5dd" path="res://Scenes/Config/SubScenes/StringArrayContainerEntry.tscn" id="2_5estf"]
 [ext_resource type="Texture2D" uid="uid://dchy6xo1cgewq" path="res://Icons/plus-circle.svg" id="2_r6yuq"]
 

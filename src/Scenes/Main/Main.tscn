@@ -1,16 +1,16 @@
 [gd_scene load_steps=15 format=3 uid="uid://cj111e8qqvul4"]
 
-[ext_resource type="Script" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
+[ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Scenes/Main/SubScenes/AppEntry.tscn" id="2_rsqs3"]
-[ext_resource type="Script" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
-[ext_resource type="Resource" path="res://Resources/WolfAPI.tres" id="4_12uqu"]
+[ext_resource type="Script" uid="uid://ej4uorvu6hbj" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
+[ext_resource type="Resource" uid="uid://81qforug05j7" path="res://Resources/WolfAPI.tres" id="4_12uqu"]
 [ext_resource type="Texture2D" uid="uid://crrypmci753r5" path="res://Icons/options.svg" id="4_s7oif"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
-[ext_resource type="Script" path="res://Scenes/Main/TitleBar.cs" id="6_pifck"]
-[ext_resource type="Script" path="res://Scenes/Main/UserList.cs" id="6_u8v04"]
-[ext_resource type="Script" path="res://Scenes/Main/VisibilitySwitcher.cs" id="7_axei7"]
-[ext_resource type="Script" path="res://Scenes/Main/AppList.cs" id="10_b2kb5"]
-[ext_resource type="Script" path="res://Scenes/Main/SoundEffects.cs" id="10_ykwdk"]
+[ext_resource type="Script" uid="uid://weajekwvgcv7" path="res://Scenes/Main/TitleBar.cs" id="6_pifck"]
+[ext_resource type="Script" uid="uid://cp32hsvi4wpej" path="res://Scenes/Main/UserList.cs" id="6_u8v04"]
+[ext_resource type="Script" uid="uid://bpe8wv7q6ajud" path="res://Scenes/Main/VisibilitySwitcher.cs" id="7_axei7"]
+[ext_resource type="Script" uid="uid://brs0ic67iu2en" path="res://Scenes/Main/AppList.cs" id="10_b2kb5"]
+[ext_resource type="Script" uid="uid://dcscvb3d1pva5" path="res://Scenes/Main/SoundEffects.cs" id="10_ykwdk"]
 [ext_resource type="AudioStream" uid="uid://c7e7c53qiijki" path="res://Audio/click.ogg" id="11_ecuro"]
 [ext_resource type="AudioStream" uid="uid://csnwuih5mmn5g" path="res://Audio/accept.ogg" id="11_hdjvh"]
 
@@ -161,15 +161,9 @@ size_flags_vertical = 3
 
 [node name="AppList" type="Control" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppContainer")]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -576.0
-offset_top = -292.0
-offset_right = 576.0
-offset_bottom = 292.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3

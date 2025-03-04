@@ -28,7 +28,7 @@ namespace UI
 			soundEffects.CallDeferred(SoundEffects.MethodName.ApplySoundEffects, this);
 
 			var time = new Timer();
-			time.WaitTime = 0.2;
+			time.WaitTime = 0.1;
 			time.OneShot = false;
 			time.Autostart = true;
 			time.Timeout += () => {
@@ -37,6 +37,8 @@ namespace UI
 
 			AddChild(time);
 
+
+			/*
 			var width = System.Environment.GetEnvironmentVariable("GAMESCOPE_WIDTH");
 			var height = System.Environment.GetEnvironmentVariable("GAMESCOPE_HEIGHT");
 			if(width != null && height != null)
@@ -44,6 +46,13 @@ namespace UI
 				GetWindow().Position = new Vector2I(0,0);
 				GetWindow().Size = new Vector2I(Int32.Parse(width), Int32.Parse(height));
 			}
+			*/
+			//DisplayServer.WindowSetMode(DisplayServer.WindowMode.ExclusiveFullscreen);
+
+			wolfAPI.StartListenToAPIEvents();
+			wolfAPI.APIEvent += (e, d) => {
+				GD.Print($"{e}: {d}");
+			};
 		}
     }
 }

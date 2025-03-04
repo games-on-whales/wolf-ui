@@ -1,33 +1,39 @@
 [gd_scene load_steps=4 format=3 uid="uid://chspw2lt1qcuc"]
 
-[ext_resource type="Script" path="res://Scenes/Main/SubScenes/AppEntry.cs" id="1_pyonv"]
+[ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/SubScenes/AppEntry.cs" id="1_pyonv"]
 [ext_resource type="Texture2D" uid="uid://bqo00nildd0cw" path="res://Icons/download-button-svgrepo-com.svg" id="3_4vl0r"]
 [ext_resource type="PackedScene" uid="uid://cnikdy0rfhss" path="res://Scenes/Main/SubScenes/AppMenu.tscn" id="3_goyyk"]
 
 [node name="AppEntry" type="Button" node_paths=PackedStringArray("AppProgress", "AppLabel", "DownloadIcon")]
-custom_minimum_size = Vector2(180, 240)
+custom_minimum_size = Vector2(200, 260)
 offset_right = 180.0
 offset_bottom = 240.0
 mouse_filter = 1
 expand_icon = true
 script = ExtResource("1_pyonv")
 AppProgress = NodePath("LoadingMargin/Loading")
-AppLabel = NodePath("NameMargin/Name")
+AppLabel = NodePath("NameMargin/PanelContainer/Name")
 DownloadIcon = NodePath("LoadingMargin/PanelContainer")
 AppMenu = ExtResource("3_goyyk")
 
 [node name="NameMargin" type="MarginContainer" parent="."]
-layout_mode = 2
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 177.0
-offset_bottom = 237.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 3
 
-[node name="Name" type="Label" parent="NameMargin"]
+[node name="PanelContainer" type="PanelContainer" parent="NameMargin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="Name" type="Label" parent="NameMargin/PanelContainer"]
 z_index = 1
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
@@ -37,11 +43,12 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="LoadingMargin" type="MarginContainer" parent="."]
-layout_mode = 2
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 177.0
-offset_bottom = 237.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10

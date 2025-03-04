@@ -10,6 +10,11 @@ public partial class VisibilitySwitcher : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		CallDeferred(MethodName.DeferredReady);
+	}
+
+	private void DeferredReady()
+	{
 		var children = GetChildren();
 		foreach(var child in children)
 		{

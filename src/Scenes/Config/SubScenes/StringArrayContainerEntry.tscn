@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b03w3aotoy5dd"]
 
-[ext_resource type="Script" path="res://Scenes/Config/SubScenes/StringArrayContainerEntry.cs" id="1_746di"]
+[ext_resource type="Script" uid="uid://diownccpd8l5y" path="res://Scenes/Config/SubScenes/StringArrayContainerEntry.cs" id="1_746di"]
 [ext_resource type="Texture2D" uid="uid://yj3etmvjfwcb" path="res://Icons/delete-1487-svgrepo-com.svg" id="2_vy5qk"]
 
 [node name="StringArrayContainerEntry" type="MarginContainer" node_paths=PackedStringArray("Entry", "DeleteEntry")]
