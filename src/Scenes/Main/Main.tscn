@@ -90,6 +90,7 @@ grow_vertical = 2
 script = ExtResource("7_axei7")
 
 [node name="UserList" type="Control" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu", "UserMenu", "AppGrid", "UserContainer")]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -162,7 +163,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="AppList" type="Control" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppContainer")]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

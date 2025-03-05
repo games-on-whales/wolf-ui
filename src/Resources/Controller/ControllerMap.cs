@@ -25,8 +25,6 @@ public partial class ControllerMap : Resource
     public ControllerMap()
     {
         Input.JoyConnectionChanged += JoyConnectionChanged;
-        
-
     }
     private void JoyConnectionChanged(long deviceID, bool connected)
     {
@@ -45,13 +43,15 @@ public partial class ControllerMap : Resource
 
         if(connected)
         {
+            GD.Print(Input.GetJoyName((int)deviceID));
             controller = Input.GetJoyName((int)deviceID) switch
             {
                 "Xbox 360 Controller" => ControllerType.XBox,
-                "Wolf Nintendo (virtual) pad" => ControllerType.Switch,
                 "Wolf X-Box One (virtual) pad" => ControllerType.XBox,
                 "Wolf DualSense (virtual) pad" => ControllerType.PS,
-                _ => ControllerType.None,
+                "Wolf Nintendo (virtual) pad" => ControllerType.Switch,
+                "Nintendo Switch Pro Controller" => ControllerType.Switch,
+                _ => ControllerType.XBox,
             };
         }
         if(!connected)
@@ -80,6 +80,23 @@ public partial class ControllerMap : Resource
             // Should never be callable but VSCode wont be fine without it
             _ => new(),
         };
+    }
+
+    public void SetController(InputEvent @event)
+    {
+        var oldController = controller;
+        if(@event is InputEventMouseMotion || @event is InputEventMouseButton || @event is InputEventKey)
+        {
+            controller = ControllerType.None;
+        }
+        if(@event is InputEventJoypadButton || @event is InputEventJoypadMotion)
+        {
+            var ConnectedController = Input.GetConnectedJoypads();
+            JoyConnectionChanged(ConnectedController[@event.Device], true);
+            return;
+        }
+        if(controller != oldController)
+            EmitSignal(SignalName.IconSetChanged);
     }
 
     [Signal]

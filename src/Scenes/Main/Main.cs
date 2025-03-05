@@ -56,5 +56,10 @@ namespace UI
 				GD.Print($"{e}: {d}");
 			};
 		}
+
+		public override void _Input(InputEvent @event)
+		{
+			controllerMap.SetController(@event);
+		}
     }
 }
