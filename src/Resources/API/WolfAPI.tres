@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="WolfAPI" load_steps=2 format=3 uid="uid://81qforug05j7"]
 
-[ext_resource type="Script" uid="uid://c7lps6tkbgqar" path="res://Resources/WolfAPI.cs" id="1_n1x3r"]
+[ext_resource type="Script" uid="uid://c7lps6tkbgqar" path="res://Resources/API/WolfAPI.cs" id="1_n1x3r"]
 
 [resource]
 script = ExtResource("1_n1x3r")

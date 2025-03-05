@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://pf7fsvqc5xqr" path="res://Scenes/Main/SubScenes/AppMenu.cs" id="1_3wvk8"]
 
-[node name="AppMenu" type="CenterContainer" node_paths=PackedStringArray("StartButton", "UpdateButton", "CancelButton")]
+[node name="AppMenu" type="CenterContainer" node_paths=PackedStringArray("StartButton", "CoopButton", "UpdateButton", "CancelButton")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -12,6 +12,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_3wvk8")
 StartButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonStart")
+CoopButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonCoop")
 UpdateButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonUpdate")
 CancelButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ButtonCancle")
 
@@ -33,21 +34,25 @@ size_flags_vertical = 4
 [node name="ButtonStart" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../ButtonCancle")
-focus_neighbor_bottom = NodePath("../ButtonUpdate")
+focus_neighbor_bottom = NodePath("../ButtonCoop")
 focus_next = NodePath("../ButtonUpdate")
 focus_previous = NodePath("../ButtonCancle")
 text = "Start"
 
-[node name="Button" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="ButtonCoop" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_neighbor_top = NodePath("../ButtonStart")
+focus_neighbor_bottom = NodePath("../ButtonUpdate")
+focus_next = NodePath("../ButtonUpdate")
+focus_previous = NodePath("../ButtonStart")
 text = "Start Co-op"
 
 [node name="ButtonUpdate" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-focus_neighbor_top = NodePath("../ButtonStart")
+focus_neighbor_top = NodePath("../ButtonCoop")
 focus_neighbor_bottom = NodePath("../ButtonCancle")
 focus_next = NodePath("../ButtonCancle")
-focus_previous = NodePath("../ButtonStart")
+focus_previous = NodePath("../ButtonCoop")
 text = "Check for Update"
 
 [node name="ButtonCancle" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]

@@ -17,7 +17,6 @@ public partial class UserList : Control
 	Control AppGrid;
 	[Export]
 	Container UserContainer;
-	private WolfConfig config;
 	private WolfAPI wolfAPI;
 
 	// Called when the node enters the scene tree for the first time.

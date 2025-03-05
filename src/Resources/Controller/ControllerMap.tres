@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ControllerMap" load_steps=26 format=3 uid="uid://badu7abuxt6we"]
 
-[ext_resource type="Script" uid="uid://bmervjm6ji7x3" path="res://Resources/ControllerMap.cs" id="1_7n7qm"]
+[ext_resource type="Script" uid="uid://bmervjm6ji7x3" path="res://Resources/Controller/ControllerMap.cs" id="1_7n7qm"]
 [ext_resource type="Texture2D" uid="uid://bws5jryfpf1mh" path="res://Icons/Controller/Switch/Switch_A.png" id="1_sh03k"]
 [ext_resource type="Texture2D" uid="uid://brf23fh4rtots" path="res://Icons/Controller/XBox/XboxOne_A.png" id="2_y1p6q"]
 [ext_resource type="Texture2D" uid="uid://dhwbgb23nbi8m" path="res://Icons/Controller/PS5/PS5_Cross.png" id="3_7p6gc"]

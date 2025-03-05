@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Scenes/Main/SubScenes/AppEntry.tscn" id="2_rsqs3"]
 [ext_resource type="Script" uid="uid://ej4uorvu6hbj" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
-[ext_resource type="Resource" uid="uid://81qforug05j7" path="res://Resources/WolfAPI.tres" id="4_12uqu"]
-[ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/ControllerMap.tres" id="4_hkvnm"]
+[ext_resource type="Resource" uid="uid://81qforug05j7" path="res://Resources/API/WolfAPI.tres" id="4_12uqu"]
+[ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
 [ext_resource type="Texture2D" uid="uid://crrypmci753r5" path="res://Icons/options.svg" id="4_s7oif"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
 [ext_resource type="Script" uid="uid://weajekwvgcv7" path="res://Scenes/Main/TitleBar.cs" id="6_pifck"]
@@ -41,21 +41,25 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TitleBar" type="MarginContainer" parent="VBoxContainer" node_paths=PackedStringArray("ExitButton", "UserButton")]
+[node name="Header" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 15
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Header" node_paths=PackedStringArray("ExitButton", "UserButton")]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 3
 script = ExtResource("6_pifck")
 ExitButton = NodePath("HBoxContainer/ExitButton")
 UserButton = NodePath("HBoxContainer/OptionsButton")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TitleBar"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Header/MarginContainer"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="OptionsButton" type="Button" parent="VBoxContainer/TitleBar/HBoxContainer"]
+[node name="OptionsButton" type="Button" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 focus_neighbor_right = NodePath("../ExitButton")
@@ -63,13 +67,13 @@ icon = ExtResource("4_s7oif")
 vertical_icon_alignment = 0
 expand_icon = true
 
-[node name="ExitButton" type="Button" parent="VBoxContainer/TitleBar/HBoxContainer"]
-custom_minimum_size = Vector2(50, 50)
+[node name="ExitButton" type="Button" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 32)
 layout_mode = 2
 size_flags_horizontal = 10
 focus_neighbor_left = NodePath("../OptionsButton")
 icon = ExtResource("5_tqvkx")
-vertical_icon_alignment = 0
+icon_alignment = 1
 expand_icon = true
 
 [node name="Menus" type="Control" parent="VBoxContainer"]
@@ -187,44 +191,51 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 columns = 6
 
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+[node name="Footer" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="ControllCaption" type="MarginContainer" parent="VBoxContainer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Footer"]
 layout_mode = 2
 theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer/ControllCaption"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Footer/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/ControllCaption/HBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/Footer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "Confirm"
 
-[node name="AcceptIcon" type="TextureRect" parent="VBoxContainer/PanelContainer/ControllCaption/HBoxContainer"]
-custom_minimum_size = Vector2(15, 32)
+[node name="AcceptIcon" type="TextureRect" parent="VBoxContainer/Footer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 4
 size_flags_vertical = 4
 texture = ExtResource("12_epx8f")
-expand_mode = 2
+expand_mode = 3
+stretch_mode = 6
 script = ExtResource("13_epx8f")
 controllerMap = ExtResource("4_hkvnm")
 
-[node name="Label2" type="Label" parent="VBoxContainer/PanelContainer/ControllCaption/HBoxContainer"]
+[node name="Spacer" type="Control" parent="VBoxContainer/Footer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(5, 0)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/Footer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "Cancel"
 
-[node name="Cancel" type="TextureRect" parent="VBoxContainer/PanelContainer/ControllCaption/HBoxContainer"]
+[node name="Cancel" type="TextureRect" parent="VBoxContainer/Footer/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
 texture = ExtResource("14_hcu3t")
-expand_mode = 2
+expand_mode = 3
+stretch_mode = 6
 script = ExtResource("13_epx8f")
 controllerMap = ExtResource("4_hkvnm")
 buttonIcon = 1

@@ -25,6 +25,8 @@ public partial class ControllerMap : Resource
     public ControllerMap()
     {
         Input.JoyConnectionChanged += JoyConnectionChanged;
+        
+
     }
     private void JoyConnectionChanged(long deviceID, bool connected)
     {

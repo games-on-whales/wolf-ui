@@ -6,6 +6,8 @@ public partial class AppMenu : CenterContainer
 	[Export]
 	Button StartButton;
 	[Export]
+	Button CoopButton;
+	[Export]
 	Button UpdateButton;
 	[Export]
 	Button CancelButton;
@@ -23,7 +25,6 @@ public partial class AppMenu : CenterContainer
 		{
 			appEntry = app;
 		}
-
 
 		StartButton.Pressed += OnStartPressed;
 		UpdateButton.Pressed += OnUpdatePressed;
@@ -58,13 +59,12 @@ public partial class AppMenu : CenterContainer
 		}
 
 		await wolfAPI.StartApp(appEntry.wolfApp, false, session_id);
-		//TODO: Request Wolf to start the Streaming app, and Close this app
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if(!StartButton.HasFocus() && !UpdateButton.HasFocus() && !CancelButton.HasFocus())
+		if(!StartButton.HasFocus() && !UpdateButton.HasFocus() && !CancelButton.HasFocus() && !CoopButton.HasFocus())
 			QueueFree();
 		if(Input.IsActionPressed("ui_cancel"))
 		{

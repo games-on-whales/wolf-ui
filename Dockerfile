@@ -35,7 +35,6 @@ RUN <<_INSTALL_PACKAGES
 
 mkdir ./bin
 dotnet add package Docker.DotNet
-dotnet add package Tomlyn
 dotnet build
 
 mkdir build
