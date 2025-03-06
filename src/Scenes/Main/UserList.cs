@@ -1,4 +1,5 @@
 using Godot;
+using Resources.WolfAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,11 +32,11 @@ public partial class UserList : Control
 		var Main = GetNode<Main>("/root/Main");
 		wolfAPI = Main.wolfAPI;
 
-		var UserList = await wolfAPI.GetClients();
+		var UserList = await WolfAPI.GetClients();
 
 		foreach(var User in UserList)
 		{
-			Button button = new(){ Text = User.App_state_folder.Left(6) };
+			Button button = new(){ Text = User.app_state_folder.Left(6) };
 			button.Pressed += () => {
 				GD.Print($"Set Selected user to {button.Text}");
 				var Main = GetNode<Main>("/root/Main");
@@ -56,20 +57,20 @@ public partial class UserList : Control
 
 	private void EditorMockupReady()
 	{
-		List<WolfClient> UserList = new(){
-			new(){ App_state_folder = "One" },
-			new(){ App_state_folder = "Two" },
-			new(){ App_state_folder = "Three" },
-			new(){ App_state_folder = "Four" },
-			new(){ App_state_folder = "Five" },
-			new(){ App_state_folder = "Six" },
-			new(){ App_state_folder = "Seven" },
-			new(){ App_state_folder = "Eight" },
-			new(){ App_state_folder = "Nine" }
+		List<Client> UserList = new(){
+			new(){ app_state_folder = "One" },
+			new(){ app_state_folder = "Two" },
+			new(){ app_state_folder = "Three" },
+			new(){ app_state_folder = "Four" },
+			new(){ app_state_folder = "Five" },
+			new(){ app_state_folder = "Six" },
+			new(){ app_state_folder = "Seven" },
+			new(){ app_state_folder = "Eight" },
+			new(){ app_state_folder = "Nine" }
 		};
 		foreach(var User in UserList)
 		{
-			Button button = new(){ Text = User.App_state_folder.Left(6) };
+			Button button = new(){ Text = User.app_state_folder.Left(6) };
 			UserContainer.AddChild(button);
 		}
 	}

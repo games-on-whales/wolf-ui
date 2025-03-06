@@ -1,4 +1,5 @@
 using Godot;
+using Resources.WolfAPI;
 using WolfManagement.Resources;
 
 namespace UI
@@ -15,12 +16,19 @@ namespace UI
 		[Export]
 		PackedScene AppMenu;
 
-		public Image AppImage;
-		public string Title;
-		public WolfApp wolfApp;
+		private App App;
+		public string Title { get{ return App.title; } }
+		private string AppDisplayImagePath { get{ return App.icon_png_path ?? ""; } }
+		public AppRunner runner { get{ return App.runner; } }
+
 		public bool ImageOnDisc = true;
 
 		private DockerController docker;
+
+		public void Init(App app)
+		{
+			App = app;
+		}
 
 		// Called when the node enters the scene tree for the first time.
 		public override void _Ready()
@@ -57,9 +65,9 @@ namespace UI
 
 		public async void PullImage()
 		{
-			if(wolfApp.Runner.Image.Contains(':'))
+			if(App.runner.image.Contains(':'))
 			{
-				var image = wolfApp.Runner.Image.Split(":");
+				var image = App.runner.image.Split(":");
 				await docker.PullImage(image[0], image[1], AppProgress, this);
 			}
 		}
@@ -80,21 +88,17 @@ namespace UI
 
 		public void SetIcon()
 		{
-			if(AppImage != null)
-			{
-				var texture = ImageTexture.CreateFromImage(AppImage);
-				Icon = texture;
-			}
+			if(AppDisplayImagePath == "")
+				return;
+			
+			var image = Image.LoadFromFile(AppDisplayImagePath);
+			var texture = ImageTexture.CreateFromImage(image);
+			Icon = texture;
 		}
 
 		public string GetFocusPath()
 		{
 			return GetPath();
-		}
-
-		// Called every frame. 'delta' is the elapsed time since the previous frame.
-		public override void _Process(double delta)
-		{
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using Godot;
+using Resources.WolfAPI;
 using UI;
 
 public partial class AppMenu : CenterContainer
@@ -27,6 +28,7 @@ public partial class AppMenu : CenterContainer
 		}
 
 		StartButton.Pressed += OnStartPressed;
+		CoopButton.Pressed += OnCoopPressed;
 		UpdateButton.Pressed += OnUpdatePressed;
 		CancelButton.Pressed += OnCancelPressed;
 		StartButton.GrabFocus();
@@ -47,18 +49,12 @@ public partial class AppMenu : CenterContainer
 
 	private async void OnStartPressed()
 	{
-		var img = appEntry.wolfApp.Runner.Image;
-		var Main = GetNode<Main>("/root/Main");
+		await WolfAPI.StartApp(appEntry.runner);
+	}
 
-		var session_id = System.Environment.GetEnvironmentVariable("WOLF_SESSION_ID");
-		if(session_id == null)
-		{
-			GD.Print("session_id not found!");
-			//return;
-			session_id = Main.SelectedClient.Client_id;
-		}
-
-		await wolfAPI.StartApp(appEntry.wolfApp, false, session_id);
+	private async void OnCoopPressed()
+	{
+		await WolfAPI.StartApp(appEntry.runner);//TODO: Add a flag for Joinable marked Games!
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

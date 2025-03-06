@@ -1,8 +1,6 @@
 using Godot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using WolfManagement.Resources;
+using Resources.WolfAPI;
 
 namespace UI
 {
@@ -15,7 +13,7 @@ namespace UI
 		public WolfAPI wolfAPI;
 		[Export]
 		public ControllerMap controllerMap;
-		public WolfClient SelectedClient = null;
+		public Client SelectedClient = null;
 
 		// Called when the node enters the scene tree for the first time.
 		public override void _Ready()
@@ -51,10 +49,14 @@ namespace UI
 			*/
 			//DisplayServer.WindowSetMode(DisplayServer.WindowMode.ExclusiveFullscreen);
 
-			//wolfAPI.StartListenToAPIEvents();
-			wolfAPI.APIEvent += (e, d) => {
-				GD.Print($"{e}: {d}");
+			wolfAPI.StartListenToAPIEvents();
+
+			wolfAPI.StreamSession += (d) =>
+			{
+				GD.Print(d);
 			};
+
+
 		}
 
 		public override void _Input(InputEvent @event)

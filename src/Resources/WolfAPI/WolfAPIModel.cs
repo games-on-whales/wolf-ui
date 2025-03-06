@@ -3,30 +3,30 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Godot;
 
-namespace WolfManagement.Resources
+namespace Resources.WolfAPI
 {
-    public class WolfStarter
+    public class Starter
     {
         public bool stop_stream_when_over {get;set;}
         public string session_id {get;set;}
-        public WolfAppRunner runner {get;set;}
+        public AppRunner runner {get;set;}
     }
 
-    public class WolfApps
+    public class Apps
     {
         public bool success {get;set;}
-        public List<WolfApp> apps {get;set;}
+        public List<App> apps {get;set;}
     }
 
-    public class WolfApp
+    public class App
     {
         public string icon_png_path {get;set;}
         public bool start_virtual_compositor {get;set;}
         public string title {get;set;}
-        public WolfAppRunner runner {get;set;}
+        public AppRunner runner {get;set;}
     }
 
-    public class WolfAppRunner
+    public class AppRunner
     {
         public string type {get;set;}
 
@@ -58,21 +58,21 @@ namespace WolfManagement.Resources
         public string run_cmd {get;set;}
     }
 
-    public class WolfClients
+    public class Clients
     {
         public bool success {get;set;}
-        public List<WolfClient> clients {get;set;}
+        public List<Client> clients {get;set;}
     }
 
-    public class WolfClient
+    public class Client
     {
         public string client_id {get;set;}
         public string app_state_folder {get;set;}
         public string client_cert {get;set;}
-        public WolfClientSettings settings {get;set;}
+        public ClientSettings settings {get;set;}
     }
 
-    public class WolfClientSettings
+    public class ClientSettings
     {
         public List<string> controllers_override {get;set;}
         public float h_scroll_acceleration {get;set;}

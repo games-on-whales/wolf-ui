@@ -1,19 +1,14 @@
 
 using Godot;
-using Godot.Collections;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
-using System.Text;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using WolfManagement.Resources;
 
+namespace Resources.WolfAPI
+{
 [GlobalClass]
 public partial class WolfAPI : Resource
 {
@@ -41,6 +36,33 @@ public partial class WolfAPI : Resource
 			GD.Print("session_id not found!");
             session_id = "123456789";
 		}
+
+        APIEvent += FilterAPIEvents;
+    }
+
+    [Signal]
+    public delegate void StreamSessionEventHandler(string data);
+    [Signal]
+    public delegate void StartRunnerEventHandler(string data);
+    [Signal]
+    public delegate void VideoSessionEventHandler(string data);
+    [Signal]
+    public delegate void StopStreamEventEventHandler(string data);
+
+    private void FilterAPIEvents(string @event, string data)
+    {
+        var error = @event switch
+        {
+            "wolf::core::events::StartRunner" => EmitSignal(SignalName.StartRunner, data),
+            "wolf::core::events::StreamSession" => EmitSignal(SignalName.StreamSession, data),
+            "wolf::core::events::StopStreamEvent" => EmitSignal(SignalName.StopStreamEvent, data),
+            "wolf::core::events::VideoSession" => EmitSignal(SignalName.VideoSession, data),
+            _ => Error.Unconfigured,
+        };
+        if(error == Error.Unconfigured)
+        {
+            //GD.Print(@event);
+        }
     }
 
     public async void StartListenToAPIEvents()
@@ -71,34 +93,33 @@ public partial class WolfAPI : Resource
             }
         }));
     }
-    public static async Task<List<WolfApp>> GetApps()
+    public static async Task<List<App>> GetApps()
     {
         var result = await _httpClient.GetStringAsync("http://localhost/api/v1/apps");
 
-        WolfApps wolfApps = JsonSerializer.Deserialize<WolfApps>(result);
-        GD.Print(wolfApps);
+        Apps wolfApps = JsonSerializer.Deserialize<Apps>(result);
         if(wolfApps?.success == true)
             return wolfApps.apps;
         return [];
     }
-    public static async Task<List<WolfClient>> GetClients()
+    public static async Task<List<Client>> GetClients()
     {
         var result = await _httpClient.GetStringAsync("http://localhost/api/v1/clients");
-        WolfClients wolfClients = JsonSerializer.Deserialize<WolfClients>(result);
+        Clients wolfClients = JsonSerializer.Deserialize<Clients>(result);
         if(wolfClients?.success == true)
             return wolfClients.clients;
         return [];
     }
 
-    public static async Task StartApp(WolfAppRunner runner, bool joinable = false)
+    public static async Task StartApp(AppRunner runner, bool joinable = false)
     {
-        var starter = new WolfStarter()
+        var starter = new Starter()
         {
             stop_stream_when_over = false,
             session_id = session_id,
             runner = runner
         };
-        string data = JsonSerializer.Serialize<WolfStarter>(starter);
+        string data = JsonSerializer.Serialize<Starter>(starter);
         StringContent content = new(data);
         var result = await _httpClient.PostAsync("http://localhost/api/v1/runners/start", content);
         GD.Print(await result.Content.ReadAsStringAsync());
@@ -106,7 +127,7 @@ public partial class WolfAPI : Resource
 
     public static async Task JoinCoopSession(string parent_session_id)
     {
-        var starter = new WolfStarter()
+        var starter = new Starter()
         {
             stop_stream_when_over = false,
             session_id = session_id,
@@ -116,12 +137,13 @@ public partial class WolfAPI : Resource
             }
         };
 
-        string data = JsonSerializer.Serialize<WolfStarter>(starter);
+        string data = JsonSerializer.Serialize<Starter>(starter);
         StringContent content = new(data);
         var result = await _httpClient.PostAsync("http://localhost/api/v1/runners/start", content);
         GD.Print(await result.Content.ReadAsStringAsync());
     }
 
 	[Signal]
-	public delegate void APIEventEventHandler(string eventType, string data);
+	private delegate void APIEventEventHandler(string eventType, string data);
+}
 }

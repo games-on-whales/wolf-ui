@@ -1,4 +1,5 @@
 using Godot;
+using Resources.WolfAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ public partial class AppList : Control
 		docker = Main.docker;
 		wolfAPI = Main.wolfAPI;
 
-		List<WolfApp> Apps = await wolfAPI.GetApps();//Main.config.GetApps();
+		List<App> Apps = await WolfAPI.GetApps();//Main.config.GetApps();
 
 		int i = 1;
 		foreach(var app in Apps)
@@ -36,13 +37,8 @@ public partial class AppList : Control
 			Control appEntry = AppEntryScene.Instantiate<Control>();
 			if(appEntry is AppEntry entry)
 			{
+				entry.Init(app);
 				entry.Name = $"App {i}";
-				entry.Title = app.Title;
-				entry.wolfApp = app;
-				if(app.Icon_png_path != "")
-				{
-					entry.AppImage = Image.LoadFromFile(app.Icon_png_path);
-				}
 				AddAppEntry(entry);
 				i++;
 			}
@@ -59,14 +55,7 @@ public partial class AppList : Control
 
 	private void EditorMockupReady()
 	{
-		List<WolfApp> Apps = new(){};
-
 		for(int n = 0; n < 23; n++)
-		{
-			Apps.Add(new());
-		}
-
-		foreach(var app in Apps)
 		{
 			Control appEntry = AppEntryScene.Instantiate<Control>();
 			if(appEntry is AppEntry entry)
@@ -121,7 +110,7 @@ public partial class AppList : Control
 		{
 			if(child is AppEntry app)
 			{
-				string imagename = app.wolfApp.Runner.Image;
+				string imagename = app.runner.image;
 				if(!imagename.Contains(':'))
 					imagename = $"{imagename}:latest";
 				if(existingImages.Contains(imagename))
