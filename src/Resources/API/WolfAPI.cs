@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using WolfManagement.Resources;
@@ -29,7 +30,19 @@ public partial class WolfAPI : Resource
         }
     });
 
+    private static string session_id = "";
     private static bool StartedListening = false;
+
+    public WolfAPI()
+    {
+        session_id = System.Environment.GetEnvironmentVariable("WOLF_SESSION_ID");
+		if(session_id == null)
+		{
+			GD.Print("session_id not found!");
+            session_id = "123456789";
+		}
+    }
+
     public async void StartListenToAPIEvents()
     {
         if(StartedListening)
@@ -58,109 +71,55 @@ public partial class WolfAPI : Resource
             }
         }));
     }
-
-    public async Task Testcall(string url)
+    public static async Task<List<WolfApp>> GetApps()
     {
-        var result = await _httpClient.GetStringAsync(url);
-        GD.Print(result);
-    }
+        var result = await _httpClient.GetStringAsync("http://localhost/api/v1/apps");
 
-    public async Task<List<WolfClient>> GetClients()
+        WolfApps wolfApps = JsonSerializer.Deserialize<WolfApps>(result);
+        GD.Print(wolfApps);
+        if(wolfApps?.success == true)
+            return wolfApps.apps;
+        return [];
+    }
+    public static async Task<List<WolfClient>> GetClients()
     {
         var result = await _httpClient.GetStringAsync("http://localhost/api/v1/clients");
-        var json = (Dictionary)Json.ParseString(result);
-        
-        if(!(bool)json["success"])
-            return new();
-
-        List<WolfClient> clients = new();
-        foreach(Dictionary json_client in (Godot.Collections.Array<Dictionary>)json["clients"])
-        {
-            WolfClient c =new(){
-                Client_id = (string)json_client["client_id"],
-                App_state_folder = (string)json_client["app_state_folder"],
-                Settings = new(){
-                    Controllers_override = new(),//(Array<string>)((Dictionary)json_client["settings"])["run_uid"],
-                    Run_uid = (int)((Dictionary)json_client["settings"])["run_uid"],
-                    Run_gid = (int)((Dictionary)json_client["settings"])["run_gid"],
-                    Mouse_acceleration = (float)((Dictionary)json_client["settings"])["mouse_acceleration"],
-                    V_scroll_acceleration = (float)((Dictionary)json_client["settings"])["v_scroll_acceleration"],
-                    H_scroll_acceleration = (float)((Dictionary)json_client["settings"])["h_scroll_acceleration"]
-                }
-            };
-            foreach(string controller in (Array<string>)((Dictionary)json_client["settings"])["controllers_override"])
-            {
-                c.Settings.Controllers_override.Add(controller);
-            }
-            clients.Add(c);
-        }
-        return clients;
+        WolfClients wolfClients = JsonSerializer.Deserialize<WolfClients>(result);
+        if(wolfClients?.success == true)
+            return wolfClients.clients;
+        return [];
     }
 
-    public async Task StartApp(WolfApp app, bool stop_stream_when_over, string session_id)
+    public static async Task StartApp(WolfAppRunner runner, bool joinable = false)
     {
-        string runner = app.Runner.ToJson();
-        string data = $@"{{
-                            ""stop_stream_when_over"": {(stop_stream_when_over ? "true" : "false")}, 
-                            ""session_id"": ""{session_id}"", 
-                            ""runner"": {runner} 
-                        }}";
-        StringContent content = new(data.ToString());
-        //GD.Print(data);
-
+        var starter = new WolfStarter()
+        {
+            stop_stream_when_over = false,
+            session_id = session_id,
+            runner = runner
+        };
+        string data = JsonSerializer.Serialize<WolfStarter>(starter);
+        StringContent content = new(data);
         var result = await _httpClient.PostAsync("http://localhost/api/v1/runners/start", content);
-        GD.Print();
-        GD.Print(result.StatusCode);
         GD.Print(await result.Content.ReadAsStringAsync());
     }
 
-    public async Task<List<WolfApp>> GetApps()
+    public static async Task JoinCoopSession(string parent_session_id)
     {
-        var result = await _httpClient.GetStringAsync("http://localhost/api/v1/apps");
-        //GD.Print(result);
-        var json = (Dictionary)Json.ParseString(result);
-
-        if(!(bool)json["success"])
-            return new();
-
-        List<WolfApp> apps = new();
-        foreach(Dictionary json_app in (Godot.Collections.Array<Dictionary>)json["apps"])
+        var starter = new WolfStarter()
         {
-            var app = new WolfApp(){
-                Icon_png_path = (string)json_app.GetValueOrDefault("icon_png_path", ""),
-                Title = (string)json_app["title"],
-                Runner = new(){
-                    Type = (string)((Dictionary)json_app["runner"])["type"],
-                    Name = (string)((Dictionary)json_app["runner"])["name"],
-                    Image= (string)((Dictionary)json_app["runner"])["image"],
-                    Base_create_json=(string)((Dictionary)json_app["runner"])["base_create_json"],
-                    Devices = new(),
-                    Env = new(),
-                    Mounts = new(),
-                    Ports = new()
-                }
-            };
-            foreach(string device in (Array<string>)((Dictionary)json_app["runner"])["devices"])
-            {
-                app.Runner.Devices.Add(device);
+            stop_stream_when_over = false,
+            session_id = session_id,
+            runner = new(){
+                type = "child_session",
+                parent_session_id = parent_session_id
             }
-            foreach(string env in (Array<string>)((Dictionary)json_app["runner"])["env"])
-            {
-                app.Runner.Env.Add(env);
-            }
-            foreach(string mount in (Array<string>)((Dictionary)json_app["runner"])["mounts"])
-            {
-                app.Runner.Mounts.Add(mount);
-            }
-            foreach(string port in (Array<string>)((Dictionary)json_app["runner"])["ports"])
-            {
-                app.Runner.Ports.Add(port);
-            }
+        };
 
-            apps.Add(app);
-        }
-
-        return apps;
+        string data = JsonSerializer.Serialize<WolfStarter>(starter);
+        StringContent content = new(data);
+        var result = await _httpClient.PostAsync("http://localhost/api/v1/runners/start", content);
+        GD.Print(await result.Content.ReadAsStringAsync());
     }
 
 	[Signal]
