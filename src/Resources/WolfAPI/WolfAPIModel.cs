@@ -81,4 +81,21 @@ namespace Resources.WolfAPI
         public int run_uid {get;set;}
         public float v_scroll_acceleration {get;set;}
     }
+
+    public class Profiles
+    {
+        public bool success {get;set;}
+        public List<Profile> profiles {get;set;}
+    }
+
+    public class Profile
+    {
+        public string id {get;set;}
+        public string name {get;set;}
+        
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string icon_png_path {get;set;}
+        public List<App> apps {get;set;}
+    }
+
 }

@@ -33,14 +33,15 @@ public partial class UserList : Control
 		wolfAPI = Main.wolfAPI;
 
 		var UserList = await WolfAPI.GetClients();
+		var profiles = await WolfAPI.GetProfiles();
 
-		foreach(var User in UserList)
+		foreach(var User in profiles)
 		{
-			Button button = new(){ Text = User.app_state_folder.Left(6) };
+			Button button = new(){ Text = User.name };
 			button.Pressed += () => {
 				GD.Print($"Set Selected user to {button.Text}");
 				var Main = GetNode<Main>("/root/Main");
-				Main.SelectedClient = User;
+				Main.SelectedProfile = User;
 				AppMenu.Visible = true;
 			};
 			UserContainer.AddChild(button);

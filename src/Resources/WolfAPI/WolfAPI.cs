@@ -93,15 +93,45 @@ public partial class WolfAPI : Resource
             }
         }));
     }
-    public static async Task<List<App>> GetApps()
+    public static async Task<List<App>> GetApps(Profile used_profile)
     {
-        var result = await _httpClient.GetStringAsync("http://localhost/api/v1/apps");
+        var result = await _httpClient.GetStringAsync("http://localhost/api/v1/profiles");
+        GD.Print(result);
+        Profiles profiles = JsonSerializer.Deserialize<Profiles>(result);
 
-        Apps wolfApps = JsonSerializer.Deserialize<Apps>(result);
-        if(wolfApps?.success == true)
-            return wolfApps.apps;
+        if(!profiles.success)
+        {
+            GD.Print("Error retrieving Profiles");
+            return [];
+        }
+
+        foreach(var profile in profiles.profiles)
+        {
+            if(profile.id == used_profile.id)
+                return profile.apps;
+        }
+        GD.Print($"Profile: {used_profile.name} not found");
+        //Apps wolfApps = JsonSerializer.Deserialize<Apps>(result);
+        //if(wolfApps?.success == true)
+        //    return wolfApps.apps;
         return [];
     }
+
+    public static async Task<List<Profile>> GetProfiles()
+    {
+        var result = await _httpClient.GetStringAsync("http://localhost/api/v1/profiles");
+        GD.Print(result);
+        Profiles profiles = JsonSerializer.Deserialize<Profiles>(result);
+
+        if(!profiles.success)
+        {
+            GD.Print("Error retrieving Profiles");
+            return [];
+        }
+
+        return profiles.profiles;
+    }
+
     public static async Task<List<Client>> GetClients()
     {
         var result = await _httpClient.GetStringAsync("http://localhost/api/v1/clients");

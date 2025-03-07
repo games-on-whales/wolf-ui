@@ -17,7 +17,7 @@ public partial class AppList : Control
 	private WolfAPI wolfAPI;
 
 	// Called when the node enters the scene tree for the first time.
-	public override async void _Ready()
+	public override void _Ready()
 	{
 		if(Engine.IsEditorHint())
 		{
@@ -29,7 +29,24 @@ public partial class AppList : Control
 		docker = Main.docker;
 		wolfAPI = Main.wolfAPI;
 
-		List<App> Apps = await WolfAPI.GetApps();//Main.config.GetApps();
+		VisibilityChanged += () => {
+			if(Visible)
+			{
+				LoadAppList();
+				if(AppContainer.GetChildCount() > 0)
+					AppContainer.GetChild<AppEntry>(0).CallDeferred(AppEntry.MethodName.GrabFocus);
+			}
+		};
+	}
+
+	public async void LoadAppList()
+	{
+		foreach(var child in AppContainer.GetChildren())
+			child.QueueFree();
+
+		var Main = GetNode<Main>("/root/Main");
+		var profile = Main.SelectedProfile;
+		List<App> Apps = await WolfAPI.GetApps(profile);//Main.config.GetApps();
 
 		int i = 1;
 		foreach(var app in Apps)
@@ -43,14 +60,6 @@ public partial class AppList : Control
 				i++;
 			}
 		}
-
-		VisibilityChanged += () => {
-			if(Visible)
-			{
-				if(AppContainer.GetChildCount() > 0)
-					AppContainer.GetChild<AppEntry>(0).CallDeferred(AppEntry.MethodName.GrabFocus);
-			}
-		};
 	}
 
 	private void EditorMockupReady()
@@ -110,6 +119,9 @@ public partial class AppList : Control
 		{
 			if(child is AppEntry app)
 			{
+				if(app.runner.image == null)
+					return;
+
 				string imagename = app.runner.image;
 				if(!imagename.Contains(':'))
 					imagename = $"{imagename}:latest";

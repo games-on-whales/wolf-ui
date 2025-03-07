@@ -13,7 +13,7 @@ namespace UI
 		public WolfAPI wolfAPI;
 		[Export]
 		public ControllerMap controllerMap;
-		public Client SelectedClient = null;
+		public Profile SelectedProfile = null;
 
 		// Called when the node enters the scene tree for the first time.
 		public override void _Ready()

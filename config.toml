@@ -1,8 +1,8 @@
-[[apps]]
+[[profiles.apps]]
 start_virtual_compositor = true
-title = 'Wolf-Management'
+title = 'Wolf UI Docker'
 
-    [apps.runner]
+    [profiles.apps.runner]
     base_create_json = '''{
       "HostConfig": {
         "IpcMode": "host",
@@ -12,9 +12,9 @@ title = 'Wolf-Management'
       }
     }'''
     devices = []
-    env = [ 'RUN_SWAY=1', 'GOW_REQUIRED_DEVICES=/dev/input/event* /dev/dri/* /dev/nvidia*' ]
-    image = 'wolf-management'
-    mounts = ['/var/run/docker.sock:/var/run/docker.sock', '/etc/wolf:/etc/wolf']
+    env = [ 'GOW_REQUIRED_DEVICES=/dev/input/event* /dev/dri/* /dev/nvidia*', 'WOLF_SOCKET_PATH=/var/run/wolf/wolf.sock' ]
+    image = 'ghcr.io/games-on-whales/wolf-ui:main'
+    mounts = ['/var/run/docker.sock:/var/run/docker.sock', '/var/run/wolf/wolf.sock:/var/run/wolf/wolf.sock', '/etc/wolf:/etc/wolf']
     name = 'WolfPegasus'
     ports = []
     type = 'docker'
