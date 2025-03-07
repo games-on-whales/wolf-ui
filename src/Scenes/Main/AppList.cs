@@ -3,6 +3,7 @@ using Resources.WolfAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UI;
 using WolfManagement.Resources;
 
@@ -29,17 +30,21 @@ public partial class AppList : Control
 		docker = Main.docker;
 		wolfAPI = Main.wolfAPI;
 
-		VisibilityChanged += () => {
+		VisibilityChanged += async () => {
 			if(Visible)
 			{
-				LoadAppList();
+				await LoadAppList();
 				if(AppContainer.GetChildCount() > 0)
+				{
 					AppContainer.GetChild<AppEntry>(0).CallDeferred(AppEntry.MethodName.GrabFocus);
+				} else {
+					GetNode<Control>("%OptionsButton").GrabFocus();
+				}
 			}
 		};
 	}
 
-	public async void LoadAppList()
+	public async Task LoadAppList()
 	{
 		foreach(var child in AppContainer.GetChildren())
 			child.QueueFree();

@@ -18,6 +18,9 @@ public partial class UserList : Control
 	Control AppGrid;
 	[Export]
 	Container UserContainer;
+	[Export]
+	PackedScene UserEntry;
+
 	private WolfAPI wolfAPI;
 
 	// Called when the node enters the scene tree for the first time.
@@ -32,12 +35,33 @@ public partial class UserList : Control
 		var Main = GetNode<Main>("/root/Main");
 		wolfAPI = Main.wolfAPI;
 
-		var UserList = await WolfAPI.GetClients();
+		await LoadUsers();
+
+		Visible = true;
+
+		VisibilityChanged += async () => {
+			if(Visible)
+			{
+				await LoadUsers();
+			}
+		};
+	}
+
+	private async Task LoadUsers()
+	{
+		foreach(var child in UserContainer.GetChildren())
+			child.QueueFree();
+
 		var profiles = await WolfAPI.GetProfiles();
 
 		foreach(var User in profiles)
 		{
-			Button button = new(){ Text = User.name };
+			Button button = UserEntry.Instantiate<Button>();
+			if(button is User user)
+			{
+				user.profile = User;
+			}
+			//Button button = new(){ Text = User.name };
 			button.Pressed += () => {
 				GD.Print($"Set Selected user to {button.Text}");
 				var Main = GetNode<Main>("/root/Main");
@@ -52,26 +76,25 @@ public partial class UserList : Control
 		{
 			b.CallDeferred(Button.MethodName.GrabFocus);
 		}
-
-		Visible = true;
 	}
 
 	private void EditorMockupReady()
 	{
-		List<Client> UserList = new(){
-			new(){ app_state_folder = "One" },
-			new(){ app_state_folder = "Two" },
-			new(){ app_state_folder = "Three" },
-			new(){ app_state_folder = "Four" },
-			new(){ app_state_folder = "Five" },
-			new(){ app_state_folder = "Six" },
-			new(){ app_state_folder = "Seven" },
-			new(){ app_state_folder = "Eight" },
-			new(){ app_state_folder = "Nine" }
+		List<Profile> UserList = new(){
+			new(){ name = "One" },
+			new(){ name = "Two" },
+			new(){ name = "Three" },
+			new(){ name = "Four" },
+			new(){ name = "Five" },
+			new(){ name = "Six" },
+			new(){ name = "Seven" },
+			new(){ name = "Eight" },
+			new(){ name = "Nine" }
 		};
 		foreach(var User in UserList)
 		{
-			Button button = new(){ Text = User.app_state_folder.Left(6) };
+			Button button = UserEntry.Instantiate<Button>();
+			button.Name = User.name;
 			UserContainer.AddChild(button);
 		}
 	}

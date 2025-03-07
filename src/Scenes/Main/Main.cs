@@ -50,13 +50,6 @@ namespace UI
 			//DisplayServer.WindowSetMode(DisplayServer.WindowMode.ExclusiveFullscreen);
 
 			wolfAPI.StartListenToAPIEvents();
-
-			wolfAPI.StreamSession += (d) =>
-			{
-				GD.Print(d);
-			};
-
-
 		}
 
 		public override void _Input(InputEvent @event)

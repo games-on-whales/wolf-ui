@@ -41,27 +41,26 @@ public partial class WolfAPI : Resource
     }
 
     [Signal]
-    public delegate void StreamSessionEventHandler(string data);
-    [Signal]
     public delegate void StartRunnerEventHandler(string data);
-    [Signal]
-    public delegate void VideoSessionEventHandler(string data);
-    [Signal]
-    public delegate void StopStreamEventEventHandler(string data);
 
     private void FilterAPIEvents(string @event, string data)
     {
         var error = @event switch
         {
             "wolf::core::events::StartRunner" => EmitSignal(SignalName.StartRunner, data),
-            "wolf::core::events::StreamSession" => EmitSignal(SignalName.StreamSession, data),
-            "wolf::core::events::StopStreamEvent" => EmitSignal(SignalName.StopStreamEvent, data),
-            "wolf::core::events::VideoSession" => EmitSignal(SignalName.VideoSession, data),
+            "wolf::core::events::StreamSession" => Error.DoesNotExist,
+            "wolf::core::events::StopStreamEvent" => Error.DoesNotExist,
+            "wolf::core::events::VideoSession" => Error.DoesNotExist,
+            "wolf::core::events::RTPAudioPingEvent" => Error.DoesNotExist,
+            "wolf::core::events::AudioSession" => Error.DoesNotExist,
+            "wolf::core::events::IDRRequestEvent" => Error.DoesNotExist,
+            "wolf::core::events::RTPVideoPingEvent" => Error.DoesNotExist,
             _ => Error.Unconfigured,
         };
         if(error == Error.Unconfigured)
         {
-            //GD.Print(@event);
+            GD.Print(@event);
+            GD.Print(data);
         }
     }
 
@@ -96,7 +95,6 @@ public partial class WolfAPI : Resource
     public static async Task<List<App>> GetApps(Profile used_profile)
     {
         var result = await _httpClient.GetStringAsync("http://localhost/api/v1/profiles");
-        GD.Print(result);
         Profiles profiles = JsonSerializer.Deserialize<Profiles>(result);
 
         if(!profiles.success)
@@ -120,7 +118,6 @@ public partial class WolfAPI : Resource
     public static async Task<List<Profile>> GetProfiles()
     {
         var result = await _httpClient.GetStringAsync("http://localhost/api/v1/profiles");
-        GD.Print(result);
         Profiles profiles = JsonSerializer.Deserialize<Profiles>(result);
 
         if(!profiles.success)
