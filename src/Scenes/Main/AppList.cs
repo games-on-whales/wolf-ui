@@ -46,6 +46,9 @@ public partial class AppList : Control
 
 	public async Task LoadAppList()
 	{
+		GetNode<Control>("%OptionsButton").Visible = true;
+		GetNode<Label>("%HeaderLabel").Text = "Select Application";
+
 		foreach(var child in AppContainer.GetChildren())
 			child.QueueFree();
 

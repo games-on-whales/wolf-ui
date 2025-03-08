@@ -49,6 +49,9 @@ public partial class UserList : Control
 
 	private async Task LoadUsers()
 	{
+		GetNode<Control>("%OptionsButton").Visible = false;
+		GetNode<Label>("%HeaderLabel").Text = "Select User";
+
 		foreach(var child in UserContainer.GetChildren())
 			child.QueueFree();
 

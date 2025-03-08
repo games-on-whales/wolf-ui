@@ -7,10 +7,10 @@
 [ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
 [ext_resource type="Texture2D" uid="uid://b1wng8q2m6i68" path="res://Icons/arrow-left-svgrepo-com.svg" id="6_hcu3t"]
-[ext_resource type="Script" uid="uid://weajekwvgcv7" path="res://Scenes/Main/TitleBar.cs" id="6_pifck"]
 [ext_resource type="Script" uid="uid://cp32hsvi4wpej" path="res://Scenes/Main/UserList.cs" id="6_u8v04"]
 [ext_resource type="Script" uid="uid://bpe8wv7q6ajud" path="res://Scenes/Main/VisibilitySwitcher.cs" id="7_axei7"]
 [ext_resource type="Script" uid="uid://cnrk2pyyp3r1p" path="res://Scenes/Main/OptionsButton.cs" id="7_qdkat"]
+[ext_resource type="Script" uid="uid://c4tkdw88qp173" path="res://Scenes/Main/ExitButton.cs" id="8_qdkat"]
 [ext_resource type="Script" uid="uid://brs0ic67iu2en" path="res://Scenes/Main/AppList.cs" id="10_b2kb5"]
 [ext_resource type="PackedScene" uid="uid://i2pa0j4ijr4s" path="res://Scenes/Main/SubScenes/User.tscn" id="10_hcu3t"]
 [ext_resource type="Script" uid="uid://dcscvb3d1pva5" path="res://Scenes/Main/SoundEffects.cs" id="10_ykwdk"]
@@ -45,41 +45,49 @@ grow_vertical = 2
 
 [node name="Header" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 4
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Header" node_paths=PackedStringArray("ExitButton", "UserButton")]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Header"]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 3
-script = ExtResource("6_pifck")
-ExitButton = NodePath("HBoxContainer/ExitButton")
-UserButton = NodePath("HBoxContainer/OptionsButton")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Header/MarginContainer"]
-custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-size_flags_vertical = 0
 
 [node name="OptionsButton" type="Button" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 50)
+visible = false
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 focus_neighbor_right = NodePath("../ExitButton")
 icon = ExtResource("6_hcu3t")
+flat = true
 vertical_icon_alignment = 0
 expand_icon = true
 script = ExtResource("7_qdkat")
 
+[node name="HeaderLabel" type="Label" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Select User"
+horizontal_alignment = 1
+
 [node name="ExitButton" type="Button" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 32)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
-size_flags_horizontal = 10
+size_flags_horizontal = 8
+size_flags_vertical = 0
 focus_neighbor_left = NodePath("../OptionsButton")
 icon = ExtResource("5_tqvkx")
-icon_alignment = 1
+flat = true
+vertical_icon_alignment = 0
 expand_icon = true
+script = ExtResource("8_qdkat")
 
 [node name="Menus" type="Control" parent="VBoxContainer"]
 layout_mode = 2
@@ -106,47 +114,25 @@ script = ExtResource("6_u8v04")
 AppMenu = NodePath("../AppList")
 UserMenu = NodePath(".")
 AppGrid = NodePath("../AppList/ScrollContainer/GridContainer")
-UserContainer = NodePath("PanelContainer/VBoxContainer/ScrollContainer/CenterContainer/GridContainer")
+UserContainer = NodePath("VBoxContainer/ScrollContainer/CenterContainer/GridContainer")
 UserEntry = ExtResource("10_hcu3t")
 
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList"]
 layout_mode = 2
+offset_right = 1280.0
+offset_bottom = 618.0
 
-[node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/PanelContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/margin_left = 3
-theme_override_constants/margin_top = 3
-theme_override_constants/margin_right = 3
-theme_override_constants/margin_bottom = 3
-
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/PanelContainer/VBoxContainer/MarginContainer2"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/PanelContainer/VBoxContainer/MarginContainer2/PanelContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Select User"
-
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/PanelContainer/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/VBoxContainer"]
 custom_minimum_size = Vector2(400, 150)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/PanelContainer/VBoxContainer/ScrollContainer"]
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/VBoxContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/PanelContainer/VBoxContainer/ScrollContainer/CenterContainer"]
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/VBoxContainer/ScrollContainer/CenterContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
