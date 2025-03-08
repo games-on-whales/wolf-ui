@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cnikdy0rfhss"]
 
-[ext_resource type="Script" uid="uid://pf7fsvqc5xqr" path="res://Scenes/Main/SubScenes/AppMenu.cs" id="1_3wvk8"]
+[ext_resource type="Script" uid="uid://pf7fsvqc5xqr" path="res://Scenes/Main/Body/Apps/AppMenu.cs" id="1_3wvk8"]
 
 [node name="AppMenu" type="CenterContainer" node_paths=PackedStringArray("StartButton", "CoopButton", "UpdateButton", "CancelButton")]
 anchors_preset = 15

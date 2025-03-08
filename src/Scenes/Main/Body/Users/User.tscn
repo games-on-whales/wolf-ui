@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://i2pa0j4ijr4s"]
 
-[ext_resource type="Script" uid="uid://co6uuhwci2mbc" path="res://Scenes/Main/SubScenes/User.cs" id="1_3my2o"]
+[ext_resource type="Script" uid="uid://co6uuhwci2mbc" path="res://Scenes/Main/Body/Users/User.cs" id="1_3my2o"]
 
 [node name="User" type="Button"]
 custom_minimum_size = Vector2(180, 240)

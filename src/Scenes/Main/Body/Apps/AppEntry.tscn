@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://chspw2lt1qcuc"]
 
-[ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/SubScenes/AppEntry.cs" id="1_pyonv"]
+[ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/Body/Apps/AppEntry.cs" id="1_pyonv"]
 [ext_resource type="Texture2D" uid="uid://bqo00nildd0cw" path="res://Icons/download-button-svgrepo-com.svg" id="3_4vl0r"]
-[ext_resource type="PackedScene" uid="uid://cnikdy0rfhss" path="res://Scenes/Main/SubScenes/AppMenu.tscn" id="3_goyyk"]
+[ext_resource type="PackedScene" uid="uid://cnikdy0rfhss" path="res://Scenes/Main/Body/Apps/AppMenu.tscn" id="3_goyyk"]
 
 [node name="AppEntry" type="Button" node_paths=PackedStringArray("AppProgress", "AppLabel", "DownloadIcon")]
 custom_minimum_size = Vector2(200, 260)
