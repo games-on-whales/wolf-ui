@@ -35,6 +35,10 @@ project/assembly_name="Wolf Management"
 
 enabled=PackedStringArray("res://addons/onscreenkeyboard/plugin.cfg")
 
+[gui]
+
+theme/custom="uid://v418qqxvwy87"
+
 [input]
 
 ui_accept={
