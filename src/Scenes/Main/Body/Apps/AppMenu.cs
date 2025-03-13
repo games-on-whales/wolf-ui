@@ -13,13 +13,11 @@ public partial class AppMenu : CenterContainer
 	[Export]
 	Button CancelButton;
 	AppEntry appEntry;
-	private WolfAPI wolfAPI;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		var Main = GetNode<Main>("/root/Main");
-		wolfAPI = Main.wolfAPI;
 
 		var parent = GetParent();
 		if(parent is AppEntry app)

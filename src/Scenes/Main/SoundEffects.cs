@@ -18,7 +18,7 @@ public partial class SoundEffects : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		hasSound = new();
+		hasSound = [];
 		HoverSoundPlayer = new(){ Stream = HoverSound };
 		AcceptSoundPlayer= new(){ Stream = AcceptSound };
 		AddChild(HoverSoundPlayer);

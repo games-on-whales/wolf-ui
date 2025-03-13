@@ -64,6 +64,20 @@ public partial class WolfAPI : Resource
         }
     }
 
+    public static async Task<Texture2D> GetAppIcon(App app)
+    {
+        if(app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
+            return null;
+
+        var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/").TrimSuffix(":edge");
+        System.Net.Http.HttpClient httpClient = new();
+        var result = await httpClient.GetByteArrayAsync($"https://github.com/games-on-whales/gow/blob/master/apps/{name}/assets/icon.png?raw=true");
+        Image image = new();
+        image.LoadPngFromBuffer(result);
+        Texture2D texture2D = ImageTexture.CreateFromImage(image);
+        return texture2D;
+    }
+
     public async void StartListenToAPIEvents()
     {
         if(StartedListening)
@@ -138,7 +152,7 @@ public partial class WolfAPI : Resource
         return [];
     }
 
-    public static async Task StartApp(AppRunner runner, bool joinable = false)
+    public static async Task StartApp(Runner runner, bool joinable = false)
     {
         var starter = new Starter()
         {

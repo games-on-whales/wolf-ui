@@ -9,7 +9,7 @@ namespace Resources.WolfAPI
     {
         public bool stop_stream_when_over {get;set;}
         public string session_id {get;set;}
-        public AppRunner runner {get;set;}
+        public Runner runner {get;set;}
     }
 
     public class Apps
@@ -23,10 +23,10 @@ namespace Resources.WolfAPI
         public string icon_png_path {get;set;}
         public bool start_virtual_compositor {get;set;}
         public string title {get;set;}
-        public AppRunner runner {get;set;}
+        public Runner runner {get;set;}
     }
 
-    public class AppRunner
+    public class Runner
     {
         public string type {get;set;}
 
@@ -98,4 +98,38 @@ namespace Resources.WolfAPI
         public List<App> apps {get;set;}
     }
 
+/*
+struct CreateLobbyEvent {
+  const std::string name;
+  const bool multi_user;
+  const bool stop_when_everyone_leaves;
+
+  struct VideoSettings {
+    int width;
+    int height;
+    int refresh_rate;
+    std::string wayland_render_node;
+    std::string runner_render_node;
+  } const video_settings;
+
+  struct AudioSettings {
+    int channel_count;
+  } const audio_settings;
+
+  const config::ClientSettings client_settings = {};
+  const std::string runner_state_folder;
+  /**
+   * The app that will be run in the lobby
+   *//*
+  std::shared_ptr<Runner> runner;
+};
+*/
+    public class Lobby
+    {
+        public string name;
+        public bool multi_user;
+        public bool stop_when_everyone_leaves;
+        public string runner_state_folder;
+        public Runner runner;
+    }
 }

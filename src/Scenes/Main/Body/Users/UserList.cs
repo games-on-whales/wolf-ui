@@ -21,8 +21,6 @@ public partial class UserList : Control
 	[Export]
 	PackedScene UserEntry;
 
-	private WolfAPI wolfAPI;
-
 	// Called when the node enters the scene tree for the first time.
 	public override async void _Ready()
 	{
@@ -33,7 +31,6 @@ public partial class UserList : Control
 		}
 
 		var Main = GetNode<Main>("/root/Main");
-		wolfAPI = Main.wolfAPI;
 
 		await LoadUsers();
 

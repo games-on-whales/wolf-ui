@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Godot;
 using Resources.WolfAPI;
 using WolfManagement.Resources;
@@ -19,7 +20,7 @@ namespace UI
 		private App App;
 		public string Title { get{ return App.title; } }
 		private string AppDisplayImagePath { get{ return App.icon_png_path ?? ""; } }
-		public AppRunner runner { get{ return App.runner; } }
+		public Runner runner { get{ return App.runner; } }
 
 		public bool ImageOnDisc = true;
 
@@ -86,10 +87,15 @@ namespace UI
 			}
 		}
 
-		public void SetIcon()
+		public async void SetIcon()
 		{
 			if(AppDisplayImagePath == "")
+			{
+				var icon = await WolfAPI.GetAppIcon(App);
+				if(icon != null)
+					Icon = icon;
 				return;
+			}
 			
 			var image = Image.LoadFromFile(AppDisplayImagePath);
 			var texture = ImageTexture.CreateFromImage(image);
