@@ -21,6 +21,7 @@ namespace UI
 		public string Title { get{ return App.title; } }
 		private string AppDisplayImagePath { get{ return App.icon_png_path ?? ""; } }
 		public Runner runner { get{ return App.runner; } }
+		public string render_node { get{ return App.render_node; }}
 
 		public bool ImageOnDisc = true;
 

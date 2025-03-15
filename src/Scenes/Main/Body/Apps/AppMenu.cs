@@ -52,7 +52,49 @@ public partial class AppMenu : CenterContainer
 
 	private async void OnCoopPressed()
 	{
-		await WolfAPI.StartApp(appEntry.runner);//TODO: Add a flag for Joinable marked Games!
+		var main = GetNode<Main>("/root/Main");
+		
+        var sessions = await WolfAPI.GetAsync<Sessions>("http://localhost/api/v1/sessions");
+        Session curr_session = null;
+        foreach(var session in sessions?.sessions)
+        {
+            if(session.client_id == WolfAPI.session_id)
+            {
+                curr_session = session;
+                break;
+            }
+        }
+
+        if(curr_session == null)
+        {
+            GD.Print("No owned Session found. Is this run without Wolf?");
+            return;
+        }
+
+		Lobby lobby = new()
+		{
+			name = appEntry.Title,
+			multi_user = true,
+			stop_when_everyone_leaves = true,
+			runner_state_folder = $"profile-data/{main.SelectedProfile.id}/{appEntry.Title}-Coop",
+			runner = appEntry.runner,
+			video_settings = new()
+			{
+				width = curr_session.video_width,
+				height = curr_session.video_height,
+				refresh_rate = curr_session.video_refresh_rate,
+				runner_render_node = appEntry.render_node,
+				wayland_render_node = appEntry.render_node
+			},
+			audio_settings = new()
+			{
+				channel_count = curr_session.audio_channel_count
+			},
+			client_settings = curr_session.client_settings
+		};
+
+		var lobby_id = await WolfAPI.CreateLobby(lobby);
+		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

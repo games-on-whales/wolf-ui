@@ -35,9 +35,6 @@ RUN <<_INSTALL_PACKAGES
 
 mkdir ./bin
 dotnet add package Docker.DotNet
-dotnet build
-
-mkdir build
 Godot --headless --export-release "Linux" ./bin/wolf-ui
 ls -la ./bin
 

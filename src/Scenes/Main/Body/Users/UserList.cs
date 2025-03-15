@@ -63,7 +63,6 @@ public partial class UserList : Control
 			}
 			//Button button = new(){ Text = User.name };
 			button.Pressed += () => {
-				GD.Print($"Set Selected user to {button.Text}");
 				var Main = GetNode<Main>("/root/Main");
 				Main.SelectedProfile = User;
 				AppMenu.Visible = true;

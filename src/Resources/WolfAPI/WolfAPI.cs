@@ -1,5 +1,6 @@
 
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -25,42 +26,51 @@ public partial class WolfAPI : Resource
         }
     });
 
-    private static string session_id = "";
+    private static string SessionId = "";
+    public static string session_id {get{ return SessionId;}}
     private static bool StartedListening = false;
 
     public WolfAPI()
     {
-        session_id = System.Environment.GetEnvironmentVariable("WOLF_SESSION_ID");
+        SessionId = System.Environment.GetEnvironmentVariable("WOLF_SESSION_ID");
 		if(session_id == null)
 		{
 			GD.Print("session_id not found!");
-            session_id = "123456789";
+            SessionId = "123456789";
 		}
 
         APIEvent += FilterAPIEvents;
+        _LobbyCreated += (data) => LobbyCreated?.Invoke(this, JsonSerializer.Deserialize<Lobby>(data));
+        _LobbyStopped += (data) => LobbyStopped?.Invoke(this, JsonSerializer.Deserialize<Lobby>(data));
     }
 
     [Signal]
     public delegate void StartRunnerEventHandler(string data);
 
+    public event EventHandler<Lobby> LobbyCreated;
+    public event EventHandler<Lobby> LobbyStopped;
+
     private void FilterAPIEvents(string @event, string data)
     {
         var error = @event switch
         {
-            "wolf::core::events::StartRunner" => EmitSignal(SignalName.StartRunner, data),
-            "wolf::core::events::StreamSession" => Error.DoesNotExist,
-            "wolf::core::events::StopStreamEvent" => Error.DoesNotExist,
-            "wolf::core::events::VideoSession" => Error.DoesNotExist,
-            "wolf::core::events::RTPAudioPingEvent" => Error.DoesNotExist,
-            "wolf::core::events::AudioSession" => Error.DoesNotExist,
-            "wolf::core::events::IDRRequestEvent" => Error.DoesNotExist,
-            "wolf::core::events::RTPVideoPingEvent" => Error.DoesNotExist,
+            //"wolf::core::events::StartRunner" => Error.DoesNotExist,
+            //"wolf::core::events::StreamSession" => Error.DoesNotExist,
+            //"wolf::core::events::StopStreamEvent" => Error.DoesNotExist,
+            //"wolf::core::events::VideoSession" => Error.DoesNotExist,
+            //"wolf::core::events::RTPAudioPingEvent" => Error.DoesNotExist,
+            //"wolf::core::events::AudioSession" => Error.DoesNotExist,
+            //"wolf::core::events::IDRRequestEvent" => Error.DoesNotExist,
+            //"wolf::core::events::RTPVideoPingEvent" => Error.DoesNotExist,
+            //"wolf::core::events::ResumeStreamEvent" => Error.DoesNotExist,
+            //"wolf::core::events::PauseStreamEvent" => Error.DoesNotExist,
+            //"wolf::core::events::CreateLobbyEvent" => EmitSignal(SignalName._LobbyCreated, data),
+            //"wolf::core::events::StopLobbyEvent" => EmitSignal(SignalName._LobbyStopped, data),
             _ => Error.Unconfigured,
         };
         if(error == Error.Unconfigured)
         {
-            GD.Print(@event);
-            GD.Print(data);
+            GD.Print($"{@event} - {data}");
         }
     }
 
@@ -166,25 +176,96 @@ public partial class WolfAPI : Resource
         GD.Print(await result.Content.ReadAsStringAsync());
     }
 
-    public static async Task JoinCoopSession(string parent_session_id)
+    public static async Task<List<Lobby>> GetLobbies()
     {
-        var starter = new Starter()
-        {
-            stop_stream_when_over = false,
-            session_id = session_id,
-            runner = new(){
-                type = "child_session",
-                parent_session_id = parent_session_id
-            }
-        };
+        Lobbies lobbies = await GetAsync<Lobbies>("http://localhost/api/v1/lobbies");
+        if(lobbies?.success == true)
+            return lobbies.lobbies ?? [];
+        return [];
+    }
 
-        string data = JsonSerializer.Serialize<Starter>(starter);
-        StringContent content = new(data);
-        var result = await _httpClient.PostAsync("http://localhost/api/v1/runners/start", content);
+    /**
+        <summary>
+        Static Method <c>CreateLobby</c> creates a Lobby based on the passed <c>Lobby</c>.
+        </summary>
+        <param name="lobby">the object defining the lobby that should be created</param>
+        <returns>
+        A string containing the Lobbies ID.
+        </returns>
+    */
+    public static async Task<string> CreateLobby(Lobby lobby)
+    {
+        var result = await PostAsync<Lobby>("http://localhost/api/v1/lobbies/create", lobby);
+        GD.Print($"called lobbies/create: {await result.Content.ReadAsStringAsync()}");
+        return JsonSerializer.Deserialize<LobbyCreatedResponse>(await result.Content.ReadAsStringAsync())?.lobby_id;
+    }
+
+    public static async Task JoinLobby(string lobby_id, string session_id)
+    {
+        string json = $@"
+        {{
+            ""lobby_id"": ""{lobby_id}"",
+            ""moonlight_session_id"": ""{session_id}""
+        }}";
+
+        StringContent content = new(json);
+        var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/join", content);
+        GD.Print($"called lobbies/join: {await result.Content.ReadAsStringAsync()}");
+    }
+
+    public static async Task LeaveLobby(string lobby_id, string session_id)
+    {
+        string json = $@"
+        {{
+            ""lobby_id"": ""{lobby_id}"",
+            ""moonlight_session_id"": ""{session_id}""
+        }}";
+
+        StringContent content = new(json);
+        var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
         GD.Print(await result.Content.ReadAsStringAsync());
     }
 
+    public static async Task StopLobby(string lobby_id)
+    {
+        string json = @$"{{""lobby_id"": ""{lobby_id}""}}";
+
+        StringContent content = new(json);
+        var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/stop", content);
+        GD.Print(await result.Content.ReadAsStringAsync());
+    }
+
+    private static async Task<HttpResponseMessage> PostAsync<T>(string url, T obj)
+    {
+        string data = JsonSerializer.Serialize<T>(obj);
+        StringContent content = new(data);
+        var result = await _httpClient.PostAsync(url, content);
+        //GD.Print(await result.Content.ReadAsStringAsync());
+        return result;
+    }
+
+    /**
+        <summary>
+        Static Method <c>GetAsync</c> is a helper that calls <c>url</c> and returns a Deserialized object of a choosen type.
+        </summary>
+        <param name="url">The url of the API to call</param>
+        <returns>
+        A object of choosen type containing the data returned by the API.
+        </returns>
+    */
+    public static async Task<T> GetAsync<T>(string url)
+    {
+        var result = await _httpClient.GetStringAsync(url);
+        //GD.Print(result);
+        T data = JsonSerializer.Deserialize<T>(result);
+        return data;
+    }   
+
 	[Signal]
 	private delegate void APIEventEventHandler(string eventType, string data);
+    [Signal]
+    private delegate void _LobbyStoppedEventHandler(string lobby);
+    [Signal]
+    private delegate void _LobbyCreatedEventHandler(string lobby);
 }
 }

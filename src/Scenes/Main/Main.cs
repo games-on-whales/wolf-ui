@@ -50,6 +50,15 @@ namespace UI
 			//DisplayServer.WindowSetMode(DisplayServer.WindowMode.ExclusiveFullscreen);
 
 			wolfAPI.StartListenToAPIEvents();
+
+			GD.Print($"This session's id: {WolfAPI.session_id}");
+
+			wolfAPI.LobbyCreated += (obj, lobby) => { 
+				//GD.Print(lobby.name);
+			};
+			wolfAPI.LobbyStopped += (obj, lobby) => {
+				//GD.Print(lobby.lobby_id);
+			};
 		}
 
 		public override void _Input(InputEvent @event)
