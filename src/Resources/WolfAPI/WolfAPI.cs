@@ -40,32 +40,34 @@ public partial class WolfAPI : Resource
 		}
 
         APIEvent += FilterAPIEvents;
-        _LobbyCreated += (data) => LobbyCreated?.Invoke(this, JsonSerializer.Deserialize<Lobby>(data));
-        _LobbyStopped += (data) => LobbyStopped?.Invoke(this, JsonSerializer.Deserialize<Lobby>(data));
     }
 
     [Signal]
     public delegate void StartRunnerEventHandler(string data);
-
-    public event EventHandler<Lobby> LobbyCreated;
-    public event EventHandler<Lobby> LobbyStopped;
+    [Signal]
+    public delegate void LobbyStoppedEventHandler(string lobby);
+    [Signal]
+    public delegate void LobbyCreatedEventHandler(string lobby);
 
     private void FilterAPIEvents(string @event, string data)
     {
         var error = @event switch
         {
-            //"wolf::core::events::StartRunner" => Error.DoesNotExist,
-            //"wolf::core::events::StreamSession" => Error.DoesNotExist,
-            //"wolf::core::events::StopStreamEvent" => Error.DoesNotExist,
-            //"wolf::core::events::VideoSession" => Error.DoesNotExist,
-            //"wolf::core::events::RTPAudioPingEvent" => Error.DoesNotExist,
-            //"wolf::core::events::AudioSession" => Error.DoesNotExist,
-            //"wolf::core::events::IDRRequestEvent" => Error.DoesNotExist,
-            //"wolf::core::events::RTPVideoPingEvent" => Error.DoesNotExist,
-            //"wolf::core::events::ResumeStreamEvent" => Error.DoesNotExist,
-            //"wolf::core::events::PauseStreamEvent" => Error.DoesNotExist,
-            //"wolf::core::events::CreateLobbyEvent" => EmitSignal(SignalName._LobbyCreated, data),
-            //"wolf::core::events::StopLobbyEvent" => EmitSignal(SignalName._LobbyStopped, data),
+            "wolf::core::events::StartRunner" => Error.DoesNotExist,
+            "wolf::core::events::StreamSession" => Error.DoesNotExist,
+            "wolf::core::events::StopStreamEvent" => Error.DoesNotExist,
+            "wolf::core::events::VideoSession" => Error.DoesNotExist,
+            "wolf::core::events::RTPAudioPingEvent" => Error.DoesNotExist,
+            "wolf::core::events::AudioSession" => Error.DoesNotExist,
+            "wolf::core::events::IDRRequestEvent" => Error.DoesNotExist,
+            "wolf::core::events::RTPVideoPingEvent" => Error.DoesNotExist,
+            "wolf::core::events::ResumeStreamEvent" => Error.DoesNotExist,
+            "wolf::core::events::PauseStreamEvent" => Error.DoesNotExist,
+            "wolf::core::events::SwitchStreamProducerEvents" => Error.DoesNotExist,
+            "wolf::core::events::JoinLobbyEvent" => Error.DoesNotExist,
+            "wolf::core::events::LeaveLobbyEvent" => Error.DoesNotExist,
+            "wolf::core::events::CreateLobbyEvent" => EmitSignal(SignalName.LobbyCreated, data),
+            "wolf::core::events::StopLobbyEvent" => EmitSignal(SignalName.LobbyStopped, data.TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\"}")),
             _ => Error.Unconfigured,
         };
         if(error == Error.Unconfigured)
@@ -196,8 +198,9 @@ public partial class WolfAPI : Resource
     public static async Task<string> CreateLobby(Lobby lobby)
     {
         var result = await PostAsync<Lobby>("http://localhost/api/v1/lobbies/create", lobby);
-        GD.Print($"called lobbies/create: {await result.Content.ReadAsStringAsync()}");
-        return JsonSerializer.Deserialize<LobbyCreatedResponse>(await result.Content.ReadAsStringAsync())?.lobby_id;
+        var content = await result.Content.ReadAsStringAsync();
+        GD.Print($"called lobbies/create: {content}");
+        return JsonSerializer.Deserialize<LobbyCreatedResponse>(content)?.lobby_id;
     }
 
     public static async Task JoinLobby(string lobby_id, string session_id)
@@ -263,9 +266,6 @@ public partial class WolfAPI : Resource
 
 	[Signal]
 	private delegate void APIEventEventHandler(string eventType, string data);
-    [Signal]
-    private delegate void _LobbyStoppedEventHandler(string lobby);
-    [Signal]
-    private delegate void _LobbyCreatedEventHandler(string lobby);
+
 }
 }

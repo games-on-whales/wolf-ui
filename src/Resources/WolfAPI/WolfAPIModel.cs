@@ -156,9 +156,14 @@ struct CreateLobbyEvent {
     public class Lobby
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string lobby_id {get;set;}
-        public string name {get;set;}
-        public bool multi_user {get;set;}
+        public string profile_id {get;set;}
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string started_by_profile_id { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string id { get; set; }
+        public string name { get; set; }
+        public List<int> pin { get; set; }
+        public bool multi_user { get; set; }
         public bool stop_when_everyone_leaves {get;set;}
         public string runner_state_folder {get;set;}
         public Runner runner {get;set;}

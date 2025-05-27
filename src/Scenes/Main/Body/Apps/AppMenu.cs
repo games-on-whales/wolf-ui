@@ -48,6 +48,8 @@ public partial class AppMenu : CenterContainer
 	private async void OnStartPressed()
 	{
 		await WolfAPI.StartApp(appEntry.runner);
+		CallDeferred(MethodName.QueueFree);
+		appEntry.GrabFocus();
 	}
 
 	private async void OnCoopPressed()
@@ -71,8 +73,9 @@ public partial class AppMenu : CenterContainer
             return;
         }
 
-		Lobby lobby = new()
+		Resources.WolfAPI.Lobby lobby = new()
 		{
+			profile_id = main.SelectedProfile.id,
 			name = appEntry.Title,
 			multi_user = true,
 			stop_when_everyone_leaves = true,
@@ -95,6 +98,8 @@ public partial class AppMenu : CenterContainer
 
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
 		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
+		CallDeferred(MethodName.QueueFree);
+		appEntry.GrabFocus();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
