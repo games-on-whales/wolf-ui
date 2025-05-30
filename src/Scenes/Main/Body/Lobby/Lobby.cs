@@ -1,6 +1,7 @@
 using Godot;
 using Resources.WolfAPI;
 using System;
+using System.Collections.Generic;
 
 //TODO Add User counter, Add check if Lobby is empty on Stop and if not ask again.
 namespace UI
@@ -24,6 +25,7 @@ namespace UI
         [Export]
         Button CloseButton;
         private WolfAPI wolfAPI;
+        public Resources.WolfAPI.Lobby LobbySettings;
         public override void _Ready()
         {
             if (AppNameLabel != null)
@@ -63,7 +65,14 @@ namespace UI
 
         private async void JoinLobby()
         {
-            await WolfAPI.JoinLobby(Name, WolfAPI.session_id);
+            List<int> pin = null;
+
+            if (LobbySettings.pin != null)
+            {
+                pin = await PinInput.RequestPin(this);
+            }
+
+            await WolfAPI.JoinLobby(Name, WolfAPI.session_id, pin);
         }
 
         private async void StopLobby()
