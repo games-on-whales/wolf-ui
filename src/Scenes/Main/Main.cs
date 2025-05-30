@@ -37,18 +37,6 @@ namespace UI
 
 			AddChild(time);
 
-
-			/*
-			var width = System.Environment.GetEnvironmentVariable("GAMESCOPE_WIDTH");
-			var height = System.Environment.GetEnvironmentVariable("GAMESCOPE_HEIGHT");
-			if(width != null && height != null)
-			{
-				GetWindow().Position = new Vector2I(0,0);
-				GetWindow().Size = new Vector2I(Int32.Parse(width), Int32.Parse(height));
-			}
-			*/
-			//DisplayServer.WindowSetMode(DisplayServer.WindowMode.ExclusiveFullscreen);
-
 			wolfAPI.StartListenToAPIEvents();
 
 			GD.Print($"This session's id: {WolfAPI.session_id}");
