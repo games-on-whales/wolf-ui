@@ -153,10 +153,18 @@ struct CreateLobbyEvent {
         public string lobby_id {get;set;}
     }
 
+    public class LobbyJoin
+    {
+        public string lobby_id { get; set; }
+        public string moonlight_session_id { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<int> pin { get; set; }
+    }
+
     public class Lobby
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string profile_id {get;set;}
+        public string profile_id { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string started_by_profile_id { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -164,15 +172,15 @@ struct CreateLobbyEvent {
         public string name { get; set; }
         public List<int> pin { get; set; }
         public bool multi_user { get; set; }
-        public bool stop_when_everyone_leaves {get;set;}
-        public string runner_state_folder {get;set;}
-        public Runner runner {get;set;}
+        public bool stop_when_everyone_leaves { get; set; }
+        public string runner_state_folder { get; set; }
+        public Runner runner { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ClientSettings client_settings {get;set;}
+        public ClientSettings client_settings { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public VideoSettings video_settings {get;set;}
+        public VideoSettings video_settings { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public AudioSettings audio_settings {get;set;}
+        public AudioSettings audio_settings { get; set; }
     }
 
     public class Session
