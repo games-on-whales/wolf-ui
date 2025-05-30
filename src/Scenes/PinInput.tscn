@@ -1,0 +1,217 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmeq4kkqbu0iw"]
+
+[ext_resource type="Script" uid="uid://b6jbv5s4xio24" path="res://Scenes/PinInput.cs" id="1_vn0ie"]
+
+[node name="PinInput" type="Control" node_paths=PackedStringArray("PinLineEdit", "NumberButtons", "BackButton", "ClearButton", "AcceptButton", "CancelButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vn0ie")
+PinLineEdit = NodePath("PanelContainer/MarginContainer/VBoxContainer/LineEdit")
+NumberButtons = [NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button0"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button1"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button2"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button3"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button4"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button5"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button6"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button7"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button8"), NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/Button9")]
+BackButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/ButtonBack")
+ClearButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/GridContainer/ButtonClear")
+AcceptButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ButtonConfirm")
+CancelButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ButtonCancel")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -90.5
+offset_right = 64.0
+offset_bottom = 90.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../GridContainer/Button3")
+focus_neighbor_top = NodePath("../HBoxContainer/ButtonConfirm")
+focus_neighbor_right = NodePath("../GridContainer/Button1")
+focus_neighbor_bottom = NodePath("../GridContainer/Button1")
+focus_next = NodePath("../HBoxContainer/ButtonConfirm")
+max_length = 50
+context_menu_enabled = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+virtual_keyboard_type = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="Button1" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../Button3")
+focus_neighbor_top = NodePath("../../LineEdit")
+focus_neighbor_right = NodePath("../Button2")
+focus_neighbor_bottom = NodePath("../Button4")
+focus_next = NodePath("../Button2")
+focus_previous = NodePath("../../LineEdit")
+text = "1"
+
+[node name="Button2" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../Button1")
+focus_neighbor_top = NodePath("../../LineEdit")
+focus_neighbor_right = NodePath("../Button3")
+focus_neighbor_bottom = NodePath("../Button5")
+focus_next = NodePath("../Button3")
+focus_previous = NodePath(".")
+text = "2"
+
+[node name="Button3" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../Button2")
+focus_neighbor_top = NodePath("../../LineEdit")
+focus_neighbor_right = NodePath("../Button1")
+focus_neighbor_bottom = NodePath("../Button6")
+focus_next = NodePath("../Button4")
+focus_previous = NodePath("../Button2")
+text = "3"
+
+[node name="Button4" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Button6")
+focus_neighbor_top = NodePath("../Button1")
+focus_neighbor_right = NodePath("../Button5")
+focus_neighbor_bottom = NodePath("../Button7")
+focus_next = NodePath("../Button5")
+focus_previous = NodePath("../Button3")
+text = "4"
+
+[node name="Button5" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Button4")
+focus_neighbor_top = NodePath("../Button2")
+focus_neighbor_right = NodePath("../Button6")
+focus_neighbor_bottom = NodePath("../Button8")
+focus_next = NodePath("../Button6")
+focus_previous = NodePath("../Button4")
+text = "5"
+
+[node name="Button6" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Button5")
+focus_neighbor_top = NodePath("../Button3")
+focus_neighbor_right = NodePath("../Button4")
+focus_neighbor_bottom = NodePath("../Button9")
+focus_next = NodePath("../Button7")
+focus_previous = NodePath("../Button5")
+text = "6"
+
+[node name="Button7" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Button9")
+focus_neighbor_top = NodePath("../Button4")
+focus_neighbor_right = NodePath("../Button8")
+focus_neighbor_bottom = NodePath("../ButtonBack")
+focus_next = NodePath("../Button8")
+focus_previous = NodePath("../Button6")
+text = "7"
+
+[node name="Button8" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Button7")
+focus_neighbor_top = NodePath("../Button5")
+focus_neighbor_right = NodePath("../Button9")
+focus_neighbor_bottom = NodePath("../Button0")
+focus_next = NodePath("../Button9")
+focus_previous = NodePath("../Button7")
+text = "8"
+
+[node name="Button9" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Button8")
+focus_neighbor_top = NodePath("../Button6")
+focus_neighbor_right = NodePath("../Button7")
+focus_neighbor_bottom = NodePath("../ButtonClear")
+focus_next = NodePath("../Button0")
+focus_previous = NodePath("../Button8")
+text = "9"
+
+[node name="ButtonBack" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../ButtonClear")
+focus_neighbor_top = NodePath("../Button7")
+focus_neighbor_right = NodePath("../Button0")
+focus_neighbor_bottom = NodePath("../../HBoxContainer/ButtonConfirm")
+text = "←"
+
+[node name="Button0" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../ButtonBack")
+focus_neighbor_top = NodePath("../Button8")
+focus_neighbor_right = NodePath("../ButtonClear")
+focus_neighbor_bottom = NodePath("../../HBoxContainer/ButtonConfirm")
+focus_next = NodePath("../Button1")
+focus_previous = NodePath("../Button9")
+text = "0"
+
+[node name="ButtonClear" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Button0")
+focus_neighbor_top = NodePath("../Button9")
+focus_neighbor_right = NodePath("../ButtonBack")
+focus_neighbor_bottom = NodePath("../../HBoxContainer/ButtonCancel")
+text = "X"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonConfirm" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../ButtonCancel")
+focus_neighbor_top = NodePath("../../GridContainer/ButtonBack")
+focus_neighbor_right = NodePath("../ButtonCancel")
+focus_neighbor_bottom = NodePath("../../LineEdit")
+focus_next = NodePath("../ButtonCancel")
+focus_previous = NodePath("../ButtonCancel")
+text = "Confirm"
+
+[node name="ButtonCancel" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../ButtonConfirm")
+focus_neighbor_top = NodePath("../../GridContainer/ButtonClear")
+focus_neighbor_right = NodePath("../ButtonConfirm")
+focus_neighbor_bottom = NodePath("../../LineEdit")
+focus_next = NodePath("../ButtonConfirm")
+focus_previous = NodePath("../ButtonConfirm")
+text = "Cancel"

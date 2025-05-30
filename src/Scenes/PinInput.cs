@@ -1,0 +1,130 @@
+using Godot;
+using Godot.Collections;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+public partial class PinInput : Control
+{
+    [Export]
+    LineEdit PinLineEdit;
+    [Export]
+    Array<Button> NumberButtons;
+    [Export]
+    Button BackButton;
+    [Export]
+    Button ClearButton;
+    [Export]
+    Button AcceptButton;
+    [Export]
+    Button CancelButton;
+
+    private bool complete = false;
+    private bool canceled = false;
+    private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://cmeq4kkqbu0iw");
+
+    public static async Task<List<int>> RequestPin(Node SceneRoot)
+    {
+        Control FocusOwner = SceneRoot.GetViewport().GuiGetFocusOwner();
+
+        PinInput node = SelfRef.Instantiate<PinInput>();
+        SceneRoot = SceneRoot.GetNode("/root/Main");
+        SceneRoot.AddChild(node);
+
+        List<int> ints = await Task.Run(node.GetPinBlocking);
+        node.QueueFree();
+
+        FocusOwner.GrabFocus();
+
+        return ints;
+    }
+
+    private PinInput()
+    {}
+
+    private List<int> GetPinBlocking()
+    {
+        while (!complete)
+        { }
+
+        if (canceled)
+            return [];
+
+        List<int> ints = [];
+        var PinText = PinLineEdit.Text;
+        foreach (char c in PinText)
+        {
+            ints.Add(int.Parse(c.ToString()));
+        }
+
+        return ints;
+    }
+
+    public override void _Ready()
+    {
+        if (PinLineEdit == null)
+            return;
+
+        PinLineEdit.GrabFocus();
+
+        PinLineEdit.GuiInput += @event =>
+        {
+            if (@event.IsActionPressed("ui_accept"))
+            {
+                PinLineEdit.ReleaseFocus();
+                complete = true;
+            }
+
+            if (@event.IsActionPressed("ui_down"))
+            {
+                NumberButtons[1].GrabFocus();
+            }
+
+            if (NumericRegex().Matches(@event.AsText()).Count <= 0)
+            {
+                // Stop event from reaching the UI.
+                PinLineEdit.AcceptEvent();
+            }
+        };
+
+        if (NumberButtons != null)
+        {
+            int i = 0;
+            foreach (Button button in NumberButtons)
+            {
+                int num = i;
+                button.Pressed += () =>
+                {
+                    PinLineEdit.Text = $"{PinLineEdit.Text}{num}";
+                };
+                i++;
+            }
+        }
+
+        BackButton.Pressed += () =>
+        {
+            PinLineEdit.Text = $"{PinLineEdit.Text.Left(PinLineEdit.Text.Length - 1)}";
+        };
+
+        ClearButton.Pressed += () =>
+        {
+            PinLineEdit.Text = "";
+        };
+
+        AcceptButton.Pressed += () =>
+        {
+            complete = true;
+        };
+
+        CancelButton.Pressed += () =>
+        {
+            canceled = true;
+            complete = true;
+        };
+    }
+
+    [GeneratedRegex("[0-9]")]
+    private static partial Regex NumericRegex();
+}
