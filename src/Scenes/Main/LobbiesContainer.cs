@@ -65,9 +65,8 @@ public partial class LobbiesContainer : VBoxContainer
 
     private void AddLobby(Resources.WolfAPI.Lobby lobby)
     {
-        if(lobby.pin != null)
-            return;
         var node = LobbyScene.Instantiate<UI.Lobby>();
+        node.LobbySettings = lobby;
         node.Name = lobby.id;
         node.AppName = lobby.name;
         if(lobby.profile_id != null)
