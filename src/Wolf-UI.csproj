@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
-    <RootNamespace>WolfManagement</RootNamespace>
+    <RootNamespace>WolfUI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Docker.DotNet" Version="3.125.15" />

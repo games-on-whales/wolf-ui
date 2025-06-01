@@ -29,7 +29,7 @@ display_server/driver.linuxbsd="wayland"
 
 [dotnet]
 
-project/assembly_name="Wolf Management"
+project/assembly_name="Wolf-UI"
 
 [editor_plugins]
 
