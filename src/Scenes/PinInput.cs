@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -10,8 +9,6 @@ public partial class PinInput : Control
     [Export]
     LineEdit PinLineEdit;
     [Export]
-    Array<Button> NumberButtons;
-    [Export]
     Button BackButton;
     [Export]
     Button ClearButton;
@@ -20,10 +17,10 @@ public partial class PinInput : Control
     [Export]
     Button CancelButton;
 
-    private bool complete = false;
     private bool canceled = false;
     private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://cmeq4kkqbu0iw");
     readonly CancellationTokenSource cancelSource = new();
+    List<Button> NumberButtons;
 
     public static async Task<List<int>> RequestPin(Node SceneRoot)
     {
@@ -36,7 +33,7 @@ public partial class PinInput : Control
         List<int> ints = await Task.Run(node.GetPinBlocking);
         node.QueueFree();
 
-        if(IsInstanceValid(FocusOwner))
+        if (FocusOwner != null && IsInstanceValid(FocusOwner))
             FocusOwner.GrabFocus();
 
         return ints;
@@ -68,12 +65,19 @@ public partial class PinInput : Control
 
         PinLineEdit.GrabFocus();
 
+        NumberButtons = [];
+        for (int i = 0; i < 10; i++)
+        {
+            NumberButtons.Add(GetNode<Button>($"%Button{i}"));
+        }
+        
+
         PinLineEdit.GuiInput += @event =>
         {
             if (@event.IsActionPressed("ui_accept"))
             {
                 PinLineEdit.ReleaseFocus();
-                complete = true;
+                cancelSource.Cancel();
             }
 
             if (@event.IsActionPressed("ui_down"))
