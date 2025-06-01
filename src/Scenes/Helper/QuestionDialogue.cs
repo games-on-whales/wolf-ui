@@ -35,7 +35,7 @@ public partial class QuestionDialogue : Control
 
         foreach (KeyValuePair<string, T> kv in Choices)
         {
-            GD.Print($"k:{kv.Key} v:{kv.Value}");
+            //GD.Print($"k:{kv.Key} v:{kv.Value}");
             T CapuredAnswer = kv.Value;
             Button b = new()
             {
