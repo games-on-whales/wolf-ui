@@ -143,14 +143,14 @@ grow_vertical = 2
 [node name="ProfilesContainer" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles"]
 custom_minimum_size = Vector2(0, 260)
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 6
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_right = 15
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/ProfilesContainer"]
 custom_minimum_size = Vector2(400, 270)
 layout_mode = 2
-size_flags_vertical = 6
+size_flags_vertical = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/ProfilesContainer/ScrollContainer"]
 layout_mode = 2
@@ -165,14 +165,17 @@ size_flags_vertical = 4
 
 [node name="LobbiesContainer" type="VBoxContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles"]
 layout_mode = 2
+size_flags_vertical = 3
 script = ExtResource("12_udh0u")
 LobbyScene = ExtResource("13_xggvw")
 
 [node name="LobbiesHeader" type="PanelContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer"]
 layout_mode = 2
+size_flags_vertical = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer/LobbiesHeader"]
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 5
@@ -180,13 +183,14 @@ theme_override_constants/margin_bottom = 3
 
 [node name="LobbiesLabel" type="Label" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer/LobbiesHeader/MarginContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 6
 text = "Running Lobbies"
 horizontal_alignment = 1
 
 [node name="Lobbies" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer"]
 custom_minimum_size = Vector2(0, 250)
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_right = 15
 
@@ -218,10 +222,10 @@ AppContainer = NodePath("Apps/GridContainer")
 AppEntryScene = ExtResource("2_rsqs3")
 
 [node name="Apps" type="ScrollContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/AppList"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 31.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3

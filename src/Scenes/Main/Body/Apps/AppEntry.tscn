@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cnikdy0rfhss" path="res://Scenes/Main/Body/Apps/AppMenu.tscn" id="3_goyyk"]
 
 [node name="AppEntry" type="Button" node_paths=PackedStringArray("AppProgress", "AppLabel", "DownloadIcon")]
-custom_minimum_size = Vector2(200, 260)
+custom_minimum_size = Vector2(200, 265)
 offset_right = 180.0
 offset_bottom = 240.0
 mouse_filter = 1

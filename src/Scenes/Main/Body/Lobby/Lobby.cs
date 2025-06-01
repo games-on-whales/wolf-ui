@@ -2,6 +2,7 @@ using Godot;
 using Resources.WolfAPI;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 //TODO Add User counter, Add check if Lobby is empty on Stop and if not ask again.
 namespace UI

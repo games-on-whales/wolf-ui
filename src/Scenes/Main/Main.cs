@@ -27,11 +27,13 @@ namespace UI
 
 			soundEffects.CallDeferred(SoundEffects.MethodName.ApplySoundEffects, this);
 
-			var time = new Timer();
-			time.WaitTime = 0.1;
-			time.OneShot = false;
-			time.Autostart = true;
-			time.Timeout += () => {
+            var time = new Timer
+            {
+                WaitTime = 0.1,
+                OneShot = false,
+                Autostart = true
+            };
+            time.Timeout += () => {
 				soundEffects.ApplySoundEffects(this);
 			};
 
