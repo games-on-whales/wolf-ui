@@ -68,11 +68,18 @@ public partial class AppMenu : CenterContainer
             }
         }
 
-        if(curr_session == null)
-        {
-            GD.Print("No owned Session found. Is this run without Wolf?");
-            return;
-        }
+		if (curr_session == null)
+		{
+			GD.Print("No owned Session found. Is this run without Wolf?");
+			curr_session = new()
+			{
+				video_width = 1920,
+				video_height = 1080,
+				video_refresh_rate = 60,
+				audio_channel_count = 2,
+				client_settings = new()
+			};
+		}
 
 		Resources.WolfAPI.Lobby lobby = new()
 		{
@@ -109,8 +116,11 @@ public partial class AppMenu : CenterContainer
 		}
 
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
-		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
-		CallDeferred(MethodName.QueueFree);
+		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
+		
+		if (IsInstanceValid(this))
+			QueueFree();
+
 		appEntry.GrabFocus();
 	}
 
