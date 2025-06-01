@@ -1,9 +1,8 @@
 using Godot;
 using Godot.Collections;
-using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 public partial class PinInput : Control
@@ -24,6 +23,7 @@ public partial class PinInput : Control
     private bool complete = false;
     private bool canceled = false;
     private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://cmeq4kkqbu0iw");
+    readonly CancellationTokenSource cancelSource = new();
 
     public static async Task<List<int>> RequestPin(Node SceneRoot)
     {
@@ -41,13 +41,11 @@ public partial class PinInput : Control
         return ints;
     }
 
-    private PinInput()
-    {}
+    private PinInput(){}
 
     private List<int> GetPinBlocking()
     {
-        while (!complete)
-        { }
+        cancelSource.Token.WaitHandle.WaitOne();
 
         if (canceled)
             return [];
@@ -115,13 +113,13 @@ public partial class PinInput : Control
 
         AcceptButton.Pressed += () =>
         {
-            complete = true;
+            cancelSource.Cancel();
         };
 
         CancelButton.Pressed += () =>
         {
             canceled = true;
-            complete = true;
+            cancelSource.Cancel();
         };
     }
 
