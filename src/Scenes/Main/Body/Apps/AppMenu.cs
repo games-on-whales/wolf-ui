@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using Resources.WolfAPI;
 using UI;
@@ -55,7 +56,7 @@ public partial class AppMenu : CenterContainer
 	private async void OnCoopPressed()
 	{
 		var main = GetNode<Main>("/root/Main");
-		
+
         var sessions = await WolfAPI.GetAsync<Sessions>("http://localhost/api/v1/sessions");
         Session curr_session = null;
         foreach(var session in sessions?.sessions)
@@ -95,6 +96,17 @@ public partial class AppMenu : CenterContainer
 			},
 			client_settings = curr_session.client_settings
 		};
+
+		if (await QuestionDialogue.OpenDialogue(main, "Pin", "Add Pin to Lobby?",
+			new System.Collections.Generic.Dictionary<string, bool> {
+				{ "Yes", true },
+				{ "No", false }
+			}
+		))
+		{
+			List<int> pin = await PinInput.RequestPin(main);
+			lobby.pin = pin;
+		}
 
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
 		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
