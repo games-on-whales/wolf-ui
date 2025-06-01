@@ -36,7 +36,8 @@ public partial class PinInput : Control
         List<int> ints = await Task.Run(node.GetPinBlocking);
         node.QueueFree();
 
-        FocusOwner.GrabFocus();
+        if(IsInstanceValid(FocusOwner))
+            FocusOwner.GrabFocus();
 
         return ints;
     }
