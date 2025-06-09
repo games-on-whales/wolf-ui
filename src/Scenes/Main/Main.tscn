@@ -1,25 +1,21 @@
-[gd_scene load_steps=23 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=19 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
-[ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Scenes/Main/Body/Apps/AppEntry.tscn" id="2_rsqs3"]
 [ext_resource type="Script" uid="uid://ej4uorvu6hbj" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
 [ext_resource type="Resource" uid="uid://81qforug05j7" path="res://Resources/WolfAPI/WolfAPI.tres" id="4_12uqu"]
 [ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
 [ext_resource type="Texture2D" uid="uid://b1wng8q2m6i68" path="res://Icons/arrow-left-svgrepo-com.svg" id="6_hcu3t"]
-[ext_resource type="Script" uid="uid://cp32hsvi4wpej" path="res://Scenes/Main/Body/Users/UserList.cs" id="6_u8v04"]
 [ext_resource type="Script" uid="uid://bpe8wv7q6ajud" path="res://Scenes/Main/Body/VisibilitySwitcher.cs" id="7_axei7"]
 [ext_resource type="Script" uid="uid://cnrk2pyyp3r1p" path="res://Scenes/Main/Header/OptionsButton.cs" id="7_qdkat"]
 [ext_resource type="Script" uid="uid://c4tkdw88qp173" path="res://Scenes/Main/Header/ExitButton.cs" id="8_qdkat"]
-[ext_resource type="Script" uid="uid://brs0ic67iu2en" path="res://Scenes/Main/Body/Apps/AppList.cs" id="10_b2kb5"]
-[ext_resource type="PackedScene" uid="uid://i2pa0j4ijr4s" path="res://Scenes/Main/Body/Users/User.tscn" id="10_hcu3t"]
+[ext_resource type="PackedScene" uid="uid://dn04imsbhqte8" path="res://Scenes/Main/Body/Users/UserList.tscn" id="10_hcu3t"]
 [ext_resource type="Script" uid="uid://dcscvb3d1pva5" path="res://Scenes/Main/SoundEffects.cs" id="10_ykwdk"]
 [ext_resource type="AudioStream" uid="uid://c7e7c53qiijki" path="res://Audio/click.ogg" id="11_ecuro"]
+[ext_resource type="PackedScene" uid="uid://b4qkc5ost514t" path="res://Scenes/Main/Body/Apps/AppList.tscn" id="11_epx8f"]
 [ext_resource type="AudioStream" uid="uid://csnwuih5mmn5g" path="res://Audio/accept.ogg" id="11_hdjvh"]
 [ext_resource type="Texture2D" uid="uid://bqmbshokjcw3n" path="res://Icons/Controller/Keyboard/Keyboard_Black_Enter.png" id="12_epx8f"]
-[ext_resource type="Script" uid="uid://ba5e67ap55vwb" path="res://Scenes/Main/LobbiesContainer.cs" id="12_udh0u"]
 [ext_resource type="Script" uid="uid://bj71nhnsgexja" path="res://Scenes/Main/Footer/ControllerIcon.cs" id="13_epx8f"]
-[ext_resource type="PackedScene" uid="uid://b8hqqrgs44qe1" path="res://Scenes/Main/Body/Lobby/Lobby.tscn" id="13_xggvw"]
 [ext_resource type="Texture2D" uid="uid://dru6vbmje5lxu" path="res://Icons/Controller/Keyboard/Keyboard_Black_Esc.png" id="14_hcu3t"]
 
 [sub_resource type="Resource" id="Resource_tl3on"]
@@ -117,126 +113,14 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_axei7")
 
-[node name="UserList" type="Control" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu", "UserMenu", "AppGrid", "UserContainer")]
+[node name="UserList" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu") instance=ExtResource("10_hcu3t")]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("6_u8v04")
 AppMenu = NodePath("../AppList")
-UserMenu = NodePath(".")
-AppGrid = NodePath("../AppList/Apps/GridContainer")
-UserContainer = NodePath("Profiles/ProfilesContainer/ScrollContainer/MarginContainer/HBoxContainer")
-UserEntry = ExtResource("10_hcu3t")
 
-[node name="Profiles" type="VBoxContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList"]
+[node name="AppList" parent="VBoxContainer/Menus/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
 layout_mode = 1
 anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="ProfilesContainer" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles"]
-custom_minimum_size = Vector2(0, 260)
-layout_mode = 2
-size_flags_vertical = 6
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_right = 15
-
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/ProfilesContainer"]
-custom_minimum_size = Vector2(400, 270)
-layout_mode = 2
-size_flags_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/ProfilesContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 6
-theme_override_constants/margin_top = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/ProfilesContainer/ScrollContainer/MarginContainer"]
-custom_minimum_size = Vector2(0, 260)
-layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 4
-
-[node name="LobbiesContainer" type="VBoxContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles"]
-layout_mode = 2
-size_flags_vertical = 3
-script = ExtResource("12_udh0u")
-LobbyScene = ExtResource("13_xggvw")
-
-[node name="LobbiesHeader" type="PanelContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer"]
-layout_mode = 2
-size_flags_vertical = 0
-
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer/LobbiesHeader"]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 3
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 3
-
-[node name="LobbiesLabel" type="Label" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer/LobbiesHeader/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 6
-text = "Running Lobbies"
-horizontal_alignment = 1
-
-[node name="Lobbies" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer"]
-custom_minimum_size = Vector2(0, 250)
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_right = 15
-
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer/Lobbies"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer/Lobbies/ScrollContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 2
-
-[node name="Lobbies" type="HBoxContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/UserList/Profiles/LobbiesContainer/Lobbies/ScrollContainer/MarginContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="AppList" type="Control" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppContainer")]
-visible = false
-layout_mode = 2
-anchors_preset = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_vertical = 3
-script = ExtResource("10_b2kb5")
-AppContainer = NodePath("Apps/GridContainer")
-AppEntryScene = ExtResource("2_rsqs3")
-
-[node name="Apps" type="ScrollContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/AppList"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-follow_focus = true
-horizontal_scroll_mode = 3
-
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Menus/VisibilitySwitcher/AppList/Apps"]
-layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 6
-columns = 6
 
 [node name="Footer" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2

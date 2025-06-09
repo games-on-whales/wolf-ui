@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://b4qkc5ost514t"]
+
+[ext_resource type="Script" uid="uid://brs0ic67iu2en" path="res://Scenes/Main/Body/Apps/AppList.cs" id="1_wixkc"]
+[ext_resource type="PackedScene" uid="uid://chspw2lt1qcuc" path="res://Scenes/Main/Body/Apps/AppEntry.tscn" id="2_mpp8u"]
+
+[node name="AppList" type="Control" node_paths=PackedStringArray("AppContainer")]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+script = ExtResource("1_wixkc")
+AppContainer = NodePath("Apps/GridContainer")
+AppEntryScene = ExtResource("2_mpp8u")
+
+[node name="Apps" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+follow_focus = true
+horizontal_scroll_mode = 3
+
+[node name="GridContainer" type="GridContainer" parent="Apps"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+columns = 6

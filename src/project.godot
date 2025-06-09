@@ -33,7 +33,7 @@ project/assembly_name="Wolf-UI"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/onscreenkeyboard/plugin.cfg")
+enabled=PackedStringArray()
 
 [gui]
 

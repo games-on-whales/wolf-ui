@@ -3,6 +3,7 @@ using Resources.WolfAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UI;
 using WolfManagement.Resources;
@@ -11,20 +12,23 @@ using WolfManagement.Resources;
 public partial class UserList : Control
 {
 	[Export]
-	Control AppMenu;
-	[Export]
-	Control UserMenu;
-	[Export]
-	Control AppGrid;
-	[Export]
-	Container UserContainer;
-	[Export]
-	PackedScene UserEntry;
+	Control AppMenu;//{ get { return GetNode<Control>(""); } }
+	private Container _UserContainer = null;
+	Container UserContainer
+	{
+		get
+		{
+			if (_UserContainer != null)
+				return _UserContainer;
+			_UserContainer = GetNode<Container>("%UserContainer");
+			return _UserContainer;
+		}
+	}
 
 	// Called when the node enters the scene tree for the first time.
 	public override async void _Ready()
 	{
-		if(Engine.IsEditorHint())
+		if (Engine.IsEditorHint())
 		{
 			EditorMockupReady();
 			return;
@@ -36,8 +40,9 @@ public partial class UserList : Control
 
 		Visible = true;
 
-		VisibilityChanged += async () => {
-			if(Visible)
+		VisibilityChanged += async () =>
+		{
+			if (Visible)
 			{
 				await LoadUsers();
 			}
@@ -54,19 +59,14 @@ public partial class UserList : Control
 
 		var profiles = await WolfAPI.GetProfiles();
 
-		foreach(var User in profiles)
+		foreach(var user in profiles)
 		{
-			Button button = UserEntry.Instantiate<Button>();
-			if(button is User user)
-			{
-				user.profile = User;
-			}
-			//Button button = new(){ Text = User.name };
-			button.Pressed += () => {
-				WolfAPI.Profile = User;
+			User userNode = User.Create(user);
+			userNode.Pressed += () => {
+				WolfAPI.Profile = user;
 				AppMenu.Visible = true;
 			};
-			UserContainer.AddChild(button);
+			UserContainer.AddChild(userNode);
 		}
 
 		var ch = UserContainer.GetChildren();
@@ -89,16 +89,10 @@ public partial class UserList : Control
 			new(){ name = "Eight" },
 			new(){ name = "Nine" }
 		};
-		foreach(var User in UserList)
+		foreach(var usr in UserList)
 		{
-			Button button = UserEntry.Instantiate<Button>();
-			button.Name = User.name;
-			UserContainer.AddChild(button);
+			User user = User.Create(usr);
+			UserContainer.AddChild(user);
 		}
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
 	}
 }

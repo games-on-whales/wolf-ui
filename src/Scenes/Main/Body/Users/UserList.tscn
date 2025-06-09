@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://dn04imsbhqte8"]
+
+[ext_resource type="Script" uid="uid://cp32hsvi4wpej" path="res://Scenes/Main/Body/Users/UserList.cs" id="1_vcdio"]
+[ext_resource type="PackedScene" uid="uid://dylvrnd6it8e6" path="res://Scenes/Main/Body/Lobby/LobbiesContainer.tscn" id="2_r48rb"]
+
+[node name="UserList" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vcdio")
+
+[node name="Profiles" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ProfilesContainer" type="MarginContainer" parent="Profiles"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_right = 15
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Profiles/ProfilesContainer"]
+custom_minimum_size = Vector2(400, 270)
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Profiles/ProfilesContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_constants/margin_top = 2
+
+[node name="UserContainer" type="HBoxContainer" parent="Profiles/ProfilesContainer/ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+
+[node name="LobbiesContainer" parent="Profiles" instance=ExtResource("2_r48rb")]
+layout_mode = 2

@@ -112,7 +112,7 @@ public partial class AppList : Control
 			return;
 
 		var Images = await docker.ListImages();
-		HashSet<string> existingImages = new();
+		HashSet<string> existingImages = [];
 		foreach(var image in Images)
 		{
 			if(image.RepoTags.Count > 0)

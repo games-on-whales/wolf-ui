@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cmeq4kkqbu0iw"]
 
-[ext_resource type="Script" uid="uid://b6jbv5s4xio24" path="res://Scenes/PinInput.cs" id="1_vn0ie"]
+[ext_resource type="Script" uid="uid://b6jbv5s4xio24" path="res://Scenes/Helper/PinInput.cs" id="1_vn0ie"]
 
 [node name="PinInput" type="Control" node_paths=PackedStringArray("PinLineEdit", "BackButton", "ClearButton", "AcceptButton", "CancelButton")]
 layout_mode = 3

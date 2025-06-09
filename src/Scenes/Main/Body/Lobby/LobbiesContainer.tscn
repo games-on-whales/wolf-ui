@@ -1,0 +1,50 @@
+[gd_scene load_steps=3 format=3 uid="uid://dylvrnd6it8e6"]
+
+[ext_resource type="Script" uid="uid://ba5e67ap55vwb" path="res://Scenes/Main/Body/Lobby/LobbiesContainer.cs" id="1_4f5y8"]
+[ext_resource type="PackedScene" uid="uid://b8hqqrgs44qe1" path="res://Scenes/Main/Body/Lobby/Lobby.tscn" id="2_ira46"]
+
+[node name="LobbiesContainer" type="VBoxContainer"]
+offset_right = 951.0
+offset_bottom = 283.0
+size_flags_vertical = 3
+script = ExtResource("1_4f5y8")
+LobbyScene = ExtResource("2_ira46")
+
+[node name="LobbiesHeader" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="LobbiesHeader"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 3
+
+[node name="LobbiesLabel" type="Label" parent="LobbiesHeader/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "Running Lobbies"
+horizontal_alignment = 1
+
+[node name="Lobbies" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_right = 15
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Lobbies"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Lobbies/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 2
+
+[node name="Lobbies" type="HBoxContainer" parent="Lobbies/ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
