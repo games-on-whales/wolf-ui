@@ -28,6 +28,7 @@ namespace Resources.WolfAPI
 
         private static string SessionId = "";
         public static string session_id {get{ return SessionId;}}
+        public static Profile Profile = null;
         private static bool StartedListening = false;
 
         public WolfAPI()
@@ -78,16 +79,25 @@ namespace Resources.WolfAPI
 
         public static async Task<Texture2D> GetAppIcon(App app)
         {
-            if(app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
+            if (app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
                 return null;
 
-            var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/").TrimSuffix(":edge");
-            System.Net.Http.HttpClient httpClient = new();
-            var result = await httpClient.GetByteArrayAsync($"https://github.com/games-on-whales/gow/blob/master/apps/{name}/assets/icon.png?raw=true");
-            Image image = new();
-            image.LoadPngFromBuffer(result);
-            Texture2D texture2D = ImageTexture.CreateFromImage(image);
-            return texture2D;
+            if (app.icon_png_path == null) // no image set, get default from github
+            {
+                var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/").TrimSuffix(":edge");
+                System.Net.Http.HttpClient httpClient = new();
+                var result = await httpClient.GetByteArrayAsync($"https://github.com/games-on-whales/gow/blob/master/apps/{name}/assets/icon.png?raw=true");
+                Image image = new();
+                image.LoadPngFromBuffer(result);
+                Texture2D texture2D = ImageTexture.CreateFromImage(image);
+                return texture2D;
+            }
+            else // image is set create texure and pass it back, TODO: Allow links for images.
+            {
+                var image = Image.LoadFromFile(app.icon_png_path);
+                var texture = ImageTexture.CreateFromImage(image);
+                return texture;
+            }
         }
 
         public async void StartListenToAPIEvents()

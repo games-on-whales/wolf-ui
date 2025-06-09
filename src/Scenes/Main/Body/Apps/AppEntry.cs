@@ -19,7 +19,8 @@ namespace UI
 
 		private App App;
 		public string Title { get{ return App.title; } }
-		private string AppDisplayImagePath { get{ return App.icon_png_path ?? ""; } }
+		public string Id {get{ return App.id;  }}
+		private string AppDisplayImagePath { get { return App.icon_png_path ?? ""; } }
 		public Runner runner { get{ return App.runner; } }
 		public string render_node { get{ return App.render_node; }}
 
@@ -90,17 +91,10 @@ namespace UI
 
 		public async void SetIcon()
 		{
-			if(AppDisplayImagePath == "")
-			{
-				var icon = await WolfAPI.GetAppIcon(App);
-				if(icon != null)
-					Icon = icon;
-				return;
-			}
-			
-			var image = Image.LoadFromFile(AppDisplayImagePath);
-			var texture = ImageTexture.CreateFromImage(image);
-			Icon = texture;
+			var icon = await WolfAPI.GetAppIcon(App);
+			if(icon != null)
+				Icon = icon;
+			return;
 		}
 
 		public string GetFocusPath()

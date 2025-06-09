@@ -52,9 +52,7 @@ public partial class AppList : Control
 		foreach(var child in AppContainer.GetChildren())
 			child.QueueFree();
 
-		var Main = GetNode<Main>("/root/Main");
-		var profile = Main.SelectedProfile;
-		List<App> Apps = await WolfAPI.GetApps(profile);//Main.config.GetApps();
+		List<App> Apps = await WolfAPI.GetApps(WolfAPI.Profile);//Main.config.GetApps();
 
 		int i = 1;
 		foreach(var app in Apps)

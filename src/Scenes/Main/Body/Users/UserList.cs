@@ -63,8 +63,7 @@ public partial class UserList : Control
 			}
 			//Button button = new(){ Text = User.name };
 			button.Pressed += () => {
-				var Main = GetNode<Main>("/root/Main");
-				Main.SelectedProfile = User;
+				WolfAPI.Profile = User;
 				AppMenu.Visible = true;
 			};
 			UserContainer.AddChild(button);
