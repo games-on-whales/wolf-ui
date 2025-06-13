@@ -159,8 +159,8 @@ public partial class AppMenu : CenterContainer
 			profile_id = WolfAPI.Profile.id,
 			name = appEntry.Title,
 			multi_user = true,
-			stop_when_everyone_leaves = true,
-			runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{appEntry.Title}-Coop",
+			stop_when_everyone_leaves = false,
+			runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{appEntry.runner.name}-Coop",
 			runner = appEntry.runner,
 			video_settings = new()
 			{
