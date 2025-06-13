@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Resources.WolfAPI;
 using UI;
@@ -16,12 +17,12 @@ public partial class AppMenu : CenterContainer
 	AppEntry appEntry;
 
 	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		var Main = GetNode<Main>("/root/Main");
 
 		var parent = GetParent();
-		if(parent is AppEntry app)
+		if (parent is AppEntry app)
 		{
 			appEntry = app;
 		}
@@ -31,6 +32,15 @@ public partial class AppMenu : CenterContainer
 		UpdateButton.Pressed += OnUpdatePressed;
 		CancelButton.Pressed += OnCancelPressed;
 		StartButton.GrabFocus();
+
+		var curr_lobbies = await WolfAPI.GetLobbies();
+		var lobby = curr_lobbies.FindAll((l) =>
+		{
+			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
+							 l.name == appEntry.Title;
+			return isRunning;
+		}).FirstOrDefault();
+		StartButton.Text = lobby == null ? "Start" : "Connect";
 	}
 
 	private void OnCancelPressed()
@@ -48,25 +58,26 @@ public partial class AppMenu : CenterContainer
 
 	private async void OnStartPressed()
 	{
-		/* old start code
-		GD.Print(appEntry.Id);
-		GD.Print(appEntry.Title);
-		GD.Print(appEntry.runner.name);
-		await WolfAPI.StartApp(appEntry.runner);
-		CallDeferred(MethodName.QueueFree);
-		appEntry.GrabFocus();
-		*/
+		//TODO: check if user already has a open singleplayer lobby for the chosen app and if yes re-join.
 
-        var sessions = await WolfAPI.GetAsync<Sessions>("http://localhost/api/v1/sessions");
-        Session curr_session = null;
-        foreach(var session in sessions?.sessions)
-        {
-            if(session.client_id == WolfAPI.session_id)
-            {
-                curr_session = session;
-                break;
-            }
-        }
+		var curr_lobbies = await WolfAPI.GetLobbies();
+		var lobby = curr_lobbies.FindAll((l) =>
+		{
+			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
+							 l.name == appEntry.Title;
+			return isRunning;
+		}).FirstOrDefault();
+
+		var sessions = await WolfAPI.GetAsync<Sessions>("http://localhost/api/v1/sessions");
+		Session curr_session = null;
+		foreach (var session in sessions?.sessions)
+		{
+			if (session.client_id == WolfAPI.session_id)
+			{
+				curr_session = session;
+				break;
+			}
+		}
 
 		if (curr_session == null)
 		{
@@ -81,30 +92,34 @@ public partial class AppMenu : CenterContainer
 			};
 		}
 
-		Resources.WolfAPI.Lobby lobby = new()
+		var lobby_id = lobby?.id;
+		if (lobby == null)
 		{
-			profile_id = WolfAPI.Profile.id,
-			name = appEntry.Title,
-			multi_user = true,
-			stop_when_everyone_leaves = false,
-			runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{appEntry.runner.name}",
-			runner = appEntry.runner,
-			video_settings = new()
+			lobby = new()
 			{
-				width = curr_session.video_width,
-				height = curr_session.video_height,
-				refresh_rate = curr_session.video_refresh_rate,
-				runner_render_node = appEntry.render_node,
-				wayland_render_node = appEntry.render_node
-			},
-			audio_settings = new()
-			{
-				channel_count = curr_session.audio_channel_count
-			},
-			client_settings = curr_session.client_settings
-		};
+				profile_id = WolfAPI.Profile.id,
+				name = appEntry.Title,
+				multi_user = false,
+				stop_when_everyone_leaves = false,
+				runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{appEntry.runner.name}",
+				runner = appEntry.runner,
+				video_settings = new()
+				{
+					width = curr_session.video_width,
+					height = curr_session.video_height,
+					refresh_rate = curr_session.video_refresh_rate,
+					runner_render_node = appEntry.render_node,
+					wayland_render_node = appEntry.render_node
+				},
+				audio_settings = new()
+				{
+					channel_count = curr_session.audio_channel_count
+				},
+				client_settings = curr_session.client_settings
+			};
+			lobby_id = await WolfAPI.CreateLobby(lobby);
+		}
 
-		var lobby_id = await WolfAPI.CreateLobby(lobby);
 		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
 		
 		if (IsInstanceValid(this))
@@ -187,9 +202,9 @@ public partial class AppMenu : CenterContainer
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if(!StartButton.HasFocus() && !UpdateButton.HasFocus() && !CancelButton.HasFocus() && !CoopButton.HasFocus())
+		if (!StartButton.HasFocus() && !UpdateButton.HasFocus() && !CancelButton.HasFocus() && !CoopButton.HasFocus())
 			QueueFree();
-		if(Input.IsActionPressed("ui_cancel"))
+		if (Input.IsActionPressed("ui_cancel"))
 		{
 			QueueFree();
 			appEntry.GrabFocus();
