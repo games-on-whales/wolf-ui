@@ -3,6 +3,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -79,22 +80,55 @@ namespace Resources.WolfAPI
 
         public static async Task<Texture2D> GetAppIcon(App app)
         {
-            if (app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
-                return null;
-
             if (app.icon_png_path == null) // no image set, get default from github
             {
-                var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/").TrimSuffix(":edge");
+                if (app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
+                    return null;
+
+                var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/");//.TrimSuffix(":edge");
+                int idx = name.LastIndexOf(':');
+                if(idx >= 0)
+                   name = name[..idx];
+
+                string user = System.Environment.GetEnvironmentVariable("USER");
+                user = (user == "root" || user == null) ? "retro" : user;
+                string filepath = $"/home/{user}/.wolf-ui/tmp/{name}.png";
+
+                Image image;
+                
+                if (File.Exists(filepath))
+                {
+                    image = Image.LoadFromFile(filepath);
+                    return ImageTexture.CreateFromImage(image);
+                }
+
                 System.Net.Http.HttpClient httpClient = new();
                 var result = await httpClient.GetByteArrayAsync($"https://github.com/games-on-whales/gow/blob/master/apps/{name}/assets/icon.png?raw=true");
-                Image image = new();
+                image = new();
                 image.LoadPngFromBuffer(result);
+                Directory.CreateDirectory(Path.GetDirectoryName(filepath));
+                image.SavePng(filepath);
                 Texture2D texture2D = ImageTexture.CreateFromImage(image);
                 return texture2D;
             }
-            else // image is set create texure and pass it back, TODO: Allow links for images.
+            else
             {
-                var image = Image.LoadFromFile(app.icon_png_path);
+                bool isHttp = Uri.TryCreate(app.icon_png_path, UriKind.Absolute, out Uri uriResult)
+                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+                Image image;
+                if (isHttp)
+                {
+                    System.Net.Http.HttpClient httpClient = new();
+                    var result = await httpClient.GetByteArrayAsync(app.icon_png_path);
+                    image = new();
+                    image.LoadPngFromBuffer(result);
+                }
+                else
+                {
+                    image = Image.LoadFromFile(app.icon_png_path);
+                }
+
                 var texture = ImageTexture.CreateFromImage(image);
                 return texture;
             }
