@@ -18,25 +18,40 @@ namespace UI
 		public override void _Ready()
 		{
 			SoundEffects soundEffects = null;
-			foreach(var child in GetChildren())
+			foreach (var child in GetChildren())
 			{
-				if(child is SoundEffects effects)
+				if (child is SoundEffects effects)
 					soundEffects = effects;
 			}
 
 			soundEffects.CallDeferred(SoundEffects.MethodName.ApplySoundEffects, this);
 
-            var time = new Timer
-            {
-                WaitTime = 0.1,
-                OneShot = false,
-                Autostart = true
-            };
-            time.Timeout += () => {
+			var time = new Timer
+			{
+				WaitTime = 0.1,
+				OneShot = false,
+				Autostart = true
+			};
+			time.Timeout += () =>
+			{
 				soundEffects.ApplySoundEffects(this);
 			};
 
 			AddChild(time);
+
+			docker.UpdateCachedImages();
+			var time2 = new Timer
+			{
+				WaitTime = 10.0,
+				OneShot = false,
+				Autostart = true
+			};
+			time2.Timeout += () =>
+			{
+				docker.UpdateCachedImages();
+			};
+
+			AddChild(time2);
 
 			wolfAPI.StartListenToAPIEvents();
 
@@ -47,5 +62,5 @@ namespace UI
 		{
 			controllerMap.SetController(@event);
 		}
-    }
+	}
 }

@@ -4,6 +4,7 @@ using Docker.DotNet.Models;
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +13,14 @@ namespace WolfManagement.Resources
     [GlobalClass]
     public partial class DockerController : Resource
     {
+        private static HashSet<string> _cachedImages = [];
+        public static HashSet<string> CachedImages {
+            get
+            {
+                return _cachedImages;
+            }
+        }
+
         DockerClient client;
         // Called when the node enters the scene tree for the first time.
         public DockerController()
@@ -21,10 +30,21 @@ namespace WolfManagement.Resources
                 .CreateClient();
         }
 
+        public async void UpdateCachedImages()
+        {
+            var imgs = await ListImages();
+            _cachedImages.Clear();
+            foreach (var i in imgs)
+            {
+                if(i.RepoTags.Count > 0)
+                    _cachedImages.Add(i.RepoTags.First());
+            }
+        }
+
         public async Task<bool> ImageExists(string Image, string Tag = "latest")
         {
             var image = await ListImage(Image, Tag);
-            if(image == null)
+            if (image == null)
                 return false;
             return true;
         }

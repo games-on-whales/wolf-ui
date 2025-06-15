@@ -1,16 +1,38 @@
-
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 
 namespace Resources.WolfAPI
 {
+/* Test for directly serializing and deserializing Godot Objects like Nodes.
+    public sealed class OptinJsonTypeInfoResolver : DefaultJsonTypeInfoResolver
+    {
+        public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
+        {
+            JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);
+
+            List<JsonPropertyInfo> prop_to_remove = [.. jsonTypeInfo.Properties
+                    .Where(prop => !prop.AttributeProvider.IsDefined(typeof(JsonIncludeAttribute), false))];
+
+            foreach (var prop in prop_to_remove)
+            {
+                jsonTypeInfo.Properties.Remove(prop);
+            }
+
+            return jsonTypeInfo;
+        }
+    }
+*/
+
     [GlobalClass]
     public partial class WolfAPI : Resource
     {
@@ -26,7 +48,12 @@ namespace Resources.WolfAPI
                 return new NetworkStream(socket, ownsSocket: true);
             }
         });
-
+/*
+        public readonly static JsonSerializerOptions JsonOptions = new()
+        {
+            TypeInfoResolver = new OptinJsonTypeInfoResolver()
+        };
+*/
         private static string SessionId = "";
         public static string session_id {get{ return SessionId;}}
         public static Profile Profile = null;
@@ -230,6 +257,35 @@ namespace Resources.WolfAPI
             return [];
         }
 
+        public static async Task<Session> GetSession()
+        {
+            var sessions = await WolfAPI.GetAsync<Sessions>("http://localhost/api/v1/sessions");
+            Session curr_session = null;
+            foreach (var session in sessions?.sessions)
+            {
+                if (session.client_id == session_id)
+                {
+                    curr_session = session;
+                    break;
+                }
+            }
+
+            if (curr_session == null)
+            {
+                GD.Print("No owned Session found. Is this run without Wolf?");
+                curr_session = new()
+                {
+                    video_width = 1920,
+                    video_height = 1080,
+                    video_refresh_rate = 60,
+                    audio_channel_count = 2,
+                    client_settings = new()
+                };
+            }
+
+            return curr_session;
+        }
+
         /**
             <summary>
             Static Method <c>CreateLobby</c> creates a Lobby based on the passed <c>Lobby</c>.
@@ -320,7 +376,7 @@ namespace Resources.WolfAPI
             //GD.Print(result);
             T data = JsonSerializer.Deserialize<T>(result);
             return data;
-        }   
+        }
 
         [Signal]
         private delegate void APIEventEventHandler(string eventType, string data);

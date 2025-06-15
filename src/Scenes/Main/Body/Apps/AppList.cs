@@ -12,8 +12,6 @@ public partial class AppList : Control
 {
 	[Export]
 	Container AppContainer;
-	[Export]
-	PackedScene AppEntryScene;
 	private DockerController docker;
 	private WolfAPI wolfAPI;
 
@@ -52,19 +50,13 @@ public partial class AppList : Control
 		foreach(var child in AppContainer.GetChildren())
 			child.QueueFree();
 
-		List<App> Apps = await WolfAPI.GetApps(WolfAPI.Profile);//Main.config.GetApps();
-
 		int i = 1;
-		foreach(var app in Apps)
+		foreach(var app in await WolfAPI.GetApps(WolfAPI.Profile))
 		{
-			Control appEntry = AppEntryScene.Instantiate<Control>();
-			if(appEntry is AppEntry entry)
-			{
-				entry.Init(app);
-				entry.Name = $"App {i}";
-				AddAppEntry(entry);
-				i++;
-			}
+			AppEntry entry = AppEntry.Create(app);
+			entry.Name = $"App {i}";
+			AddAppEntry(entry);
+			i++;
 		}
 	}
 
@@ -72,11 +64,8 @@ public partial class AppList : Control
 	{
 		for(int n = 0; n < 23; n++)
 		{
-			Control appEntry = AppEntryScene.Instantiate<Control>();
-			if(appEntry is AppEntry entry)
-			{
-				AppContainer.AddChild(entry);
-			}
+			AppEntry entry = AppEntry.Create(new());
+			AppContainer.AddChild(entry);
 		}
 	}
 
@@ -101,44 +90,6 @@ public partial class AppList : Control
 					gridContainer.GetChild<AppEntry>(-1).FocusNeighborLeft = AppEntry.GetFocusPath();
 				}
 
-			}
-		}
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public async override void _Process(double delta)
-	{
-		if(Engine.IsEditorHint())
-			return;
-
-		var Images = await docker.ListImages();
-		HashSet<string> existingImages = [];
-		foreach(var image in Images)
-		{
-			if(image.RepoTags.Count > 0)
-			{
-				existingImages.Add(image.RepoTags.First<string>());
-			}
-		}
-
-		foreach(var child in AppContainer.GetChildren())
-		{
-			if(child is AppEntry app)
-			{
-				if(app.runner.image == null)
-					return;
-
-				string imagename = app.runner.image;
-				if(!imagename.Contains(':'))
-					imagename = $"{imagename}:latest";
-				if(existingImages.Contains(imagename))
-				{
-					app.ImageOnDisc = true;
-					app.DownloadIcon.Visible = false;
-				} else {
-					app.ImageOnDisc = false;
-					app.DownloadIcon.Visible = true;
-				}
 			}
 		}
 	}
