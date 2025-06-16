@@ -11,7 +11,6 @@ public partial class LobbiesContainer : VBoxContainer
     [Export]
     PackedScene LobbyScene;
     private Control lobbies;
-    private WolfAPI wolfAPI;
     public override async void _Ready()
     {
         lobbies = GetNode<Control>("%Lobbies");
@@ -22,12 +21,10 @@ public partial class LobbiesContainer : VBoxContainer
             return;
         }
 
-        wolfAPI = GetNode<Main>("/root/Main").wolfAPI;
-
         Hide();
 
-        wolfAPI.LobbyCreated += (data) => CallDeferred(MethodName.OnLobbieCreated, data);
-        wolfAPI.LobbyStopped += (data) => CallDeferred(MethodName.OnLobbieStopped, data);
+        WolfAPI.Singleton.LobbyCreated += (data) => CallDeferred(MethodName.OnLobbieCreated, data);
+        WolfAPI.Singleton.LobbyStopped += (data) => CallDeferred(MethodName.OnLobbieStopped, data);
         lobbies.ChildEnteredTree += (node) => SetDeferred(PropertyName.Visible, true);
         lobbies.ChildExitingTree += (node) => CallDeferred(MethodName.OnChildExitingTree, node);
 

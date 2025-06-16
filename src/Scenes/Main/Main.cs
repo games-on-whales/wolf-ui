@@ -10,8 +10,6 @@ namespace UI
 		[Export]
 		public DockerController docker;
 		[Export]
-		public WolfAPI wolfAPI;
-		[Export]
 		public ControllerMap controllerMap;
 
 		// Called when the node enters the scene tree for the first time.
@@ -53,7 +51,7 @@ namespace UI
 
 			AddChild(time2);
 
-			wolfAPI.StartListenToAPIEvents();
+			WolfAPI.Init();
 
 			GD.Print($"This session's id: {WolfAPI.session_id}");
 		}

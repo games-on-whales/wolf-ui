@@ -58,17 +58,30 @@ namespace Resources.WolfAPI
         public static string session_id {get{ return SessionId;}}
         public static Profile Profile = null;
         private static bool StartedListening = false;
+        private static WolfAPI _Singleton = null;
+        public static WolfAPI Singleton
+        {
+            get
+            {
+                _Singleton ??= new();
+                return _Singleton;
+            }
+        }
+        public static void Init()
+        {
+            _Singleton ??= new();
+        }
 
-        public WolfAPI()
+        private WolfAPI()
         {
             SessionId = System.Environment.GetEnvironmentVariable("WOLF_SESSION_ID");
-            if(session_id == null)
+            if (session_id == null)
             {
                 GD.Print("session_id not found!");
                 SessionId = "123456789";
             }
-
             APIEvent += FilterAPIEvents;
+            StartListenToAPIEvents();
         }
 
         [Signal]
@@ -191,33 +204,23 @@ namespace Resources.WolfAPI
         }
         public static async Task<List<App>> GetApps(Profile used_profile)
         {
-            var result = await _httpClient.GetStringAsync("http://localhost/api/v1/profiles");
-            Profiles profiles = JsonSerializer.Deserialize<Profiles>(result);
+            List<Profile> profiles = await GetProfiles();
 
-            if(!profiles.success)
-            {
-                GD.Print("Error retrieving Profiles");
-                return [];
-            }
-
-            foreach(var profile in profiles.profiles)
+            foreach(var profile in profiles)
             {
                 if(profile.id == used_profile.id)
                     return profile.apps;
             }
             GD.Print($"Profile: {used_profile.name} not found");
-            //Apps wolfApps = JsonSerializer.Deserialize<Apps>(result);
-            //if(wolfApps?.success == true)
-            //    return wolfApps.apps;
+
             return [];
         }
 
         public static async Task<List<Profile>> GetProfiles()
         {
-            var result = await _httpClient.GetStringAsync("http://localhost/api/v1/profiles");
-            Profiles profiles = JsonSerializer.Deserialize<Profiles>(result);
+            Profiles profiles = await GetAsync<Profiles>("http://localhost/api/v1/profiles");
 
-            if(!profiles.success)
+            if (!profiles.success)
             {
                 GD.Print("Error retrieving Profiles");
                 return [];
@@ -228,9 +231,9 @@ namespace Resources.WolfAPI
 
         public static async Task<List<Client>> GetClients()
         {
-            var result = await _httpClient.GetStringAsync("http://localhost/api/v1/clients");
-            Clients wolfClients = JsonSerializer.Deserialize<Clients>(result);
-            if(wolfClients?.success == true)
+            Clients wolfClients = await GetAsync<Clients>("http://localhost/api/v1/clients");
+
+            if (wolfClients?.success == true)
                 return wolfClients.clients;
             return [];
         }
@@ -243,9 +246,7 @@ namespace Resources.WolfAPI
                 session_id = session_id,
                 runner = runner
             };
-            string data = JsonSerializer.Serialize<Starter>(starter);
-            StringContent content = new(data);
-            var result = await _httpClient.PostAsync("http://localhost/api/v1/runners/start", content);
+            var result = await PostAsync("http://localhost/api/v1/runners/start", starter);
             GD.Print(await result.Content.ReadAsStringAsync());
         }
 
@@ -297,7 +298,7 @@ namespace Resources.WolfAPI
         */
         public static async Task<string> CreateLobby(Lobby lobby)
         {
-            var result = await PostAsync<Lobby>("http://localhost/api/v1/lobbies/create", lobby);
+            var result = await PostAsync("http://localhost/api/v1/lobbies/create", lobby);
             var content = await result.Content.ReadAsStringAsync();
             GD.Print($"called lobbies/create: {content}");
             return JsonSerializer.Deserialize<LobbyCreatedResponse>(content)?.lobby_id;
@@ -316,17 +317,8 @@ namespace Resources.WolfAPI
                 moonlight_session_id = session_id,
                 pin = pin
             };
-            var json = JsonSerializer.Serialize<LobbyJoin>(lobbyobj);
 
-            /*
-            string json = $@"
-            {{
-                ""lobby_id"": ""{lobby_id}"",
-                ""moonlight_session_id"": ""{session_id}""
-            }}";
-            */
-            StringContent content = new(json);
-            var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/join", content);
+            var result = await PostAsync("http://localhost/api/v1/lobbies/join", lobbyobj);
             GD.Print($"called lobbies/join: {await result.Content.ReadAsStringAsync()}");
         }
 
@@ -357,7 +349,6 @@ namespace Resources.WolfAPI
             string data = JsonSerializer.Serialize<T>(obj);
             StringContent content = new(data);
             var result = await _httpClient.PostAsync(url, content);
-            //GD.Print(await result.Content.ReadAsStringAsync());
             return result;
         }
 

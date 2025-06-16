@@ -1,8 +1,7 @@
-[gd_scene load_steps=19 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=18 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="Script" uid="uid://ej4uorvu6hbj" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
-[ext_resource type="Resource" uid="uid://81qforug05j7" path="res://Resources/WolfAPI/WolfAPI.tres" id="4_12uqu"]
 [ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
 [ext_resource type="Texture2D" uid="uid://b1wng8q2m6i68" path="res://Icons/arrow-left-svgrepo-com.svg" id="6_hcu3t"]
@@ -30,7 +29,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xobeq")
 docker = SubResource("Resource_tl3on")
-wolfAPI = ExtResource("4_12uqu")
 controllerMap = ExtResource("4_hkvnm")
 
 [node name="Panel" type="Panel" parent="."]
@@ -115,10 +113,12 @@ script = ExtResource("7_axei7")
 
 [node name="UserList" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu") instance=ExtResource("10_hcu3t")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 AppMenu = NodePath("../AppList")
 
 [node name="AppList" parent="VBoxContainer/Menus/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
+visible = true
 layout_mode = 1
 anchors_preset = 15
 

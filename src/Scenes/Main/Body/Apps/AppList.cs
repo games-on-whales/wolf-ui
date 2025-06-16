@@ -12,8 +12,6 @@ public partial class AppList : Control
 {
 	[Export]
 	Container AppContainer;
-	private DockerController docker;
-	private WolfAPI wolfAPI;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -23,10 +21,6 @@ public partial class AppList : Control
 			EditorMockupReady();
 			return;
 		}
-
-		var Main = GetNode<Main>("/root/Main");
-		docker = Main.docker;
-		wolfAPI = Main.wolfAPI;
 
 		VisibilityChanged += async () => {
 			if(Visible)
