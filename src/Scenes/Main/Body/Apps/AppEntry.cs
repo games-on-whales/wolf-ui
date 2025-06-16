@@ -88,6 +88,11 @@ namespace UI
 		{
 			base._Process(delta);
 
+			if (Engine.IsEditorHint())
+			{
+				return;
+			}
+
 			if (AppMenu.Visible && !(
 				MenuButtonCancle.HasFocus() ||
 				MenuButtonUpdate.HasFocus() ||
