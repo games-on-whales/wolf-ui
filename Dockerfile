@@ -43,6 +43,13 @@ _INSTALL_PACKAGES
 
 FROM ${BASE_APP_IMAGE}
 
+RUN <<_INSTALL_REQIREMENTS
+set -e
+apt-get update -y
+apt-get install -y libicu-dev
+
+_INSTALL_REQIREMENTS
+
 ENV PUID=0 \
     PGID=0 \
     UNAME="root"

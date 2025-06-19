@@ -1,6 +1,6 @@
 [[profiles.apps]]
 start_virtual_compositor = true
-title = 'Wolf UI Docker'
+title = 'Wolf UI'
 
     [profiles.apps.runner]
     base_create_json = '''{
