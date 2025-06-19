@@ -4,6 +4,7 @@ using Docker.DotNet.Models;
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,16 +23,39 @@ namespace WolfManagement.Resources
         }
 
         DockerClient client;
+
+        private static bool _isDisabled = false;
+
+        public static bool isDisabled
+        {
+            get
+            {
+                return _isDisabled;
+            }
+        }
         // Called when the node enters the scene tree for the first time.
         public DockerController()
         {
-            client = new DockerClientConfiguration(
-                new Uri("unix:///var/run/docker.sock"))
-                .CreateClient();
+            try
+            {
+                if(!File.Exists("/var/run/docker.sock"))
+                    _isDisabled = true;
+
+                client = new DockerClientConfiguration(
+                    new Uri("unix:///var/run/docker.sock"))
+                    .CreateClient();
+            }
+            catch (Exception)
+            {
+                _isDisabled = true;
+            }
         }
 
         public async void UpdateCachedImages()
         {
+            if (isDisabled)
+                return;
+
             var imgs = await ListImages();
             _cachedImages.Clear();
             foreach (var i in imgs)
@@ -43,6 +67,9 @@ namespace WolfManagement.Resources
 
         public async Task<bool> ImageExists(string Image, string Tag = "latest")
         {
+            if (isDisabled)
+                return true;
+
             var image = await ListImage(Image, Tag);
             if (image == null)
                 return false;
@@ -78,6 +105,9 @@ namespace WolfManagement.Resources
 
         public async Task PullImage(string Image, string Tag, ProgressBar progressBar, Button appButton)
         {
+            if (isDisabled)
+                return;
+
             appButton.Disabled = true;
             progressBar.Visible = true;
             void Msgpartial(JSONMessage c) => PullProgressCallback(c, progressBar, appButton);
@@ -95,6 +125,9 @@ namespace WolfManagement.Resources
 
         public async Task<IList<ImagesListResponse>> ListImages()
         {
+            if (isDisabled)
+                return [];
+
             return await client.Images.ListImagesAsync(
                 new ImagesListParameters()
             );
@@ -102,6 +135,9 @@ namespace WolfManagement.Resources
 
         public async Task<ImagesListResponse> ListImage(string Name, string Tag)
         {
+            if (isDisabled)
+                return null;
+
             var images = await client.Images.ListImagesAsync(
                 new ImagesListParameters{
                     All = true,
@@ -119,6 +155,9 @@ namespace WolfManagement.Resources
 
         public async Task<IList<ContainerListResponse>> ListContainer()
         {
+            if (isDisabled)
+                return [];
+
             return await client.Containers.ListContainersAsync(
                 new ContainersListParameters()
             );
@@ -126,6 +165,9 @@ namespace WolfManagement.Resources
 
         public async Task<ContainerListResponse> GetContainerInfo(string Name)
         {
+            if (isDisabled)
+                return null;
+
             var containers = await client.Containers.ListContainersAsync(
                 new ContainersListParameters {
                     All = true,
@@ -154,6 +196,9 @@ namespace WolfManagement.Resources
 
         public void ListenToDockerStream()
         {
+            if (isDisabled)
+                return;
+
             ThreadPool.QueueUserWorkItem(new(async obj =>
             {
                 Progress<Message> progress = new(ReactToDockerEvent);

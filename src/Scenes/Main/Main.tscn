@@ -61,18 +61,11 @@ theme_override_constants/margin_bottom = 3
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Header/MarginContainer"]
 layout_mode = 2
 
-[node name="Control" type="Control" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-
-[node name="OptionsButton" type="Button" parent="VBoxContainer/Header/MarginContainer/HBoxContainer/Control"]
+[node name="OptionsButton" type="Button" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-visible = false
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
-offset_right = 32.0
-offset_bottom = 32.0
-focus_neighbor_right = NodePath("../../ExitButton")
+focus_neighbor_right = NodePath("../ExitButton")
 icon = ExtResource("6_hcu3t")
 flat = true
 vertical_icon_alignment = 0
@@ -98,11 +91,11 @@ vertical_icon_alignment = 0
 expand_icon = true
 script = ExtResource("8_qdkat")
 
-[node name="Menus" type="Control" parent="VBoxContainer"]
+[node name="Body" type="Control" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VisibilitySwitcher" type="Control" parent="VBoxContainer/Menus"]
+[node name="VisibilitySwitcher" type="Control" parent="VBoxContainer/Body"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -111,14 +104,12 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_axei7")
 
-[node name="UserList" parent="VBoxContainer/Menus/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu") instance=ExtResource("10_hcu3t")]
+[node name="UserList" parent="VBoxContainer/Body/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu") instance=ExtResource("10_hcu3t")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 AppMenu = NodePath("../AppList")
 
-[node name="AppList" parent="VBoxContainer/Menus/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
-visible = true
+[node name="AppList" parent="VBoxContainer/Body/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
 layout_mode = 1
 anchors_preset = 15
 

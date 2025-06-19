@@ -37,19 +37,22 @@ namespace UI
 
 			AddChild(time);
 
-			docker.UpdateCachedImages();
-			var time2 = new Timer
-			{
-				WaitTime = 10.0,
-				OneShot = false,
-				Autostart = true
-			};
-			time2.Timeout += () =>
+			if (!DockerController.isDisabled)
 			{
 				docker.UpdateCachedImages();
-			};
+				var time2 = new Timer
+				{
+					WaitTime = 10.0,
+					OneShot = false,
+					Autostart = true
+				};
+				time2.Timeout += () =>
+				{
+					docker.UpdateCachedImages();
+				};
 
-			AddChild(time2);
+				AddChild(time2);
+			}
 
 			WolfAPI.Init();
 

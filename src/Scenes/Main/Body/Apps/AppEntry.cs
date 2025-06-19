@@ -57,6 +57,8 @@ namespace UI
 			var Main = GetNode<Main>("/root/Main");
 			docker = Main.docker;
 
+			if (DockerController.isDisabled)
+				MenuButtonUpdate.Hide();
 
 			AppLabel.Text = App.title;
 			DownloadIcon.Hide();
@@ -112,7 +114,7 @@ namespace UI
 			{
 				var app_image_name = App.runner.image.Contains(':') ? App.runner.image : $"{App.runner.image}:latest";
 				var docker_images = DockerController.CachedImages;
-				ImageOnDisc = docker_images.Contains(app_image_name);
+				ImageOnDisc = docker_images.Contains(app_image_name) || DockerController.isDisabled;
 				DownloadIcon.Visible = !ImageOnDisc;
 			}
         }
@@ -225,6 +227,9 @@ namespace UI
 
 		public async void PullImage()
 		{
+			if (DockerController.isDisabled)
+				return;
+
 			GrabFocus();
 			if (App.runner.image.Contains(':'))
 			{
