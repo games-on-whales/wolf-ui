@@ -143,7 +143,7 @@ namespace Resources.WolfAPI
                 }
 
                 System.Net.Http.HttpClient httpClient = new();
-                var result = await httpClient.GetByteArrayAsync($"https://github.com/games-on-whales/gow/blob/master/apps/{name}/assets/icon.png?raw=true");
+                var result = await httpClient.GetByteArrayAsync($"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png");
                 image = new();
                 image.LoadPngFromBuffer(result);
                 Directory.CreateDirectory(Path.GetDirectoryName(filepath));
@@ -153,11 +153,11 @@ namespace Resources.WolfAPI
             }
             else
             {
-                bool isHttp = Uri.TryCreate(app.icon_png_path, UriKind.Absolute, out Uri uriResult)
+                bool isURL = Uri.TryCreate(app.icon_png_path, UriKind.Absolute, out Uri uriResult)
                     && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
                 Image image;
-                if (isHttp)
+                if (isURL)
                 {
                     System.Net.Http.HttpClient httpClient = new();
                     var result = await httpClient.GetByteArrayAsync(app.icon_png_path);
