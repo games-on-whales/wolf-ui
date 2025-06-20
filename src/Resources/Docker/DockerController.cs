@@ -85,7 +85,8 @@ namespace WolfManagement.Resources
                 if(msg.Progress.Total != 0)
                 {
                     GD.Print(msg.ProgressMessage);
-                    progressBar?.Value = 100 * (float)msg.Progress.Current / (float)msg.Progress.Total;
+                    if(progressBar is not null)
+                        progressBar.Value = 100 * (float)msg.Progress.Current / (float)msg.Progress.Total;
                 }
                 return;
             }
@@ -96,7 +97,8 @@ namespace WolfManagement.Resources
                 {
                     progressBar?.Hide();
 
-                    button?.Disabled = false;
+                    if(button is not null)
+                        button.Disabled = false;
                 }
             }
         }
@@ -106,8 +108,11 @@ namespace WolfManagement.Resources
             if (isDisabled)
                 return;
 
-            appButton?.Disabled = true;
-            progressBar?.Visible = true;
+            if(appButton is not null)
+                appButton.Disabled = true;
+
+            if(progressBar is not null)
+                progressBar.Visible = true;
             void Msgpartial(JSONMessage c) => PullProgressCallback(c, progressBar, appButton);
             Progress<JSONMessage> msg = new(Msgpartial);
             await client.Images.CreateImageAsync(
