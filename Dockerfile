@@ -39,6 +39,10 @@ dotnet add package Docker.DotNet
 Godot --headless --export-release "Linux" ./bin/wolf-ui
 ls -la ./bin
 
+
+test -f ./bin/wolf-ui
+test -d ./bin/data_Wolf-UI_linuxbsd_x86_64
+
 _INSTALL_PACKAGES
 ###############################################################################################
 
