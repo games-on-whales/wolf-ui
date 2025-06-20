@@ -14,7 +14,7 @@ set -e
 apt-get update -y
 apt-get install -y dotnet-sdk-8.0 unzip build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev \
     libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libfreetype6-dev libudev-dev libxi-dev \
-    libxrandr-dev yasm wget
+    libxrandr-dev yasm wget libfontconfig
 
 wget -O Godot.zip https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_mono_linux_x86_64.zip
 unzip Godot.zip -d /usr/local/bin
@@ -32,6 +32,7 @@ _INSTALL_DOTNET
 WORKDIR /src
 COPY ./src .
 RUN <<_INSTALL_PACKAGES
+set -e
 
 mkdir ./bin
 dotnet add package Docker.DotNet
