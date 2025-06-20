@@ -1,6 +1,9 @@
 using Godot;
 using WolfManagement.Resources;
 using Resources.WolfAPI;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Data.Common;
 
 namespace UI
 {
@@ -56,12 +59,38 @@ namespace UI
 
 			WolfAPI.Init();
 
+			CheckForUpdate();
+
 			GD.Print($"This session's id: {WolfAPI.session_id}");
 		}
 
 		public override void _Input(InputEvent @event)
 		{
 			controllerMap.SetController(@event);
+		}
+
+		private async void CheckForUpdate()
+		{
+			var apps = await WolfAPI.GetAsync<Apps>("http://localhost/api/v1/apps");
+
+			App Wolf_UI = apps.apps.FindAll(app => app.runner.image is not null
+											&& app.runner.image.Contains("wolf-ui")
+											&& app.runner.env.Contains("WOLF_UI_AUTOUPDATE=True"))
+									.FirstOrDefault();
+
+			if (Wolf_UI is not null)
+			{
+				string auto_update_env = System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE");
+				bool AutoupdateEnable = auto_update_env is null || auto_update_env == "True";
+				if (AutoupdateEnable)
+				{
+					if (Wolf_UI.runner.image.Contains(':'))
+					{
+						var image = Wolf_UI.runner.image.Split(":");
+						await docker.PullImage(image[0], image[1], null, null);
+					}
+				}
+			}
 		}
 	}
 }
