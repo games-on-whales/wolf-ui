@@ -85,8 +85,7 @@ namespace WolfManagement.Resources
                 if(msg.Progress.Total != 0)
                 {
                     GD.Print(msg.ProgressMessage);
-                    if(progressBar != null)
-                        progressBar.Value = 100 * (float)msg.Progress.Current / (float)msg.Progress.Total;
+                    progressBar?.Value = 100 * (float)msg.Progress.Current / (float)msg.Progress.Total;
                 }
                 return;
             }
@@ -97,8 +96,7 @@ namespace WolfManagement.Resources
                 {
                     progressBar?.Hide();
 
-                    if(button != null)
-                        button.Disabled = false;
+                    button?.Disabled = false;
                 }
             }
         }
