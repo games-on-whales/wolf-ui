@@ -108,8 +108,8 @@ namespace WolfManagement.Resources
             if (isDisabled)
                 return;
 
-            appButton.Disabled = true;
-            progressBar.Visible = true;
+            appButton?.Disabled = true;
+            progressBar?.Visible = true;
             void Msgpartial(JSONMessage c) => PullProgressCallback(c, progressBar, appButton);
             Progress<JSONMessage> msg = new(Msgpartial);
             await client.Images.CreateImageAsync(
