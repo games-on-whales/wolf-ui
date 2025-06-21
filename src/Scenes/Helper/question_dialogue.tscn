@@ -12,13 +12,29 @@ grow_vertical = 2
 script = ExtResource("1_qxpr7")
 TitleLabel = NodePath("PanelContainer/VBoxContainer/PanelContainer/TitleLabel")
 ContentLabel = NodePath("PanelContainer/VBoxContainer/MarginContainer/ContentLabel")
-ButtonContainer = NodePath("PanelContainer/VBoxContainer/ButtonContainer")
+ButtonContainer = NodePath("PanelContainer/VBoxContainer/MarginContainer2/ButtonContainer")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="ColorRect2" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.75)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(202, 152)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -102.0
+offset_top = -76.0
+offset_right = 102.0
+offset_bottom = 76.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -30,10 +46,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = -100.0
+offset_top = -75.0
+offset_right = 100.0
+offset_bottom = 75.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -62,6 +78,12 @@ theme_override_constants/margin_bottom = 5
 [node name="ContentLabel" type="Label" parent="PanelContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+[node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer2"]
 layout_mode = 2
 size_flags_vertical = 8

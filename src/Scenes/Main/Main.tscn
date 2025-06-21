@@ -38,6 +38,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -91,11 +93,32 @@ vertical_icon_alignment = 0
 expand_icon = true
 script = ExtResource("8_qdkat")
 
-[node name="Body" type="Control" parent="VBoxContainer"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VisibilitySwitcher" type="Control" parent="VBoxContainer/Body"]
+[node name="SubViewport" type="SubViewport" parent="VBoxContainer/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1280, 636)
+render_target_update_mode = 4
+
+[node name="Panel" type="Panel" parent="VBoxContainer/SubViewportContainer/SubViewport"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Body" type="Control" parent="VBoxContainer/SubViewportContainer/SubViewport"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 636.0
+size_flags_vertical = 3
+
+[node name="VisibilitySwitcher" type="Control" parent="VBoxContainer/SubViewportContainer/SubViewport/Body"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -104,12 +127,12 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_axei7")
 
-[node name="UserList" parent="VBoxContainer/Body/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu") instance=ExtResource("10_hcu3t")]
+[node name="UserList" parent="VBoxContainer/SubViewportContainer/SubViewport/Body/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu") instance=ExtResource("10_hcu3t")]
 unique_name_in_owner = true
 layout_mode = 1
 AppMenu = NodePath("../AppList")
 
-[node name="AppList" parent="VBoxContainer/Body/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
+[node name="AppList" parent="VBoxContainer/SubViewportContainer/SubViewport/Body/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
 layout_mode = 1
 anchors_preset = 15
 
