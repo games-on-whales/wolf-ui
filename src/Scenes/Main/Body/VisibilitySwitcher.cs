@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using System.Collections.Generic;
 
 // Makes Sure at least on of its Control typed children Stays Visible. Runs in Game and in Editor
 

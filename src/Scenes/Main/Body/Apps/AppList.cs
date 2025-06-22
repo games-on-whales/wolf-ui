@@ -1,11 +1,8 @@
 using Godot;
 using Resources.WolfAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using UI;
-using WolfManagement.Resources;
+
+namespace WolfUI;
 
 [Tool]
 public partial class AppList : Control

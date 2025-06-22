@@ -36,6 +36,8 @@ set -e
 
 mkdir ./bin
 dotnet add package Docker.DotNet
+dotnet add package Microsoft.Extensions.Logging --version 9.0.6
+dotnet add package Microsoft.Extensions.Logging.Console --version 9.0.6
 Godot --headless --export-release "Linux" ./bin/wolf-ui
 ls -la ./bin
 

@@ -3,7 +3,10 @@ using System.Diagnostics;
 using Godot;
 using Godot.Collections;
 
-[GlobalClass][Tool]
+namespace WolfUI;
+
+[GlobalClass]
+[Tool]
 public partial class ControllerMap : Resource
 {
     public enum ControllerType {Switch, XBox, PS, None};

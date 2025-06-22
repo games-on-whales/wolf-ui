@@ -1,15 +1,16 @@
 using Godot;
+using Microsoft.Extensions.Logging;
 using Resources.WolfAPI;
-using System;
 using System.Text.Json;
-using System.Threading.Tasks;
-using UI;
+
+namespace WolfUI;
 
 [Tool]
 public partial class LobbiesContainer : VBoxContainer
 {
     [Export]
     PackedScene LobbyScene;
+    private static readonly ILogger<LobbiesContainer> Logger = WolfUI.Main.GetLogger<LobbiesContainer>();
     private Control lobbies;
     public override async void _Ready()
     {
@@ -47,7 +48,8 @@ public partial class LobbiesContainer : VBoxContainer
 
     private void OnChildExitingTree(Node child)
     {
-        GD.Print(lobbies.GetChildCount());
+        //Logger.LogInformation("{Msg}", lobbies.GetChildCount());
+        //GD.Print(lobbies.GetChildCount());
         if(lobbies.GetChildCount() == 0)
         {
             Hide();
@@ -65,7 +67,7 @@ public partial class LobbiesContainer : VBoxContainer
         if (lobby.multi_user == false)
             return;
 
-        var node = LobbyScene.Instantiate<UI.Lobby>();
+        var node = LobbyScene.Instantiate<WolfUI.Lobby>();
         node.LobbySettings = lobby;
         node.Name = lobby.id;
         node.AppName = lobby.name;
@@ -79,7 +81,8 @@ public partial class LobbiesContainer : VBoxContainer
     
     private void OnLobbieStopped(string lobby_id)
     {
-        GD.Print($"Lobby stopped {lobby_id}");
+        Logger.LogInformation("Lobby stopped {ID}", lobby_id);
+        //GD.Print($"Lobby stopped {lobby_id}");
 
         foreach (var node in lobbies.GetChildren())
         {

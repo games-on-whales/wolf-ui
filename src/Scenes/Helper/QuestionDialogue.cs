@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace WolfUI;
+
 public partial class QuestionDialogue : Control
 {
     [Export]
@@ -55,7 +57,7 @@ public partial class QuestionDialogue : Control
         await Task.Run(() => { Cancellation.Token.WaitHandle.WaitOne(); });
 
         dialogue.QueueFree();
-        if(IsInstanceValid(FocusOwner))
+        if (IsInstanceValid(FocusOwner))
             FocusOwner?.GrabFocus();
 
         return Answer;

@@ -1,6 +1,8 @@
 using Godot;
 using System;
 
+namespace WolfUI;
+
 [GlobalClass]
 public partial class ControllerIcon : TextureRect
 {

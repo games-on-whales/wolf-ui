@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace WolfUI;
+
 public partial class PinInput : Control
 {
     [Export]
@@ -39,7 +41,7 @@ public partial class PinInput : Control
         return ints;
     }
 
-    private PinInput(){}
+    private PinInput() { }
 
     private List<int> GetPinBlocking()
     {
@@ -70,7 +72,7 @@ public partial class PinInput : Control
         {
             NumberButtons.Add(GetNode<Button>($"%Button{i}"));
         }
-        
+
 
         PinLineEdit.GuiInput += @event =>
         {

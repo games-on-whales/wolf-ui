@@ -1,7 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using UI;
+
+
+namespace WolfUI;
 
 [GlobalClass]
 public partial class SoundEffects : Node
@@ -13,23 +15,23 @@ public partial class SoundEffects : Node
 
 	private AudioStreamPlayer2D HoverSoundPlayer;
 	private AudioStreamPlayer2D AcceptSoundPlayer;
-	private HashSet<Button> hasSound; 
+	private HashSet<Button> hasSound;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		hasSound = [];
-		HoverSoundPlayer = new(){ Stream = HoverSound };
-		AcceptSoundPlayer= new(){ Stream = AcceptSound };
+		HoverSoundPlayer = new() { Stream = HoverSound };
+		AcceptSoundPlayer = new() { Stream = AcceptSound };
 		AddChild(HoverSoundPlayer);
 		AddChild(AcceptSoundPlayer);
 	}
 
 	public void ApplySoundEffects(Node parent)
 	{
-		foreach(var child in parent.GetChildren())
+		foreach (var child in parent.GetChildren())
 		{
-			if(child is Button button && !hasSound.Contains(button))
+			if (child is Button button && !hasSound.Contains(button))
 			{
 
 				button.FocusEntered += () => { HoverSoundPlayer.Play(); };

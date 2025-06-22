@@ -1,6 +1,7 @@
 using Godot;
 using Resources.WolfAPI;
-using System;
+
+namespace WolfUI;
 
 [Tool]
 public partial class User : Button
