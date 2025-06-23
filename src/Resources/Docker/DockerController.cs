@@ -2,14 +2,13 @@
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Godot;
-using GodotPlugins.Game;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WolfUI;
 
 namespace WolfManagement.Resources;
 
@@ -83,13 +82,13 @@ public partial class DockerController : Resource
     private static void PullProgressCallback(JSONMessage msg, ProgressBar progressBar = null, Button button = null)
     {
         if (msg.Error != null)
-            Logger.LogError("{Error}: {Message}", msg.Error, msg.ErrorMessage);
+            Logger.LogError("{0}: {1}", msg.Error, msg.ErrorMessage);
             //GD.Print($"{msg.Error} - {msg.ErrorMessage}");
         if(msg.Progress != null)
         {
             if(msg.Progress.Total != 0)
             {
-                Logger.LogInformation("{Msg}", msg.ProgressMessage);
+                Logger.LogInformation("{0}", msg.ProgressMessage);
                 //GD.Print(msg.ProgressMessage);
                 if(progressBar is not null)
                     progressBar.Value = 100 * (float)msg.Progress.Current / (float)msg.Progress.Total;
@@ -99,7 +98,7 @@ public partial class DockerController : Resource
         if(msg.Status != null)
         {
             if(msg.ProgressMessage is not null)
-                Logger.LogInformation("{Msg}", msg.ProgressMessage);
+                Logger.LogInformation("{0}", msg.ProgressMessage);
             //GD.Print(msg.Status);
             if(msg.Status.Contains("Downloaded") || msg.Status.Contains("Image is up to date"))
             {
@@ -202,7 +201,7 @@ public partial class DockerController : Resource
         if(info == null)
             return;
 
-        Logger.LogInformation("{ID} {Action} Status: {Status}", msg.Actor.ID, msg. Action, info.Status);
+        Logger.LogInformation("{0} {1} Status: {2}", msg.Actor.ID, msg. Action, info.Status);
         //GD.Print($"{msg.Actor.ID} {msg.Action} Status: {info.Status}");
     }
 

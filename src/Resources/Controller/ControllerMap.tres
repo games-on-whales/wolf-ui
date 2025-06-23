@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ControllerMap" load_steps=26 format=3 uid="uid://badu7abuxt6we"]
+[gd_resource type="Resource" script_class="ControllerMap" load_steps=30 format=3 uid="uid://badu7abuxt6we"]
 
 [ext_resource type="Script" uid="uid://bmervjm6ji7x3" path="res://Resources/Controller/ControllerMap.cs" id="1_7n7qm"]
 [ext_resource type="Texture2D" uid="uid://bws5jryfpf1mh" path="res://Icons/Controller/Switch/Switch_A.png" id="1_sh03k"]
@@ -6,9 +6,13 @@
 [ext_resource type="Texture2D" uid="uid://dhwbgb23nbi8m" path="res://Icons/Controller/PS5/PS5_Cross.png" id="3_7p6gc"]
 [ext_resource type="Texture2D" uid="uid://bqmbshokjcw3n" path="res://Icons/Controller/Keyboard/Keyboard_Black_Enter.png" id="4_mcfce"]
 [ext_resource type="Texture2D" uid="uid://ck34xmo2jkl2y" path="res://Icons/Controller/Switch/Switch_B.png" id="5_hixsa"]
+[ext_resource type="Texture2D" uid="uid://da0ha5rr676hj" path="res://Icons/Controller/Switch/Switch_X.png" id="5_l2f7a"]
 [ext_resource type="Texture2D" uid="uid://co1y5gj0ryg5c" path="res://Icons/Controller/XBox/XboxOne_B.png" id="6_kh6cs"]
+[ext_resource type="Texture2D" uid="uid://5liqjpx7y0dv" path="res://Icons/Controller/XBox/XboxOne_Y.png" id="6_tlrk0"]
+[ext_resource type="Texture2D" uid="uid://db5mylg8hfspn" path="res://Icons/Controller/PS5/PS5_Triangle.png" id="7_dhsbg"]
 [ext_resource type="Texture2D" uid="uid://chsgb316tb6rg" path="res://Icons/Controller/PS5/PS5_Circle.png" id="7_k8bs2"]
 [ext_resource type="Texture2D" uid="uid://dru6vbmje5lxu" path="res://Icons/Controller/Keyboard/Keyboard_Black_Esc.png" id="8_3gfmb"]
+[ext_resource type="Texture2D" uid="uid://bo4v5wbplyq46" path="res://Icons/Controller/Keyboard/Keyboard_Black_Backspace_Alt.png" id="8_g4h50"]
 [ext_resource type="Texture2D" uid="uid://cuapxjag3w5ry" path="res://Icons/Controller/Keyboard/Keyboard_Black_Arrow_Down.png" id="9_ql3hh"]
 [ext_resource type="Texture2D" uid="uid://bh1rgb356ugow" path="res://Icons/Controller/Switch/Switch_Dpad_Down.png" id="10_iw7ox"]
 [ext_resource type="Texture2D" uid="uid://bphas4aarecvl" path="res://Icons/Controller/XBox/XboxOne_Dpad_Down.png" id="11_h3k74"]
@@ -64,4 +68,10 @@ Right = {
 2: ExtResource("20_cuugd"),
 3: ExtResource("17_5hub4")
 }
+Back = Dictionary[int, Texture2D]({
+0: ExtResource("5_l2f7a"),
+1: ExtResource("6_tlrk0"),
+2: ExtResource("7_dhsbg"),
+3: ExtResource("8_g4h50")
+})
 metadata/_custom_type_script = "uid://bmervjm6ji7x3"

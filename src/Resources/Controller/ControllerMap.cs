@@ -10,8 +10,8 @@ namespace WolfUI;
 public partial class ControllerMap : Resource
 {
     public enum ControllerType {Switch, XBox, PS, None};
-    public enum ControllerButton {Accept, Cancel, Up, Down, Left, Right};
-
+    public enum ControllerButton {Accept, Cancel, Up, Down, Left, Right, Back};
+    private static readonly ILogger<ControllerMap> Logger = WolfUI.Main.GetLogger<ControllerMap>();
     [Export]
     Dictionary<ControllerType, Texture2D> Accept;
     [Export]
@@ -24,11 +24,14 @@ public partial class ControllerMap : Resource
     Dictionary<ControllerType, Texture2D> Left;
     [Export]
     Dictionary<ControllerType, Texture2D> Right;
+    [Export]
+    Dictionary<ControllerType, Texture2D> Back;
     private ControllerType controller = ControllerType.None;
     public ControllerMap()
     {
         Input.JoyConnectionChanged += JoyConnectionChanged;
     }
+
     private void JoyConnectionChanged(long deviceID, bool connected)
     {
         /*
@@ -44,9 +47,9 @@ public partial class ControllerMap : Resource
 
         var oldController = controller;
 
-        if(connected)
+        if (connected)
         {
-            GD.Print(Input.GetJoyName((int)deviceID));
+            
             controller = Input.GetJoyName((int)deviceID) switch
             {
                 "Xbox 360 Controller" => ControllerType.XBox,
@@ -57,17 +60,21 @@ public partial class ControllerMap : Resource
                 _ => ControllerType.XBox,
             };
         }
-        if(!connected)
+        if (!connected)
         {
             var ConnectedController = Input.GetConnectedJoypads();
-            if(ConnectedController.Count == 0)
+            if (ConnectedController.Count == 0)
             {
                 controller = ControllerType.None;
             }
         }
 
-        if(controller != oldController)
+        if (controller != oldController)
+        {
+            Logger.LogInformation("{0} detected", Input.GetJoyName((int)deviceID));
             EmitSignal(SignalName.IconSetChanged);
+        }
+
     }
 
     public Texture2D GetIcon(ControllerButton button)
@@ -80,6 +87,7 @@ public partial class ControllerMap : Resource
             ControllerButton.Down => Down[controller],
             ControllerButton.Left => Left[controller],
             ControllerButton.Right => Right[controller],
+            ControllerButton.Back => Back[controller],
             // Should never be callable but VSCode wont be fine without it
             _ => new(),
         };

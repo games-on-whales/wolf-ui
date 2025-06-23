@@ -68,7 +68,7 @@ public partial class Lobby : Control
 
         if (LobbySettings.pin != null)
         {
-            pin = await PinInput.RequestPin(this);
+            pin = await PinInput.RequestPin();
         }
 
         await WolfAPI.JoinLobby(Name, WolfAPI.session_id, pin);

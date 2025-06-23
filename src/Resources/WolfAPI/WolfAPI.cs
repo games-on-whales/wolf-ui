@@ -1,5 +1,4 @@
 using Godot;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +6,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WolfUI;
 
 namespace Resources.WolfAPI;
 
@@ -114,7 +114,7 @@ public partial class WolfAPI : Resource
         };
         if(error == Error.Unconfigured)
         {
-            Logger.LogInformation("{Event} - {Data}", @event, data);
+            Logger.LogInformation("{0} - {1}", @event, data);
             //GD.Print($"{@event} - {data}");
         }
     }
@@ -212,7 +212,7 @@ public partial class WolfAPI : Resource
             if(profile.id == used_profile.id)
                 return profile.apps;
         }
-        Logger.LogInformation("Profile: {Name} not found", used_profile.name);
+        Logger.LogInformation("Profile: {0} not found", used_profile.name);
         //GD.Print($"Profile: {used_profile.name} not found");
 
         return [];
@@ -250,7 +250,7 @@ public partial class WolfAPI : Resource
             runner = runner
         };
         var result = await PostAsync("http://localhost/api/v1/runners/start", starter);
-        Logger.LogInformation("{Msg}", await result.Content.ReadAsStringAsync());
+        Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
         //GD.Print(await result.Content.ReadAsStringAsync());
     }
 
@@ -305,7 +305,7 @@ public partial class WolfAPI : Resource
     {
         var result = await PostAsync("http://localhost/api/v1/lobbies/create", lobby);
         var content = await result.Content.ReadAsStringAsync();
-        Logger.LogInformation("called lobbies/create: {Content}", content);
+        Logger.LogInformation("called lobbies/create: {0}", content);
         //GD.Print($"called lobbies/create: {content}");
         return JsonSerializer.Deserialize<LobbyCreatedResponse>(content)?.lobby_id;
     }
@@ -325,7 +325,7 @@ public partial class WolfAPI : Resource
         };
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/join", lobbyobj);
-        Logger.LogInformation("called lobbies/join: {Msg}", await result.Content.ReadAsStringAsync());
+        Logger.LogInformation("called lobbies/join: {0}", await result.Content.ReadAsStringAsync());
         //GD.Print($"called lobbies/join: {await result.Content.ReadAsStringAsync()}");
     }
 
@@ -339,7 +339,7 @@ public partial class WolfAPI : Resource
 
         StringContent content = new(json);
         var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
-        Logger.LogInformation("{Msg}", await result.Content.ReadAsStringAsync());
+        Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
         //GD.Print(await result.Content.ReadAsStringAsync());
     }
 
@@ -349,7 +349,7 @@ public partial class WolfAPI : Resource
 
         StringContent content = new(json);
         var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/stop", content);
-        Logger.LogInformation("{Msg}", await result.Content.ReadAsStringAsync());
+        Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
         //GD.Print(await result.Content.ReadAsStringAsync());
     }
 

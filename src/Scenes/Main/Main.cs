@@ -2,8 +2,9 @@ using Godot;
 using WolfManagement.Resources;
 using Resources.WolfAPI;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using System;
+using System.Globalization;
 
 namespace WolfUI;
 
@@ -17,15 +18,42 @@ public partial class Main : Control
 	private readonly static ILoggerFactory factory;
 	private static readonly ILogger<Main> Logger;
 
+	private static Main _Singleton;
+	public static Main Singleton
+	{
+		get
+		{
+			return _Singleton;
+		}
+	}
+
+	public Main()
+	{
+		_Singleton ??= this;
+	}
+
+	private Node _TopLayer;
+	public Node TopLayer
+	{
+		get
+		{
+			_TopLayer ??= GetNode<Node>("%TopLayer");
+			return _TopLayer;
+		}
+	}
+
 	static Main()
 	{
-		factory = LoggerFactory.Create(builder => builder.AddSimpleConsole(options =>
+		factory = LoggerFactory.Create();
+		/*
+			builder => builder.AddSimpleConsole(options =>
 			{
 				options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled;
 				options.IncludeScopes = true;
 				options.SingleLine = true;
 				options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
 			}));
+		*/
 		Logger = factory.CreateLogger<Main>();
 		Logger.LogInformation("Wolf-UI started.");
 	}
@@ -81,7 +109,7 @@ public partial class Main : Control
 
 		CheckForUpdate();
 
-		Logger.LogInformation("This session's id: {ID}", WolfAPI.session_id);
+		Logger.LogInformation("This session's id: {0}", WolfAPI.session_id);
 		//GD.Print($"This session's id: {WolfAPI.session_id}");
 	}
 

@@ -207,14 +207,14 @@ public partial class AppEntry : Button
 
 		var main = GetNode<Main>("/root/Main");
 
-		if (await QuestionDialogue.OpenDialogue(main, "Pin", "Add Pin to Lobby?",
+		if (await QuestionDialogue.OpenDialogue("Pin", "Add Pin to Lobby?",
 			new Dictionary<string, bool> {
 				{ "Yes", true },
 				{ "No", false }
 			}
 		))
 		{
-			List<int> pin = await PinInput.RequestPin(main);
+			List<int> pin = await PinInput.RequestPin();
 			lobby.pin = pin;
 		}
 

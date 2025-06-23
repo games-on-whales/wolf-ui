@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmeq4kkqbu0iw"]
+[gd_scene load_steps=3 format=3 uid="uid://cmeq4kkqbu0iw"]
 
 [ext_resource type="Script" uid="uid://b6jbv5s4xio24" path="res://Scenes/Helper/PinInput.cs" id="1_vn0ie"]
+[ext_resource type="StyleBox" uid="uid://n885cbhj1q" path="res://Themes/OLED_theme_popup.tres" id="2_bee2s"]
 
 [node name="PinInput" type="Control" node_paths=PackedStringArray("PinLineEdit", "BackButton", "ClearButton", "AcceptButton", "CancelButton")]
 layout_mode = 3
@@ -25,21 +26,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.75)
 
-[node name="ColorRect" type="ColorRect" parent="."]
-custom_minimum_size = Vector2(160, 218)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -64.0
-offset_top = -76.0
-offset_right = 64.0
-offset_bottom = 76.0
-grow_horizontal = 2
-grow_vertical = 2
-
 [node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(128, 0)
 layout_mode = 1
@@ -54,6 +40,7 @@ offset_right = 64.0
 offset_bottom = 90.5
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_bee2s")
 
 [node name="Panel" type="Panel" parent="PanelContainer"]
 layout_mode = 2
@@ -80,6 +67,7 @@ context_menu_enabled = false
 emoji_menu_enabled = false
 virtual_keyboard_enabled = false
 virtual_keyboard_type = 2
+secret = true
 
 [node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2

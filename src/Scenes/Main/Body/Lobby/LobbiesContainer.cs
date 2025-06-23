@@ -1,5 +1,4 @@
 using Godot;
-using Microsoft.Extensions.Logging;
 using Resources.WolfAPI;
 using System.Text.Json;
 
@@ -81,7 +80,7 @@ public partial class LobbiesContainer : VBoxContainer
     
     private void OnLobbieStopped(string lobby_id)
     {
-        Logger.LogInformation("Lobby stopped {ID}", lobby_id);
+        Logger.LogInformation("Lobby stopped {0}", lobby_id);
         //GD.Print($"Lobby stopped {lobby_id}");
 
         foreach (var node in lobbies.GetChildren())

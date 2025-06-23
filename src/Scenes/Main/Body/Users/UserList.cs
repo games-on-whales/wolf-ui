@@ -1,6 +1,7 @@
 using Godot;
 using Resources.WolfAPI;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WolfUI;
@@ -56,11 +57,29 @@ public partial class UserList : Control
 
 		var profiles = await WolfAPI.GetProfiles();
 
-		foreach(var user in profiles)
+		foreach(var profile in profiles)
 		{
-			User userNode = User.Create(user);
-			userNode.Pressed += () => {
-				WolfAPI.Profile = user;
+			User userNode = User.Create(profile);
+			userNode.Pressed += async () => {
+				if (profile.pin is not null)
+				{
+					var focus = GetViewport().GuiGetFocusOwner();
+					List<int> pin = await PinInput.RequestPin();
+					if (!pin.SequenceEqual(profile.pin))
+					{
+						await QuestionDialogue.OpenDialogue<bool>(
+							"Incorrect Pin",
+							"The entered Pin is incorrect",
+							new Dictionary<string, bool>
+							{
+								{"OK", false}
+							});
+						focus.GrabFocus();
+						return;
+					}
+				}
+
+				WolfAPI.Profile = profile;
 				AppMenu.Visible = true;
 			};
 			UserContainer.AddChild(userNode);

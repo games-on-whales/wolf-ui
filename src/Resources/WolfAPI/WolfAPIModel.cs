@@ -97,7 +97,10 @@ public class Profile
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string icon_png_path {get;set;}
-    public List<App> apps {get;set;}
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<int> pin { get; set; }
+    public List<App> apps { get; set; }
 }
 
 public class AudioSettings

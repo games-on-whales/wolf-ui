@@ -17,19 +17,19 @@ public partial class QuestionDialogue : Control
     private readonly static PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bnq13qdhpc2km");
     private QuestionDialogue() { }
 
-    public static async Task<T> OpenDialogue<T>(Node Parent, string Title, string Content, Dictionary<string, T> Choices)
+    public static async Task<T> OpenDialogue<T>(string Title, string Content, Dictionary<string, T> Choices)
     {
         if (Choices.Count <= 0)
             throw new ArgumentException("Dialogue requires at least one Choice");
 
         //Save current Focus, so focus can restored after
-        Control FocusOwner = Parent.GetViewport().GuiGetFocusOwner();
+        Control FocusOwner = Main.Singleton.GetViewport().GuiGetFocusOwner();
 
         QuestionDialogue dialogue = SelfRef.Instantiate<QuestionDialogue>();
         dialogue.TitleLabel.Text = Title;
         dialogue.ContentLabel.Text = Content;
 
-        Parent.AddChild(dialogue);
+        Main.Singleton.TopLayer.AddChild(dialogue);
 
 
         T Answer = default(T);

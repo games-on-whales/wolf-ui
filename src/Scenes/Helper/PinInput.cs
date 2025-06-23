@@ -24,13 +24,13 @@ public partial class PinInput : Control
     readonly CancellationTokenSource cancelSource = new();
     List<Button> NumberButtons;
 
-    public static async Task<List<int>> RequestPin(Node SceneRoot)
+    public static async Task<List<int>> RequestPin()
     {
-        Control FocusOwner = SceneRoot.GetViewport().GuiGetFocusOwner();
+        Control FocusOwner = Main.Singleton.GetViewport().GuiGetFocusOwner();
 
         PinInput node = SelfRef.Instantiate<PinInput>();
-        SceneRoot = SceneRoot.GetNode("/root/Main");
-        SceneRoot.AddChild(node);
+
+        Main.Singleton.TopLayer.AddChild(node);
 
         List<int> ints = await Task.Run(node.GetPinBlocking);
         node.QueueFree();
