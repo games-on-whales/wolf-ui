@@ -1,10 +1,13 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using WolfUI;
 
@@ -108,6 +111,8 @@ public partial class WolfAPI : Resource
             "wolf::core::events::SwitchStreamProducerEvents" => Error.DoesNotExist,
             "wolf::core::events::JoinLobbyEvent" => Error.DoesNotExist,
             "wolf::core::events::LeaveLobbyEvent" => Error.DoesNotExist,
+            "wolf::core::events::UnplugDeviceEvent" => Error.DoesNotExist,
+            "wolf::core::events::PlugDeviceEvent" => Error.DoesNotExist,
             "wolf::core::events::CreateLobbyEvent" => EmitSignal(SignalName.LobbyCreated, data),
             "wolf::core::events::StopLobbyEvent" => EmitSignal(SignalName.LobbyStopped, data.TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\"}")),
             _ => Error.Unconfigured,
@@ -343,14 +348,23 @@ public partial class WolfAPI : Resource
         //GD.Print(await result.Content.ReadAsStringAsync());
     }
 
-    public static async Task StopLobby(string lobby_id)
+    private record StopLobbyRecord
     {
-        string json = @$"{{""lobby_id"": ""{lobby_id}""}}";
+        public string lobby_id { get; set; }
 
-        StringContent content = new(json);
-        var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/stop", content);
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<int> pin { get; set; }
+    }
+    public static async Task StopLobby(string lobby_id, List<int> pin = null)
+    {
+        var stop_lobby = new StopLobbyRecord()
+        {
+            lobby_id = lobby_id,
+            pin = pin
+        };
+
+        var result = await PostAsync("http://localhost/api/v1/lobbies/stop", stop_lobby);
         Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
-        //GD.Print(await result.Content.ReadAsStringAsync());
     }
 
     private static async Task<HttpResponseMessage> PostAsync<T>(string url, T obj)

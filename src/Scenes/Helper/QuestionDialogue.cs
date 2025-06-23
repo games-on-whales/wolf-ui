@@ -17,7 +17,12 @@ public partial class QuestionDialogue : Control
     private readonly static PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bnq13qdhpc2km");
     private QuestionDialogue() { }
 
-    public static async Task<T> OpenDialogue<T>(string Title, string Content, Dictionary<string, T> Choices)
+    Dictionary<string, Func<bool>> Keybinds;
+
+    [Signal]
+    private delegate void KeybindPressedEventHandler(string ChoiceKey);
+
+    public static async Task<T> OpenDialogue<T>(string Title, string Content, Dictionary<string, T> Choices, Dictionary<string, Func<bool>> Keybinds = null)
     {
         if (Choices.Count <= 0)
             throw new ArgumentException("Dialogue requires at least one Choice");
@@ -28,12 +33,21 @@ public partial class QuestionDialogue : Control
         QuestionDialogue dialogue = SelfRef.Instantiate<QuestionDialogue>();
         dialogue.TitleLabel.Text = Title;
         dialogue.ContentLabel.Text = Content;
+        dialogue.Keybinds = Keybinds;
 
         Main.Singleton.TopLayer.AddChild(dialogue);
 
-
         T Answer = default(T);
         CancellationTokenSource Cancellation = new();
+
+        if (Keybinds is not null)
+        {
+            dialogue.KeybindPressed += (key) =>
+            {
+                Answer = Choices[key];
+                Cancellation.Cancel();
+            };
+        }
 
         foreach (KeyValuePair<string, T> kv in Choices)
         {
@@ -61,6 +75,20 @@ public partial class QuestionDialogue : Control
             FocusOwner?.GrabFocus();
 
         return Answer;
+    }
+
+    public override void _Process(double delta)
+    {
+        if (Keybinds is null)
+            return;
+
+        foreach (var kv in Keybinds)
+        {
+            if (kv.Value())
+            {
+                EmitSignalKeybindPressed(kv.Key);
+            }
+        }
     }
 
     public override void _Ready()

@@ -1,6 +1,7 @@
 using Godot;
 using Resources.WolfAPI;
 using System.Collections.Generic;
+using System.Linq;
 
 //TODO Add User counter, Add check if Lobby is empty on Stop and if not ask again.
 namespace WolfUI;
@@ -76,6 +77,56 @@ public partial class Lobby : Control
 
     private async void StopLobby()
     {
-        await WolfAPI.StopLobby(Name);
+        var profiles = await WolfAPI.GetProfiles();
+        var owner = profiles.FindAll(profile => profile.id == LobbySettings.started_by_profile_id
+                                             || profile.id == LobbySettings.profile_id)
+                            .FirstOrDefault();
+
+        var lobbies = await WolfAPI.GetLobbies();
+        var lobby = lobbies.Find(lobby => lobby.id == LobbySettings.id);
+        GD.Print(LobbySettings.pin_required);
+
+        if (owner.pin is not null && !lobby.pin_required)
+        {
+            var focus = GetViewport().GuiGetFocusOwner();
+            await QuestionDialogue.OpenDialogue<bool>(
+                "Pin required",
+                "Please enter the Profiles access Pin",
+                new Dictionary<string, bool>
+                {
+                    {"OK", false}
+                });
+            List<int> pin = await PinInput.RequestPin();
+            if (!pin.SequenceEqual(owner.pin))
+            {
+                await QuestionDialogue.OpenDialogue<bool>(
+                    "Incorrect Pin",
+                    "The entered Pin is incorrect",
+                    new Dictionary<string, bool>
+                    {
+                        {"OK", false}
+                    });
+                focus.GrabFocus();
+                return;
+            }
+            await WolfAPI.StopLobby(Name);
+        }
+        else if (lobby.pin_required)
+        {
+            var focus = GetViewport().GuiGetFocusOwner();
+            await QuestionDialogue.OpenDialogue<bool>(
+                "Pin required",
+                "Please enter the Lobby Pin",
+                new Dictionary<string, bool>
+                {
+                    {"OK", false}
+                });
+            List<int> pin = await PinInput.RequestPin();
+            await WolfAPI.StopLobby(Name, pin);
+        }
+        else
+        {
+            await WolfAPI.StopLobby(Name);
+        }
     }
 }

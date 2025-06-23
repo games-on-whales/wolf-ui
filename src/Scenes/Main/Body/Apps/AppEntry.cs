@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -211,6 +212,10 @@ public partial class AppEntry : Button
 			new Dictionary<string, bool> {
 				{ "Yes", true },
 				{ "No", false }
+			},
+			new Dictionary<string, Func<bool>>
+			{
+				{"No", () => { return Input.IsActionJustPressed("ui_cancel"); } }
 			}
 		))
 		{

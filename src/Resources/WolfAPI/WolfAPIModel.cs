@@ -146,6 +146,7 @@ public class Lobby
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string id { get; set; }
     public string name { get; set; }
+    public bool pin_required { get; set; }
     public List<int> pin { get; set; }
     public bool multi_user { get; set; }
     public bool stop_when_everyone_leaves { get; set; }

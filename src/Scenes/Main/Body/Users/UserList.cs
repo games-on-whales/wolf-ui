@@ -47,20 +47,38 @@ public partial class UserList : Control
 		};
 	}
 
+	public override void _Process(double delta)
+	{
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
+		if (Visible)
+		{
+			var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
+			if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
+			{
+				var ctrl = (Control)UserContainer.GetChildren().ToList<Node>().Find(c => c is Control);
+				ctrl?.GrabFocus();
+			}
+		}
+    }
+
 	private async Task LoadUsers()
 	{
 		GetNode<Control>("%OptionsButton").Visible = false;
 		GetNode<Label>("%HeaderLabel").Text = "Select User";
 
-		foreach(var child in UserContainer.GetChildren())
+		foreach (var child in UserContainer.GetChildren())
 			child.QueueFree();
 
 		var profiles = await WolfAPI.GetProfiles();
 
-		foreach(var profile in profiles)
+		foreach (var profile in profiles)
 		{
 			User userNode = User.Create(profile);
-			userNode.Pressed += async () => {
+			userNode.Pressed += async () =>
+			{
 				if (profile.pin is not null)
 				{
 					var focus = GetViewport().GuiGetFocusOwner();
@@ -86,7 +104,7 @@ public partial class UserList : Control
 		}
 
 		var ch = UserContainer.GetChildren();
-		if(ch[0] is Button b)
+		if (ch[0] is Button b)
 		{
 			b.CallDeferred(Button.MethodName.GrabFocus);
 		}
