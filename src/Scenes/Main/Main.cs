@@ -32,13 +32,23 @@ public partial class Main : Control
 		_Singleton ??= this;
 	}
 
-	private Node _TopLayer;
-	public Node TopLayer
+	private SubViewport _TopLayer;
+	public SubViewport TopLayer
 	{
 		get
 		{
-			_TopLayer ??= GetNode<Node>("%TopLayer");
+			_TopLayer ??= GetNode<SubViewport>("%TopLayer");
 			return _TopLayer;
+		}
+	}
+
+	private SubViewport _BottomLayer;
+	public SubViewport BottomLayer
+	{
+		get
+		{
+			_BottomLayer ??= GetNode<SubViewport>("%BottomLayer");
+			return _BottomLayer;
 		}
 	}
 

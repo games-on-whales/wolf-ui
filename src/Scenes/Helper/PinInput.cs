@@ -26,7 +26,7 @@ public partial class PinInput : Control
 
     public static async Task<List<int>> RequestPin()
     {
-        Control FocusOwner = Main.Singleton.GetViewport().GuiGetFocusOwner();
+        Control FocusOwner = Main.Singleton.BottomLayer.GuiGetFocusOwner();
 
         PinInput node = SelfRef.Instantiate<PinInput>();
 

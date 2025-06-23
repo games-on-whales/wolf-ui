@@ -55,7 +55,7 @@ public partial class UserList : Control
 		}
 		if (Visible)
 		{
-			var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
+			var focus = Main.Singleton.GetNode("%BottomLayer").GetViewport().GuiGetFocusOwner();
 			if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
 			{
 				var ctrl = (Control)UserContainer.GetChildren().ToList<Node>().Find(c => c is Control);
