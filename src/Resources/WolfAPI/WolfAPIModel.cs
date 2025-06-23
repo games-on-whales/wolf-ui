@@ -110,11 +110,12 @@ public class AudioSettings
 
 public class VideoSettings
 {
-    public int width {get;set;}
-    public int height {get;set;}
-    public int refresh_rate {get;set;}
-    public string wayland_render_node {get;set;}
-    public string runner_render_node {get;set;}
+    public int width { get; set; }
+    public int height { get; set; }
+    public int refresh_rate { get; set; }
+    public string wayland_render_node { get; set; }
+    public string runner_render_node { get; set; }
+    public string video_producer_buffer_caps { get; set; }
 }
 
 public class Lobbies

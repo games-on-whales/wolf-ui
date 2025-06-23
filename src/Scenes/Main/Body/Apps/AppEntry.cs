@@ -163,7 +163,8 @@ public partial class AppEntry : Button
 					height = session.video_height,
 					refresh_rate = session.video_refresh_rate,
 					runner_render_node = App.render_node,
-					wayland_render_node = App.render_node
+					wayland_render_node = App.render_node,
+					video_producer_buffer_caps = System.Environment.GetEnvironmentVariable("WOLF_VIDEO_BUFFER_CAPS") ?? ""
 				},
 				audio_settings = new()
 				{
@@ -197,7 +198,8 @@ public partial class AppEntry : Button
 				height = session.video_height,
 				refresh_rate = session.video_refresh_rate,
 				runner_render_node = App.render_node,
-				wayland_render_node = App.render_node
+				wayland_render_node = App.render_node,
+				video_producer_buffer_caps = System.Environment.GetEnvironmentVariable("WOLF_VIDEO_BUFFER_CAPS") ?? ""
 			},
 			audio_settings = new()
 			{
