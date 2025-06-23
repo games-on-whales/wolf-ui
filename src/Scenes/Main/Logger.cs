@@ -41,27 +41,31 @@ public interface ILogger<T>
 
 public sealed class MyTempLogger<T> : ILogger<T>
 {
-    public void LogDebug(string text, params object[] args)
-    {
+	private Action<string> Writer = Console.Out.WriteLine;//GD.Print;
+
+	private void Write(string text, string level, params object[] args)
+	{
 		string Msg = String.Format(new CultureInfo("en-US"), text, args);
-		GD.Print($"{DateTime.Now} debug: {typeof(T).FullName} {Msg}");
-    }
+		Writer($"{DateTime.Now} {level}: {typeof(T).FullName} {Msg}");
+	}
+
+	public void LogDebug(string text, params object[] args)
+	{
+		Write(text, "debug", args);
+	}
 
     public void LogError(string text, params object[] args)
     {
-		string Msg = String.Format(new CultureInfo("en-US"), text, args);
-		GD.Print($"{DateTime.Now} error: {typeof(T).FullName} {Msg}");
+		Write(text, "error", args);
     }
 
     public void LogInformation(string text, params object[] args)
     {
-		string Msg = String.Format(new CultureInfo("en-US"), text, args);
-		GD.Print($"{DateTime.Now} info: {typeof(T).FullName} {Msg}");
+		Write(text, "info", args);
     }
 
     public void LogWarning(string text, params object[] args)
     {
-		string Msg = String.Format(new CultureInfo("en-US"), text, args);
-		GD.Print($"{DateTime.Now} warn: {typeof(T).FullName} {Msg}");
+		Write(text, "warn", args);
     }
 }
