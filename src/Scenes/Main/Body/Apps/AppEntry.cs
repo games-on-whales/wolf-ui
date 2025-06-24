@@ -15,6 +15,7 @@ public partial class AppEntry : Button
 	Control DownloadIcon;
 	Control AppMenu;
 	Button MenuButtonStart;
+	Button MenuButtonStop;
 	Button MenuButtonCoop;
 	Button MenuButtonUpdate;
 	Button MenuButtonCancle;
@@ -45,17 +46,20 @@ public partial class AppEntry : Button
 		AppMenu = GetNode<Control>("%AppMenu");
 
 		MenuButtonStart = GetNode<Button>("%MenuButtonStart");
+		MenuButtonStop = GetNode<Button>("%MenuButtonStop");
 		MenuButtonCoop = GetNode<Button>("%MenuButtonCoop");
 		MenuButtonUpdate = GetNode<Button>("%MenuButtonUpdate");
 		MenuButtonCancle = GetNode<Button>("%MenuButtonCancle");
+
+		MenuButtonStop.Visible = false;
 
 		if (Engine.IsEditorHint())
 		{
 			return;
 		}
 
-		var Main = GetNode<Main>("/root/Main");
-		docker = Main.docker;
+		var main = Main.Singleton;
+		docker = main.docker;
 
 		if (DockerController.isDisabled)
 			MenuButtonUpdate.Hide();
@@ -75,12 +79,14 @@ public partial class AppEntry : Button
 				return isRunning;
 			}).FirstOrDefault();
 			MenuButtonStart.Text = lobby == null ? "Start" : "Connect";
+			MenuButtonStop.Visible = lobby != null;
 		};
 
 		FocusEntered += AppMenu.Hide;
 		MenuButtonCancle.Pressed += GrabFocus; //Hides menu via the FocusEntered above
 		MenuButtonUpdate.Pressed += PullImage;
 		MenuButtonCoop.Pressed += OnCoopPressed;
+		MenuButtonStop.Pressed += OnStopPressed;
 		MenuButtonStart.Pressed += OnStartPressed;
 
 		Icon = await WolfAPI.GetAppIcon(App);
@@ -176,6 +182,21 @@ public partial class AppEntry : Button
 		}
 
 		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
+		
+		GrabFocus();
+	}
+
+	private async void OnStopPressed()
+	{
+		var curr_lobbies = await WolfAPI.GetLobbies();
+		var lobby = curr_lobbies.FindAll((l) =>
+		{
+			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
+							l.name == App.title;
+			return isRunning;
+		}).FirstOrDefault();
+
+		await WolfAPI.StopLobby(lobby.name);
 		
 		GrabFocus();
 	}

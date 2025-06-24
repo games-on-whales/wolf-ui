@@ -101,6 +101,16 @@ focus_next = NodePath("../MenuButtonUpdate")
 focus_previous = NodePath("../MenuButtonCancle")
 text = "Start"
 
+[node name="MenuButtonStop" type="Button" parent="AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_neighbor_top = NodePath("../MenuButtonCancle")
+focus_neighbor_bottom = NodePath("../MenuButtonCoop")
+focus_next = NodePath("../MenuButtonUpdate")
+focus_previous = NodePath("../MenuButtonCancle")
+text = "Stop"
+
 [node name="MenuButtonCoop" type="Button" parent="AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2

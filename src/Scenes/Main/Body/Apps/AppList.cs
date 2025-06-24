@@ -1,5 +1,6 @@
 using Godot;
 using Resources.WolfAPI;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WolfUI;
@@ -19,6 +20,23 @@ public partial class AppList : Control
 			return;
 		}
 
+		// Ensure at least one element is focused when switching to controller.
+		Main.Singleton.controllerMap.UsedControllerChanged += (controller) =>
+		{
+			if (!Visible)
+				return;
+
+			var focus = Main.Singleton.BottomLayer.GuiGetFocusOwner();
+			if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
+			{
+				var ctrl = (Control)AppContainer.GetChildren().ToList<Node>().Find(c => c is Control);
+				ctrl?.GrabFocus();
+				if (ctrl is null)
+					GetNode<Control>("%OptionsButton").GrabFocus();
+			}
+			
+		};
+
 		VisibilityChanged += async () =>
 		{
 			Control BackHint = GetNode<Control>("%BackHint");
@@ -26,14 +44,12 @@ public partial class AppList : Control
 			{
 				BackHint.Visible = true;
 				await LoadAppList();
-				if (AppContainer.GetChildCount() > 0)
-				{
-					AppContainer.GetChild<AppEntry>(0).CallDeferred(AppEntry.MethodName.GrabFocus);
-				}
-				else
-				{
+				
+				var ctrl = (Control)AppContainer.GetChildren().ToList<Node>().Find(c => c is Control);
+				ctrl?.GrabFocus();
+				if (ctrl is null)
 					GetNode<Control>("%OptionsButton").GrabFocus();
-				}
+
 				return;
 			}
 			BackHint.Hide();
@@ -42,6 +58,11 @@ public partial class AppList : Control
 
 	public override void _Process(double delta)
 	{
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
+    
 		if (Input.IsActionJustPressed("ui_select"))
 		{
 			GetNode<Control>("%UserList").Visible = true;
