@@ -21,7 +21,7 @@ public partial class AppEntry : Button
 	Button MenuButtonCancle;
 
 	private App App;
-
+    private static readonly ILogger<WolfAPI> Logger = WolfUI.Main.GetLogger<WolfAPI>();
 	private bool ImageOnDisc = true;
 
 	private DockerController docker;
@@ -69,10 +69,13 @@ public partial class AppEntry : Button
 		AppProgress.Hide();
 		Pressed += OnPressed;
 
-		AppMenu.VisibilityChanged += async () =>
-		{
-			var curr_lobbies = await WolfAPI.GetLobbies();
-			var lobby = curr_lobbies.FindAll((l) =>
+			AppMenu.VisibilityChanged += async () =>
+			{
+				if (!AppMenu.Visible)
+					return;
+
+				var curr_lobbies = await WolfAPI.GetLobbies();
+				var lobby = curr_lobbies.FindAll((l) =>
 			{
 				bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
 								l.name == App.title;
@@ -80,6 +83,34 @@ public partial class AppEntry : Button
 			}).FirstOrDefault();
 			MenuButtonStart.Text = lobby == null ? "Start" : "Connect";
 			MenuButtonStop.Visible = lobby != null;
+
+			//Logger.LogDebug($"{MenuButtonStart.FocusNeighborBottom}");
+		};
+
+		MenuButtonStop.VisibilityChanged += () =>
+		{
+			if (MenuButtonStop.Visible)
+			{
+				MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
+				MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
+
+				MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
+				MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
+
+				MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
+				MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
+
+				MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
+				MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
+			}
+			else
+			{
+				MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
+				MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
+
+				MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
+				MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
+			}
 		};
 
 		FocusEntered += AppMenu.Hide;
@@ -181,7 +212,8 @@ public partial class AppEntry : Button
 			lobby_id = await WolfAPI.CreateLobby(lobby);
 		}
 
-		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
+		if(lobby_id is not null)
+			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
 		
 		GrabFocus();
 	}
@@ -247,7 +279,8 @@ public partial class AppEntry : Button
 		}
 
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
-		await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
+		if(lobby_id is not null)
+			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
 
 		GrabFocus();
 	}

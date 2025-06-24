@@ -28,7 +28,7 @@ public partial class QuestionDialogue : Control
             throw new ArgumentException("Dialogue requires at least one Choice");
 
         //Save current Focus, so focus can restored after
-        Control FocusOwner = Main.Singleton.BottomLayer.GuiGetFocusOwner();
+        Control FocusOwner = Main.Singleton.GetViewport().GuiGetFocusOwner();
 
         QuestionDialogue dialogue = SelfRef.Instantiate<QuestionDialogue>();
         dialogue.TitleLabel.Text = Title;

@@ -26,7 +26,7 @@ public partial class AppList : Control
 			if (!Visible)
 				return;
 
-			var focus = Main.Singleton.BottomLayer.GuiGetFocusOwner();
+			var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
 			if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
 			{
 				var ctrl = (Control)AppContainer.GetChildren().ToList<Node>().Find(c => c is Control);
@@ -44,7 +44,7 @@ public partial class AppList : Control
 			{
 				BackHint.Visible = true;
 				await LoadAppList();
-				
+
 				var ctrl = (Control)AppContainer.GetChildren().ToList<Node>().Find(c => c is Control);
 				ctrl?.GrabFocus();
 				if (ctrl is null)

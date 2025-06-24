@@ -4,6 +4,7 @@
 [ext_resource type="StyleBox" uid="uid://n885cbhj1q" path="res://Themes/OLED_theme_popup.tres" id="2_bee2s"]
 
 [node name="PinInput" type="Control" node_paths=PackedStringArray("PinLineEdit", "BackButton", "ClearButton", "AcceptButton", "CancelButton")]
+z_index = 1
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

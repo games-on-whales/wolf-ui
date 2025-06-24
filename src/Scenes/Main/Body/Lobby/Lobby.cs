@@ -67,7 +67,7 @@ public partial class Lobby : Control
     {
         List<int> pin = null;
 
-        if (LobbySettings.pin != null)
+        if (LobbySettings.pin_required)
         {
             pin = await PinInput.RequestPin();
         }

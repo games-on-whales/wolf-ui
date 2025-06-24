@@ -5,11 +5,15 @@
 
 [node name="AppEntry" type="Button"]
 custom_minimum_size = Vector2(200, 265)
-offset_right = 180.0
-offset_bottom = 240.0
+anchors_preset = -1
+anchor_right = 0.15625
+anchor_bottom = 0.368056
+offset_right = -20.0
+offset_bottom = -25.0
 mouse_filter = 1
 expand_icon = true
 script = ExtResource("1_pyonv")
+metadata/_edit_use_anchors_ = true
 
 [node name="NameMargin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -25,7 +29,6 @@ theme_override_constants/margin_right = 3
 
 [node name="AppName" type="Label" parent="NameMargin"]
 unique_name_in_owner = true
-z_index = 1
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 0
@@ -67,7 +70,6 @@ expand_mode = 4
 
 [node name="AppMenu" type="CenterContainer" parent="."]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -97,7 +99,7 @@ unique_name_in_owner = true
 layout_mode = 2
 focus_neighbor_top = NodePath("../MenuButtonCancle")
 focus_neighbor_bottom = NodePath("../MenuButtonCoop")
-focus_next = NodePath("../MenuButtonUpdate")
+focus_next = NodePath("../MenuButtonCoop")
 focus_previous = NodePath("../MenuButtonCancle")
 text = "Start"
 
@@ -105,10 +107,10 @@ text = "Start"
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-focus_neighbor_top = NodePath("../MenuButtonCancle")
+focus_neighbor_top = NodePath("../MenuButtonStart")
 focus_neighbor_bottom = NodePath("../MenuButtonCoop")
-focus_next = NodePath("../MenuButtonUpdate")
-focus_previous = NodePath("../MenuButtonCancle")
+focus_next = NodePath("../MenuButtonCoop")
+focus_previous = NodePath("../MenuButtonStart")
 text = "Stop"
 
 [node name="MenuButtonCoop" type="Button" parent="AppMenu/PanelContainer/MarginContainer/VBoxContainer"]

@@ -42,16 +42,6 @@ public partial class Main : Control
 		}
 	}
 
-	private SubViewport _BottomLayer;
-	public SubViewport BottomLayer
-	{
-		get
-		{
-			_BottomLayer ??= GetNode<SubViewport>("%BottomLayer");
-			return _BottomLayer;
-		}
-	}
-
 	static Main()
 	{
 		factory = LoggerFactory.Create();
