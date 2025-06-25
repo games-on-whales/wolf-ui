@@ -84,7 +84,6 @@ public partial class Lobby : Control
 
         var lobbies = await WolfAPI.GetLobbies();
         var lobby = lobbies.Find(lobby => lobby.id == LobbySettings.id);
-        GD.Print(LobbySettings.pin_required);
 
         if (owner.pin is not null && !lobby.pin_required)
         {

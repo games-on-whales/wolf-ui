@@ -78,6 +78,7 @@ public partial class AppEntry : Button
 				var lobby = curr_lobbies.FindAll((l) =>
 			{
 				bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
+								 l.multi_user == false &&
 								l.name == App.title;
 				return isRunning;
 			}).FirstOrDefault();
@@ -136,6 +137,7 @@ public partial class AppEntry : Button
 			MenuButtonCancle.HasFocus() ||
 			MenuButtonUpdate.HasFocus() ||
 			MenuButtonCoop.HasFocus() ||
+			MenuButtonStop.HasFocus() ||
 			MenuButtonStart.HasFocus())
 		)
 		{
@@ -177,7 +179,8 @@ public partial class AppEntry : Button
 		var lobby = curr_lobbies.FindAll((l) =>
 		{
 			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
-							l.name == App.title;
+							 l.multi_user == false &&
+							 l.name == App.title;
 			return isRunning;
 		}).FirstOrDefault();
 
@@ -220,6 +223,7 @@ public partial class AppEntry : Button
 
 	private async void OnStopPressed()
 	{
+		Logger.LogInformation("OnStopPressed");
 		var curr_lobbies = await WolfAPI.GetLobbies();
 		var lobby = curr_lobbies.FindAll((l) =>
 		{
@@ -228,7 +232,7 @@ public partial class AppEntry : Button
 			return isRunning;
 		}).FirstOrDefault();
 
-		await WolfAPI.StopLobby(lobby.name);
+		await WolfAPI.StopLobby(lobby.id);
 		
 		GrabFocus();
 	}
