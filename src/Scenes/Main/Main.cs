@@ -5,6 +5,7 @@ using System.Linq;
 //using Microsoft.Extensions.Logging;
 using System;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace WolfUI;
 
@@ -44,7 +45,23 @@ public partial class Main : Control
 
 	static Main()
 	{
-		factory = LoggerFactory.Create();
+		var str_to_enum = new Dictionary<string, ILoggerFactory.LogLevelEnum>
+		{
+			{ "NONE", ILoggerFactory.LogLevelEnum.NONE},
+			{ "ERROR", ILoggerFactory.LogLevelEnum.ERROR},
+			{ "WARNING", ILoggerFactory.LogLevelEnum.WARN},
+			{ "WARN", ILoggerFactory.LogLevelEnum.WARN},
+			{ "INFORMATION", ILoggerFactory.LogLevelEnum.INFO},
+			{ "INFO", ILoggerFactory.LogLevelEnum.INFO},
+			{ "DEBUG", ILoggerFactory.LogLevelEnum.DEBUG}
+		};
+		var log_level_env = System.Environment.GetEnvironmentVariable("LOGLEVEL") ?? "INFO";
+        if (!str_to_enum.TryGetValue(log_level_env.ToUpper(), out var logLevel))
+        {
+            logLevel = ILoggerFactory.LogLevelEnum.INFO;
+        }
+
+        factory = LoggerFactory.Create();
 		/*
 			builder => builder.AddSimpleConsole(options =>
 			{
@@ -54,6 +71,7 @@ public partial class Main : Control
 				options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
 			}));
 		*/
+		factory.SetLogLevel(logLevel);
 		Logger = factory.CreateLogger<Main>();
 		Logger.LogInformation("Wolf-UI started.");
 	}
