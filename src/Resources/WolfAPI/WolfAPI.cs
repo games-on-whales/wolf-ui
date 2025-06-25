@@ -96,32 +96,34 @@ public partial class WolfAPI : Resource
 
     private void FilterAPIEvents(string @event, string data)
     {
-        var error = @event switch
-        {
-            "wolf::core::events::StartRunner" => Error.DoesNotExist,
-            "wolf::core::events::StreamSession" => Error.DoesNotExist,
-            "wolf::core::events::StopStreamEvent" => Error.DoesNotExist,
-            "wolf::core::events::VideoSession" => Error.DoesNotExist,
-            "wolf::core::events::RTPAudioPingEvent" => Error.DoesNotExist,
-            "wolf::core::events::AudioSession" => Error.DoesNotExist,
-            "wolf::core::events::IDRRequestEvent" => Error.DoesNotExist,
-            "wolf::core::events::RTPVideoPingEvent" => Error.DoesNotExist,
-            "wolf::core::events::ResumeStreamEvent" => Error.DoesNotExist,
-            "wolf::core::events::PauseStreamEvent" => Error.DoesNotExist,
-            "wolf::core::events::SwitchStreamProducerEvents" => Error.DoesNotExist,
-            "wolf::core::events::JoinLobbyEvent" => Error.DoesNotExist,
-            "wolf::core::events::LeaveLobbyEvent" => Error.DoesNotExist,
-            "wolf::core::events::UnplugDeviceEvent" => Error.DoesNotExist,
-            "wolf::core::events::PlugDeviceEvent" => Error.DoesNotExist,
-            "wolf::core::events::CreateLobbyEvent" => EmitSignal(SignalName.LobbyCreated, data),
-            "wolf::core::events::StopLobbyEvent" => EmitSignal(SignalName.LobbyStopped, data.TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\"}")),
-            _ => Error.Unconfigured,
+        var Operations = new Dictionary<string, Action<string>> {
+            { "wolf::core::events::PairSignal", (data)=>{}},
+            { "wolf::core::events::StartRunner", (data)=>{}},
+            { "wolf::core::events::StreamSession", (data)=>{}},
+            { "wolf::core::events::StopStreamEvent", (data)=>{}},
+            { "wolf::core::events::VideoSession", (data)=>{}},
+            { "wolf::core::events::RTPAudioPingEvent", (data)=>{}},
+            { "wolf::core::events::AudioSession", (data)=>{}},
+            { "wolf::core::events::IDRRequestEvent", (data)=>{}},
+            { "wolf::core::events::RTPVideoPingEvent", (data)=>{}},
+            { "wolf::core::events::ResumeStreamEvent", (data)=>{}},
+            { "wolf::core::events::PauseStreamEvent", (data)=>{}},
+            { "wolf::core::events::SwitchStreamProducerEvents", (data)=>{}},
+            { "wolf::core::events::JoinLobbyEvent", (data)=>{}},
+            { "wolf::core::events::LeaveLobbyEvent", (data)=>{}},
+            { "wolf::core::events::CreateLobbyEvent", EmitSignalLobbyCreated },
+            { "wolf::core::events::StopLobbyEvent", (data)=>{ EmitSignalLobbyStopped(data.TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\"}")); }},
         };
-        if(error == Error.Unconfigured)
+
+        //var failed = delegate(){ Logger.LogInformation("{Event} - {Data}", @event, data); };
+
+        if (!Operations.TryGetValue(@event, out var value))
         {
             Logger.LogInformation("{0} - {1}", @event, data);
-            //GD.Print($"{@event} - {data}");
+            return;
         }
+
+        value(data);
     }
 
     public static async Task<Texture2D> GetAppIcon(App app)
@@ -182,28 +184,48 @@ public partial class WolfAPI : Resource
 
     public async void StartListenToAPIEvents()
     {
-        if(StartedListening)
+        if (StartedListening)
             return;
 
         StartedListening = true;
-
-        await Task.Run(new(async () => { 
-            var stream = await _httpClient.GetStreamAsync("http://localhost/api/v1/events");
-            string eventType = "";
-            using var reader = new StreamReader(stream);
-            while (!reader.EndOfStream)
+        
+        await Task.Run(new(async () =>
+        {
+            while (true)
             {
-                var line = await reader.ReadLineAsync();
-                if (line == ":keepalive")
-                    continue;
-
-                if (line.StartsWith("event:"))
-                    eventType = line.TrimPrefix("event: ");
-
-                if (line.StartsWith("data:"))
+                try
                 {
-                    var data = line.TrimPrefix("data: ");
-                    EmitSignal(SignalName.APIEvent, eventType, data);
+                    var stream = await _httpClient.GetStreamAsync("http://localhost/api/v1/events");
+                    string eventType = "";
+                    using var reader = new StreamReader(stream);
+                    while (!reader.EndOfStream)
+                    {
+                        var line = await reader.ReadLineAsync();
+                        if (line is null)
+                            continue;
+
+                        if (line == ":keepalive")
+                            continue;
+
+                        if (line.StartsWith("event:"))
+                            eventType = line["event: ".Length..];
+
+
+                        if (line.StartsWith("data:"))
+                        {
+                            var data = line["data: ".Length..];
+
+                            EmitSignalAPIEvent(eventType, data);
+                        }
+                    }
+
+                    Logger.LogError("Lost connection to the Wolf API. End of Stream.");
+                    await Task.Delay(1000);
+                }
+                catch (HttpRequestException e)
+                {
+                    Logger.LogError("Failed connecting to the Wolf API: {0}; Retrying in 5s.", e.Message);
+                    await Task.Delay(5000);
                 }
             }
         }));
@@ -217,7 +239,7 @@ public partial class WolfAPI : Resource
             if(profile.id == used_profile.id)
                 return profile.apps;
         }
-        Logger.LogInformation("Profile: {0} not found", used_profile.name);
+        Logger.LogError("Profile: {0} not found", used_profile.name);
         //GD.Print($"Profile: {used_profile.name} not found");
 
         return [];
@@ -229,7 +251,7 @@ public partial class WolfAPI : Resource
 
         if (!profiles.success)
         {
-            Logger.LogInformation("Error retrieving Profiles");
+            Logger.LogError("Error retrieving Profiles");
             //GD.Print("Error retrieving Profiles");
             return [];
         }
@@ -255,7 +277,7 @@ public partial class WolfAPI : Resource
             runner = runner
         };
         var result = await PostAsync("http://localhost/api/v1/runners/start", starter);
-        Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
+        //Logger.LogInformation("{0}", result);
         //GD.Print(await result.Content.ReadAsStringAsync());
     }
 
@@ -308,9 +330,9 @@ public partial class WolfAPI : Resource
     */
     public static async Task<string> CreateLobby(Lobby lobby)
     {
-        var result = await PostAsync("http://localhost/api/v1/lobbies/create", lobby);
-        var content = await result.Content.ReadAsStringAsync();
-        Logger.LogInformation("called lobbies/create: {0}", content);
+        var content = await PostAsync("http://localhost/api/v1/lobbies/create", lobby);
+        //var content = await result.Content.ReadAsStringAsync();
+        //Logger.LogInformation("called lobbies/create: {0}", content);
         //GD.Print($"called lobbies/create: {content}");
         return JsonSerializer.Deserialize<LobbyCreatedResponse>(content)?.lobby_id;
     }
@@ -330,7 +352,7 @@ public partial class WolfAPI : Resource
         };
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/join", lobbyobj);
-        Logger.LogInformation("called lobbies/join: {0}", await result.Content.ReadAsStringAsync());
+        //Logger.LogInformation("called lobbies/join: {0}", await result.Content.ReadAsStringAsync());
         //GD.Print($"called lobbies/join: {await result.Content.ReadAsStringAsync()}");
     }
 
@@ -364,15 +386,18 @@ public partial class WolfAPI : Resource
         };
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/stop", stop_lobby);
-        Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
+        //Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
     }
 
-    private static async Task<HttpResponseMessage> PostAsync<T>(string url, T obj)
+    private static async Task<string> PostAsync<T>(string url, T obj)
     {
         string data = JsonSerializer.Serialize<T>(obj);
+        Logger.LogDebug("API call POST: {0} - {1}", url, data);
         StringContent content = new(data);
         var result = await _httpClient.PostAsync(url, content);
-        return result;
+        var return_data = await result.Content.ReadAsStringAsync();
+        Logger.LogDebug("API answer from: {0} - {1}", url, return_data);
+        return return_data;
     }
 
     /**
@@ -387,7 +412,7 @@ public partial class WolfAPI : Resource
     public static async Task<T> GetAsync<T>(string url)
     {
         var result = await _httpClient.GetStringAsync(url);
-        //GD.Print(result);
+        Logger.LogDebug("API call GET: {0} - {1}", url, result);
         T data = JsonSerializer.Deserialize<T>(result);
         return data;
     }
