@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -18,7 +19,7 @@ public class Apps
     public List<App> apps {get;set;}
 }
 
-public class App
+public class App : EventArgs
 {
     public string icon_png_path {get;set;}
     public bool start_virtual_compositor {get;set;}
@@ -138,7 +139,7 @@ public class LobbyJoin
     public List<int> pin { get; set; }
 }
 
-public class Lobby
+public class Lobby : EventArgs
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string profile_id { get; set; }
