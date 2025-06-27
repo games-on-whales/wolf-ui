@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WolfUI;
 
-public partial class PinInput : Control
+public partial class PinInput : CenterContainer
 {
     [Export]
     LineEdit PinLineEdit;

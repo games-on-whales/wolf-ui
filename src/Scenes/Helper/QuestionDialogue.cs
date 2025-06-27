@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace WolfUI;
 
-public partial class QuestionDialogue : Control
+[Tool]
+public partial class QuestionDialogue : CenterContainer
 {
     [Export]
     Label TitleLabel;
@@ -16,6 +17,7 @@ public partial class QuestionDialogue : Control
     Control ButtonContainer;
     private readonly static PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bnq13qdhpc2km");
     private QuestionDialogue() { }
+    private ScrollContainer scrollContainer;
 
     Dictionary<string, Func<bool>> Keybinds;
 
@@ -79,6 +81,20 @@ public partial class QuestionDialogue : Control
 
     public override void _Process(double delta)
     {
+        if (Engine.IsEditorHint())
+        {
+            return;
+        }
+
+        if (Input.IsActionPressed("ui_text_scroll_up"))
+        {
+            scrollContainer.ScrollVertical -= (int)(10.0 * Input.GetActionStrength("ui_text_scroll_up"));
+        }
+        if (Input.IsActionPressed("ui_text_scroll_down"))
+        {
+            scrollContainer.ScrollVertical += (int)(10.0 * Input.GetActionStrength("ui_text_scroll_down"));
+        }
+
         if (Keybinds is null)
             return;
 
@@ -93,6 +109,19 @@ public partial class QuestionDialogue : Control
 
     public override void _Ready()
     {
+        scrollContainer = GetNode<ScrollContainer>("%ScrollContainer");
 
+        if (Engine.IsEditorHint())
+        {
+            TitleLabel.Text = "QuestionDialogue";
+            ContentLabel.Text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+            Button b = new()
+            {
+                Text = "OK",
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            ButtonContainer.AddChild(b);
+            return;
+        }
     }
 }
