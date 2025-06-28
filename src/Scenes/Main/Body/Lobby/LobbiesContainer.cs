@@ -23,8 +23,8 @@ public partial class LobbiesContainer : VBoxContainer
 
         Hide();
 
-        WolfAPI.Singleton.LobbyCreated += (data) => CallDeferred(MethodName.OnLobbieCreated, data);
-        WolfAPI.Singleton.LobbyStopped += (data) => CallDeferred(MethodName.OnLobbieStopped, data);
+        WolfAPI.Singleton.LobbyCreatedEvent += (caller, data) => AddLobby(data);
+        WolfAPI.Singleton.LobbyStoppedEvent += (caller, data) => OnLobbieStopped(data);
         lobbies.ChildEnteredTree += (node) => SetDeferred(PropertyName.Visible, true);
         lobbies.ChildExitingTree += (node) => CallDeferred(MethodName.OnChildExitingTree, node);
 
@@ -53,12 +53,6 @@ public partial class LobbiesContainer : VBoxContainer
         {
             Hide();
         }
-    }
-
-    private void OnLobbieCreated(string lobbydata)
-    {
-        var lobby = JsonSerializer.Deserialize<Resources.WolfAPI.Lobby>(lobbydata);
-        AddLobby(lobby);
     }
 
     private void AddLobby(Resources.WolfAPI.Lobby lobby)

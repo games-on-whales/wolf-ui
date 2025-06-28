@@ -1,44 +1,27 @@
-[gd_scene load_steps=3 format=3 uid="uid://bnq13qdhpc2km"]
+[gd_scene load_steps=2 format=3 uid="uid://bnq13qdhpc2km"]
 
 [ext_resource type="Script" uid="uid://d2jhc55r1u4jo" path="res://Scenes/Helper/QuestionDialogue.cs" id="1_qxpr7"]
-[ext_resource type="StyleBox" uid="uid://n885cbhj1q" path="res://Themes/OLED_theme_popup.tres" id="2_7jscl"]
 
-[node name="QuestionDialogue" type="Control" node_paths=PackedStringArray("TitleLabel", "ContentLabel", "ButtonContainer")]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+[node name="QuestionDialogue" type="CenterContainer" node_paths=PackedStringArray("TitleLabel", "ContentLabel", "ButtonContainer")]
+anchors_preset = -1
+anchor_left = 0.413281
+anchor_top = 0.395833
+anchor_right = 0.586719
+anchor_bottom = 0.604167
+offset_left = 11.0
+offset_right = -11.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qxpr7")
 TitleLabel = NodePath("PanelContainer/VBoxContainer/PanelContainer/TitleLabel")
-ContentLabel = NodePath("PanelContainer/VBoxContainer/MarginContainer/ContentLabel")
+ContentLabel = NodePath("PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/ContentLabel")
 ButtonContainer = NodePath("PanelContainer/VBoxContainer/MarginContainer2/ButtonContainer")
-
-[node name="ColorRect2" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.75)
+metadata/_edit_use_anchors_ = true
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(200, 150)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -75.0
-offset_right = 100.0
-offset_bottom = 75.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("2_7jscl")
+layout_mode = 2
+theme_type_variation = &"PopupWindowContainer"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
 layout_mode = 2
@@ -52,7 +35,7 @@ layout_mode = 2
 [node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer/PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Title"
+text = "QuestionDialogue"
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -62,8 +45,18 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
 
-[node name="ContentLabel" type="Label" parent="PanelContainer/VBoxContainer/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer/MarginContainer"]
+unique_name_in_owner = true
 layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ContentLabel" type="Label" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer"]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+autowrap_mode = 3
 
 [node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -73,4 +66,3 @@ theme_override_constants/margin_bottom = 2
 
 [node name="ButtonContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer2"]
 layout_mode = 2
-size_flags_vertical = 8

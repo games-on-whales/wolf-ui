@@ -8,23 +8,23 @@ using WolfManagement.Resources;
 namespace WolfUI;
 
 [GlobalClass][Tool]
-public partial class AppEntry : Button
+public partial class AppEntry : Control
 {
 	ProgressBar AppProgress;
 	Label AppLabel;
 	Control DownloadIcon;
 	Control AppMenu;
+	Button AppButton;
 	Button MenuButtonStart;
 	Button MenuButtonStop;
 	Button MenuButtonCoop;
 	Button MenuButtonUpdate;
 	Button MenuButtonCancle;
+	TextureRect AppIcon;
 
 	private App App;
     private static readonly ILogger<WolfAPI> Logger = WolfUI.Main.GetLogger<WolfAPI>();
 	private bool ImageOnDisc = true;
-
-	private DockerController docker;
 
 	public static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://chspw2lt1qcuc");
 
@@ -44,7 +44,9 @@ public partial class AppEntry : Button
 		AppLabel = GetNode<Label>("%AppName");
 		DownloadIcon = GetNode<Control>("%DownloadHint");
 		AppMenu = GetNode<Control>("%AppMenu");
+		AppIcon = GetNode<TextureRect>("%AppIcon");
 
+		AppButton = GetNode<Button>("%AppButton");
 		MenuButtonStart = GetNode<Button>("%MenuButtonStart");
 		MenuButtonStop = GetNode<Button>("%MenuButtonStop");
 		MenuButtonCoop = GetNode<Button>("%MenuButtonCoop");
@@ -58,70 +60,25 @@ public partial class AppEntry : Button
 			return;
 		}
 
-		var main = Main.Singleton;
-		docker = main.docker;
-
 		if (DockerController.isDisabled)
 			MenuButtonUpdate.Hide();
 
 		AppLabel.Text = App.title;
 		DownloadIcon.Hide();
 		AppProgress.Hide();
-		Pressed += OnPressed;
+		AppButton.Pressed += OnPressed;
 
-			AppMenu.VisibilityChanged += async () =>
-			{
-				if (!AppMenu.Visible)
-					return;
-
-				var curr_lobbies = await WolfAPI.GetLobbies();
-				var lobby = curr_lobbies.FindAll((l) =>
-			{
-				bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
-								 l.multi_user == false &&
-								l.name == App.title;
-				return isRunning;
-			}).FirstOrDefault();
-			MenuButtonStart.Text = lobby == null ? "Start" : "Connect";
-			MenuButtonStop.Visible = lobby != null;
-
-			//Logger.LogDebug($"{MenuButtonStart.FocusNeighborBottom}");
-		};
-
-		MenuButtonStop.VisibilityChanged += () =>
-		{
-			if (MenuButtonStop.Visible)
-			{
-				MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
-				MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
-
-				MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
-				MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
-
-				MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
-				MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
-
-				MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
-				MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
-			}
-			else
-			{
-				MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
-				MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
-
-				MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
-				MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
-			}
-		};
+		AppMenu.VisibilityChanged += OnAppMenuVisibilityChanged;
+		MenuButtonStop.VisibilityChanged += OnMenuButtonStopVisibilityChanged;
 
 		FocusEntered += AppMenu.Hide;
-		MenuButtonCancle.Pressed += GrabFocus; //Hides menu via the FocusEntered above
+		MenuButtonCancle.Pressed += AppButton.GrabFocus; //Hides menu via the FocusEntered above
 		MenuButtonUpdate.Pressed += PullImage;
 		MenuButtonCoop.Pressed += OnCoopPressed;
 		MenuButtonStop.Pressed += OnStopPressed;
 		MenuButtonStart.Pressed += OnStartPressed;
 
-		Icon = await WolfAPI.GetAppIcon(App);
+		AppIcon.Texture = await WolfAPI.GetAppIcon(App);
 	}
 
 	public override void _Process(double delta)
@@ -146,7 +103,7 @@ public partial class AppEntry : Button
 
 		if (AppMenu.Visible && Input.IsActionPressed("ui_cancel"))
 		{
-			GrabFocus();
+			AppButton.GrabFocus();
 		}
 
 		if (App.runner.image is not null)
@@ -215,10 +172,10 @@ public partial class AppEntry : Button
 			lobby_id = await WolfAPI.CreateLobby(lobby);
 		}
 
-		if(lobby_id is not null)
+		if (lobby_id is not null)
 			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
 		
-		GrabFocus();
+		AppButton.GrabFocus();
 	}
 
 	private async void OnStopPressed()
@@ -234,7 +191,13 @@ public partial class AppEntry : Button
 
 		await WolfAPI.StopLobby(lobby.id);
 		
-		GrabFocus();
+		AppButton.GrabFocus();
+	}
+
+	public new void GrabFocus()
+	{
+		GD.Print("Tried to Grab");
+		AppButton.GrabFocus();
 	}
 
 	private async void OnCoopPressed()
@@ -283,10 +246,10 @@ public partial class AppEntry : Button
 		}
 
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
-		if(lobby_id is not null)
+		if (lobby_id is not null)
 			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
 
-		GrabFocus();
+		AppButton.GrabFocus();
 	}
 
 	public async void PullImage()
@@ -294,11 +257,54 @@ public partial class AppEntry : Button
 		if (DockerController.isDisabled)
 			return;
 
-		GrabFocus();
+		AppButton.GrabFocus();
 		if (App.runner.image.Contains(':'))
 		{
 			var image = App.runner.image.Split(":");
-			await docker.PullImage(image[0], image[1], AppProgress, this);
+			await Main.Singleton.docker.PullImage(image[0], image[1], AppProgress, AppButton);
+		}
+	}
+
+	private async void OnAppMenuVisibilityChanged()
+	{
+		if (!AppMenu.Visible)
+			return;
+
+			var curr_lobbies = await WolfAPI.GetLobbies();
+			var lobby = curr_lobbies.FindAll((l) =>
+		{
+			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
+								l.multi_user == false &&
+							l.name == App.title;
+			return isRunning;
+		}).FirstOrDefault();
+		MenuButtonStart.Text = lobby == null ? "Start" : "Connect";
+		MenuButtonStop.Visible = lobby != null;
+	}
+
+	private void OnMenuButtonStopVisibilityChanged()
+	{
+		if (MenuButtonStop.Visible)
+		{
+			MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
+			MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
+
+			MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
+			MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
+
+			MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
+			MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
+
+			MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
+			MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
+		}
+		else
+		{
+			MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
+			MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
+
+			MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
+			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
 		}
 	}
 

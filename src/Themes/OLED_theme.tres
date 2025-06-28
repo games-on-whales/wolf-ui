@@ -1,4 +1,17 @@
-[gd_resource type="Theme" load_steps=3 format=3 uid="uid://v418qqxvwy87"]
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://v418qqxvwy87"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rhp46"]
+bg_color = Color(0.103744, 0.103744, 0.103743, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_af2rq"]
+bg_color = Color(0.117647, 0.117647, 0.117647, 1)
+corner_radius_bottom_right = 500
+corner_detail = 1
+expand_margin_right = 17.0
+expand_margin_bottom = 17.0
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_f7dxq"]
+color = Color(0.548963, 0.548963, 0.548963, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f7dxq"]
 bg_color = Color(0, 0, 0, 1)
@@ -6,6 +19,22 @@ bg_color = Color(0, 0, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_awilq"]
 bg_color = Color(0.0687983, 0.0687983, 0.0687982, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ss67d"]
+bg_color = Color(0.0705882, 0.0705882, 0.0705882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
 [resource]
+AppCardBackground/base_type = &"Panel"
+AppCardBackground/styles/panel = SubResource("StyleBoxFlat_rhp46")
+AppCardCorner/base_type = &"PanelContainer"
+AppCardCorner/styles/panel = SubResource("StyleBoxFlat_af2rq")
+AppCardStatusIcon/base_type = &"Label"
+AppCardStatusIcon/colors/font_color = Color(0.564962, 0.564962, 0.564962, 1)
+AppCardStatusIcon/styles/normal = SubResource("StyleBoxLine_f7dxq")
 Panel/styles/panel = SubResource("StyleBoxFlat_f7dxq")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_awilq")
+PopupWindowContainer/base_type = &"PanelContainer"
+PopupWindowContainer/styles/panel = SubResource("StyleBoxFlat_ss67d")
