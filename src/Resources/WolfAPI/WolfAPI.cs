@@ -90,6 +90,8 @@ public partial class WolfAPI : Resource
         void InvokeLobbyCreated(string data) => InvokeEvent(LobbyCreatedEvent, data);
 
         var Operations = new Dictionary<string, Action<string>> {
+            { "wolf::core::events::PlugDeviceEvent", (data)=>{}},
+            { "wolf::core::events::UnplugDeviceEvent", (data)=>{}},
             { "wolf::core::events::PairSignal", (data)=>{}},
             { "wolf::core::events::StartRunner", (data)=>{}},
             { "wolf::core::events::StreamSession", (data)=>{}},
