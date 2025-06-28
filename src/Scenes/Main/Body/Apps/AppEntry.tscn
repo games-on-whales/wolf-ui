@@ -10,27 +10,22 @@
 [node name="AppEntry" type="Control"]
 custom_minimum_size = Vector2(200, 295)
 layout_mode = 3
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -100.0
-offset_right = 100.0
+anchors_preset = 0
+offset_right = 200.0
 offset_bottom = 295.0
-grow_horizontal = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+size_flags_horizontal = 6
+size_flags_vertical = 6
 mouse_filter = 1
+theme_type_variation = &"AppCard"
 script = ExtResource("1_pyonv")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = -2.7
-anchor_right = 3.7
-anchor_bottom = 1.0
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 295.0
 grow_horizontal = 2
 mouse_filter = 2
-metadata/_edit_use_anchors_ = true
 
 [node name="SpacerLeft" type="Control" parent="HBoxContainer"]
 layout_mode = 2
@@ -41,7 +36,6 @@ mouse_filter = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 295)
 layout_mode = 2
-size_flags_horizontal = 4
 expand_icon = true
 
 [node name="Panel" type="Panel" parent="HBoxContainer/AppButton"]
@@ -110,7 +104,7 @@ text = "NAME"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/AppButton"]
+[node name="AppCardCorner" type="PanelContainer" parent="HBoxContainer/AppButton"]
 layout_mode = 2
 offset_left = 1.0
 offset_top = 1.0
@@ -120,7 +114,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_type_variation = &"AppCardCorner"
 
-[node name="LoadingMargin" type="MarginContainer" parent="HBoxContainer/AppButton/PanelContainer"]
+[node name="LoadingMargin" type="MarginContainer" parent="HBoxContainer/AppButton/AppCardCorner"]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 7
@@ -128,10 +122,10 @@ theme_override_constants/margin_top = 7
 theme_override_constants/margin_right = 13
 theme_override_constants/margin_bottom = 13
 
-[node name="DownloadHint" type="TextureRect" parent="HBoxContainer/AppButton/PanelContainer/LoadingMargin"]
+[node name="DownloadHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
 unique_name_in_owner = true
 visible = false
-self_modulate = Color(0.564706, 0.564706, 0.564706, 1)
+self_modulate = Color(0.757453, 0.0663632, 0, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -142,10 +136,10 @@ texture = ExtResource("3_h5jnb")
 expand_mode = 4
 script = ExtResource("4_0urjt")
 
-[node name="PlayingHint" type="TextureRect" parent="HBoxContainer/AppButton/PanelContainer/LoadingMargin"]
+[node name="PlayingHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
 unique_name_in_owner = true
 visible = false
-self_modulate = Color(0.564706, 0.564706, 0.564706, 1)
+self_modulate = Color(0.773325, 0.641663, 0.178565, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -156,9 +150,9 @@ texture = ExtResource("5_tte3r")
 expand_mode = 4
 script = ExtResource("4_0urjt")
 
-[node name="OkHint" type="TextureRect" parent="HBoxContainer/AppButton/PanelContainer/LoadingMargin"]
+[node name="OkHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
 unique_name_in_owner = true
-self_modulate = Color(0.564706, 0.564706, 0.564706, 1)
+self_modulate = Color(0.292571, 0.533571, 0.177747, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
 size_flags_horizontal = 4

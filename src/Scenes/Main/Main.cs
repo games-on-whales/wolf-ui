@@ -6,6 +6,8 @@ using System.Linq;
 using System;
 using System.Globalization;
 using System.Collections.Generic;
+using System.IO;
+using System.Resources;
 
 namespace WolfUI;
 
@@ -84,6 +86,9 @@ public partial class Main : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		if (Engine.IsEditorHint())
+			return;
+
 		SoundEffects soundEffects = null;
 		foreach (var child in GetChildren())
 		{
@@ -129,6 +134,44 @@ public partial class Main : Control
 
 		Logger.LogInformation("This session's id: {0}", WolfAPI.session_id);
 		//GD.Print($"This session's id: {WolfAPI.session_id}");
+
+		
+		//GetTree().CreateTimer(10).Timeout += () =>
+		//	GetTree().Root.Theme = ResourceLoader.Load<Theme>("/home/sebastian/Test/OLED_theme.tres");//"uid://v418qqxvwy87");
+	}
+
+	public override void _EnterTree()
+	{
+		base._EnterTree();
+		GetTree().Root.Theme = ResourceLoader.Load<Theme>("uid://v418qqxvwy87");
+    }
+
+	public void LoadTheme(string theme_name)
+	{
+		string user = System.Environment.GetEnvironmentVariable("USER");
+		user = (user == "root" || user == null) ? "retro" : user;
+		string filepath = $"/home/{user}/.wolf-ui/{theme_name}.tres";
+
+		if (File.Exists(filepath))
+		{
+			return;
+		}
+
+		GetTree().Root.Theme = ResourceLoader.Load<Theme>(filepath);
+	}
+
+	public void SaveTheme(string theme_name)
+	{
+		string user = System.Environment.GetEnvironmentVariable("USER");
+		user = (user == "root" || user == null) ? "retro" : user;
+		string filepath = $"/home/{user}/.wolf-ui/{theme_name}.tres";
+
+		if (File.Exists(filepath))
+		{
+			return;
+		}
+
+		//GetTree().Root.Theme;
 	}
 
 	public override void _Input(InputEvent @event)

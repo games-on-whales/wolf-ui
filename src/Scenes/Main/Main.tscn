@@ -1,7 +1,7 @@
 [gd_scene load_steps=22 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
-[ext_resource type="Script" uid="uid://ej4uorvu6hbj" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
+[ext_resource type="Resource" uid="uid://3uu0v8l30oi5" path="res://Resources/Docker/DockerController.tres" id="3_xggvw"]
 [ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
 [ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
 [ext_resource type="Texture2D" uid="uid://b1wng8q2m6i68" path="res://Icons/arrow-left-svgrepo-com.svg" id="6_hcu3t"]
@@ -14,15 +14,13 @@
 [ext_resource type="PackedScene" uid="uid://b4qkc5ost514t" path="res://Scenes/Main/Body/Apps/AppList.tscn" id="11_epx8f"]
 [ext_resource type="AudioStream" uid="uid://csnwuih5mmn5g" path="res://Audio/accept.ogg" id="11_hdjvh"]
 [ext_resource type="Texture2D" uid="uid://5ljg2ifn2pfm" path="res://Icons/Controller/PS5/PS5_Right_Stick.png" id="11_udh0u"]
+[ext_resource type="PackedScene" uid="uid://8c0yr4763825" path="res://Scenes/Main/Body/Settings/Settings.tscn" id="11_xggvw"]
 [ext_resource type="Texture2D" uid="uid://bqmbshokjcw3n" path="res://Icons/Controller/Keyboard/Keyboard_Black_Enter.png" id="12_epx8f"]
 [ext_resource type="Script" uid="uid://bj71nhnsgexja" path="res://Scenes/Main/Footer/ControllerIcon.cs" id="13_epx8f"]
 [ext_resource type="Texture2D" uid="uid://0tdw5ixm6l7n" path="res://Icons/Controller/Directional_Arrow_Vertical.png" id="13_xggvw"]
 [ext_resource type="Texture2D" uid="uid://bo4v5wbplyq46" path="res://Icons/Controller/Keyboard/Keyboard_Black_Backspace_Alt.png" id="14_epx8f"]
 [ext_resource type="Texture2D" uid="uid://dru6vbmje5lxu" path="res://Icons/Controller/Keyboard/Keyboard_Black_Esc.png" id="14_hcu3t"]
 [ext_resource type="Script" uid="uid://d4ip3lrbe4d5p" path="res://Scenes/Main/PopupViewportContainer.cs" id="15_hcu3t"]
-
-[sub_resource type="Resource" id="Resource_tl3on"]
-script = ExtResource("3_kxedh")
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -32,7 +30,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xobeq")
-docker = SubResource("Resource_tl3on")
+docker = ExtResource("3_xggvw")
 controllerMap = ExtResource("4_hkvnm")
 
 [node name="Panel" type="Panel" parent="."]
@@ -119,6 +117,10 @@ AppMenu = NodePath("../AppList")
 
 [node name="AppList" parent="Content/Body/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
 unique_name_in_owner = true
+layout_mode = 1
+
+[node name="Settings" parent="Content/Body/VisibilitySwitcher" instance=ExtResource("11_xggvw")]
+visible = false
 layout_mode = 1
 
 [node name="Footer" type="PanelContainer" parent="Content"]
@@ -244,23 +246,6 @@ script = ExtResource("13_epx8f")
 controllerMap = ExtResource("4_hkvnm")
 buttonIcon = 6
 metadata/_custom_type_script = "uid://bj71nhnsgexja"
-
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_vertical = 3
-
-[node name="BottomLayer" type="SubViewport" parent="SubViewportContainer"]
-unique_name_in_owner = true
-transparent_bg = true
-handle_input_locally = false
-size = Vector2i(1280, 720)
-render_target_update_mode = 0
 
 [node name="PopupViewportContainer" type="SubViewportContainer" parent="."]
 visible = false
