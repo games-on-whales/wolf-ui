@@ -63,17 +63,35 @@ offset_right = 199.0
 offset_bottom = 294.0
 theme_override_constants/separation = 0
 
-[node name="AppIcon" type="TextureRect" parent="HBoxContainer/AppButton/VBoxContainer"]
+[node name="Control" type="Control" parent="HBoxContainer/AppButton/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="AppIcon" type="TextureRect" parent="HBoxContainer/AppButton/VBoxContainer/Control"]
 unique_name_in_owner = true
 layout_mode = 2
+offset_right = 198.0
+offset_bottom = 270.0
 size_flags_vertical = 3
 texture = ExtResource("2_af2rq")
 expand_mode = 4
 stretch_mode = 6
 
+[node name="DisabledIndicator" type="ColorRect" parent="HBoxContainer/AppButton/VBoxContainer/Control"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.75)
+
 [node name="NameMargin" type="MarginContainer" parent="HBoxContainer/AppButton/VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 8
 mouse_filter = 2
 
 [node name="ProgressBar" type="ProgressBar" parent="HBoxContainer/AppButton/VBoxContainer/NameMargin"]
@@ -157,6 +175,7 @@ script = ExtResource("4_0urjt")
 
 [node name="AppMenu" type="CenterContainer" parent="HBoxContainer/AppButton"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

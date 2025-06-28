@@ -1,5 +1,6 @@
 using Godot;
 using Resources.WolfAPI;
+using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -12,12 +13,8 @@ public partial class AppList : Control
 	[Export]
 	Container AppContainer;
     private static readonly ILogger<AppList> Logger = WolfUI.Main.GetLogger<AppList>();
-
-	[Signal]
-	public delegate void SingleplayerLobbyStoppedEventHandler(string lobby_id);
-
-	[Signal]
-	public delegate void SingleplayerLobbyStartedEventHandler(string lobby_name);
+    public event EventHandler<Resources.WolfAPI.Lobby> LobbyCreatedEvent;
+    public event EventHandler<string> LobbyStoppedEvent;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -58,6 +55,9 @@ public partial class AppList : Control
 				BackHint.Visible = true;
 				await LoadAppList();
 
+				var lobbies = await WolfAPI.GetLobbies();
+				lobbies.ForEach(l => OnLobbyStarted(this, l));
+
 				var ctrl = (AppEntry)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
 				ctrl?.GrabFocus();
 				if (ctrl is null)
@@ -77,8 +77,7 @@ public partial class AppList : Control
 		if (!Visible)
 			return;
 
-		Logger.LogInformation(lobby_id);
-		EmitSignalSingleplayerLobbyStopped(lobby_id);
+		LobbyStoppedEvent?.Invoke(this, lobby_id);
 	}
 
 	private void OnLobbyStarted(object sender, Resources.WolfAPI.Lobby lobby)
@@ -86,13 +85,11 @@ public partial class AppList : Control
 		if (!Visible)
 			return;
 
-		if (lobby.multi_user == false &&
-			(
-				lobby.profile_id == WolfAPI.Profile.id ||
-				lobby.started_by_profile_id == WolfAPI.Profile.id
-			))
+		if (lobby.profile_id == WolfAPI.Profile.id ||
+			lobby.started_by_profile_id == WolfAPI.Profile.id
+		)
 		{
-			Logger.LogInformation(lobby.id);
+			LobbyCreatedEvent?.Invoke(this, lobby);
 			//EmitSignalSingleplayerLobbyStarted(lobbyJson);
 		}
 	}

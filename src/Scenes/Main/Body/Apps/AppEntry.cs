@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using Godot;
 using Resources.WolfAPI;
 using WolfManagement.Resources;
@@ -13,6 +14,9 @@ public partial class AppEntry : Control
 	ProgressBar AppProgress;
 	Label AppLabel;
 	Control DownloadIcon;
+	Control OKIcon;
+	Control PlayingIcon;
+	Control DisabledIndicator;
 	Control AppMenu;
 	Button AppButton;
 	Button MenuButtonStart;
@@ -21,10 +25,10 @@ public partial class AppEntry : Control
 	Button MenuButtonUpdate;
 	Button MenuButtonCancle;
 	TextureRect AppIcon;
-
+	private Resources.WolfAPI.Lobby RunningLobby = null;
 	private App App;
     private static readonly ILogger<WolfAPI> Logger = WolfUI.Main.GetLogger<WolfAPI>();
-	private bool ImageOnDisc = true;
+	private bool IsImageOnDisc = true;
 
 	public static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://chspw2lt1qcuc");
 
@@ -37,12 +41,34 @@ public partial class AppEntry : Control
 		return entry;
 	}
 
+	[Signal]
+	private delegate void AppRunningEventHandler();
+
+	[Signal]
+	private delegate void AppStoppedEventHandler();
+
+	private bool IsAlreadyRunning(Resources.WolfAPI.Lobby lobby)
+	{
+		//check if the App.Title is the same as the lobbies Name
+		if (lobby.name == App.title)
+			return true;
+		//check if this app uses the same folder as the lobby 
+		if (lobby.runner_state_folder == $"profile-data/{WolfAPI.Profile.id}/{App.runner.name}")
+			return true;
+
+		return false;
+	}
+
 	// Called when the node enters the scene tree for the first time.
 	public async override void _Ready()
 	{
 		AppProgress = GetNode<ProgressBar>("%ProgressBar");
 		AppLabel = GetNode<Label>("%AppName");
 		DownloadIcon = GetNode<Control>("%DownloadHint");
+		OKIcon = GetNode<Control>("%OkHint");
+		PlayingIcon = GetNode<Control>("%PlayingHint");
+		DisabledIndicator = GetNode<Control>("%DisabledIndicator");
+
 		AppMenu = GetNode<Control>("%AppMenu");
 		AppIcon = GetNode<TextureRect>("%AppIcon");
 
@@ -54,6 +80,7 @@ public partial class AppEntry : Control
 		MenuButtonCancle = GetNode<Button>("%MenuButtonCancle");
 
 		MenuButtonStop.Visible = false;
+		DisabledIndicator.Visible = false;
 
 		if (Engine.IsEditorHint())
 		{
@@ -68,15 +95,75 @@ public partial class AppEntry : Control
 		AppProgress.Hide();
 		AppButton.Pressed += OnPressed;
 
-		AppMenu.VisibilityChanged += OnAppMenuVisibilityChanged;
-		MenuButtonStop.VisibilityChanged += OnMenuButtonStopVisibilityChanged;
-
 		FocusEntered += AppMenu.Hide;
 		MenuButtonCancle.Pressed += AppButton.GrabFocus; //Hides menu via the FocusEntered above
 		MenuButtonUpdate.Pressed += PullImage;
 		MenuButtonCoop.Pressed += OnCoopPressed;
 		MenuButtonStop.Pressed += OnStopPressed;
 		MenuButtonStart.Pressed += OnStartPressed;
+
+		var appList = Main.Singleton.GetNode<AppList>("%AppList");
+		appList.LobbyCreatedEvent += (caller, lobby) =>
+		{
+			if (IsAlreadyRunning(lobby))
+			{
+				RunningLobby = lobby;
+				EmitSignalAppRunning();
+			}
+		};
+
+		appList.LobbyStoppedEvent += (caller, lobby_id) =>
+		{
+			if (lobby_id == RunningLobby?.id)
+			{
+				RunningLobby = null;
+				EmitSignalAppStopped();
+			}
+		};
+
+		AppRunning += () =>
+		{
+			if (!RunningLobby.multi_user)
+			{
+				MenuButtonStart.Text = "Connect";
+				MenuButtonStop.Visible = true;
+			}
+
+			OKIcon.Visible = false;
+			PlayingIcon.Visible = true;
+
+			MenuButtonCoop.Disabled = true;
+
+			MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
+			MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
+
+			MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
+			MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
+
+			MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
+			MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
+
+			MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
+			MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
+		};
+
+		AppStopped += () =>
+		{
+			MenuButtonStart.Text = "Start";
+			MenuButtonStop.Visible = false;
+
+			PlayingIcon.Visible = false;
+			OKIcon.Visible = IsImageOnDisc;
+
+			MenuButtonCoop.Disabled = false;
+
+			MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
+			MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
+
+			MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
+			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
+		};
+
 
 		AppIcon.Texture = await WolfAPI.GetAppIcon(App);
 	}
@@ -110,14 +197,15 @@ public partial class AppEntry : Control
 		{
 			var app_image_name = App.runner.image.Contains(':') ? App.runner.image : $"{App.runner.image}:latest";
 			var docker_images = DockerController.CachedImages;
-			ImageOnDisc = docker_images.Contains(app_image_name) || DockerController.isDisabled;
-			DownloadIcon.Visible = !ImageOnDisc;
+			IsImageOnDisc = docker_images.Contains(app_image_name) || DockerController.isDisabled;
+			DownloadIcon.Visible = !IsImageOnDisc;
+			OKIcon.Visible = IsImageOnDisc;
 		}
 	}
 
 	private void OnPressed()
 	{
-		if (!ImageOnDisc)
+		if (!IsImageOnDisc)
 		{
 			PullImage();
 		}
@@ -132,20 +220,15 @@ public partial class AppEntry : Control
 	{
 		//TODO: check if user already has a open singleplayer lobby for the chosen app and if yes re-join.
 
-		var curr_lobbies = await WolfAPI.GetLobbies();
-		var lobby = curr_lobbies.FindAll((l) =>
-		{
-			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
-							 l.multi_user == false &&
-							 l.name == App.title;
-			return isRunning;
-		}).FirstOrDefault();
+		MenuButtonStart.Disabled = true;
 
-		Session session = await WolfAPI.GetSession();
+		var lobby = RunningLobby;
 
 		var lobby_id = lobby?.id;
 		if (lobby == null)
 		{
+			Session session = await WolfAPI.GetSession();
+
 			lobby = new()
 			{
 				profile_id = WolfAPI.Profile.id,
@@ -175,33 +258,33 @@ public partial class AppEntry : Control
 		if (lobby_id is not null)
 			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
 		
+		MenuButtonStart.Disabled = false;
+
 		AppButton.GrabFocus();
 	}
 
 	private async void OnStopPressed()
 	{
-		Logger.LogInformation("OnStopPressed");
-		var curr_lobbies = await WolfAPI.GetLobbies();
-		var lobby = curr_lobbies.FindAll((l) =>
-		{
-			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
-							l.name == App.title;
-			return isRunning;
-		}).FirstOrDefault();
+		if (RunningLobby is null)
+			return;
 
-		await WolfAPI.StopLobby(lobby.id);
-		
+
+		MenuButtonStop.Disabled = true;
+		await WolfAPI.StopLobby(RunningLobby.id);
+		MenuButtonStop.Disabled = false;
+
 		AppButton.GrabFocus();
 	}
 
 	public new void GrabFocus()
 	{
-		GD.Print("Tried to Grab");
 		AppButton.GrabFocus();
 	}
 
 	private async void OnCoopPressed()
 	{
+		MenuButtonCoop.Disabled = true;
+
 		Session session = await WolfAPI.GetSession();
 
 		Resources.WolfAPI.Lobby lobby = new()
@@ -228,8 +311,6 @@ public partial class AppEntry : Control
 			client_settings = session.client_settings
 		};
 
-		var main = GetNode<Main>("/root/Main");
-
 		if (await QuestionDialogue.OpenDialogue("Pin", "Add Pin to Lobby?",
 			new Dictionary<string, bool> {
 				{ "Yes", true },
@@ -249,6 +330,8 @@ public partial class AppEntry : Control
 		if (lobby_id is not null)
 			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
 
+		MenuButtonCoop.Disabled = false;
+
 		AppButton.GrabFocus();
 	}
 
@@ -261,50 +344,9 @@ public partial class AppEntry : Control
 		if (App.runner.image.Contains(':'))
 		{
 			var image = App.runner.image.Split(":");
+			DisabledIndicator.Visible = true;
 			await Main.Singleton.docker.PullImage(image[0], image[1], AppProgress, AppButton);
-		}
-	}
-
-	private async void OnAppMenuVisibilityChanged()
-	{
-		if (!AppMenu.Visible)
-			return;
-
-			var curr_lobbies = await WolfAPI.GetLobbies();
-			var lobby = curr_lobbies.FindAll((l) =>
-		{
-			bool isRunning = l.started_by_profile_id == WolfAPI.Profile.id &&
-								l.multi_user == false &&
-							l.name == App.title;
-			return isRunning;
-		}).FirstOrDefault();
-		MenuButtonStart.Text = lobby == null ? "Start" : "Connect";
-		MenuButtonStop.Visible = lobby != null;
-	}
-
-	private void OnMenuButtonStopVisibilityChanged()
-	{
-		if (MenuButtonStop.Visible)
-		{
-			MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
-			MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
-
-			MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
-			MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
-
-			MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
-			MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
-
-			MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
-			MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
-		}
-		else
-		{
-			MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
-			MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
-
-			MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
-			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
+			DisabledIndicator.Visible = false;
 		}
 	}
 
