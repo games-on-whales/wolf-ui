@@ -210,7 +210,7 @@ public partial class DockerController : Resource
         if (isDisabled)
             return;
 
-        ThreadPool.QueueUserWorkItem(new(async obj =>
+        Task.Run(new(async () =>
         {
             Progress<Message> progress = new(ReactToDockerEvent);
             await client.System.MonitorEventsAsync(new ContainerEventsParameters(), progress, CancellationToken.None);
