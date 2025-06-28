@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -129,7 +130,7 @@ public partial class WolfAPI : Resource
 
             var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/");//.TrimSuffix(":edge");
             int idx = name.LastIndexOf(':');
-            if(idx >= 0)
+            if (idx >= 0)
                 name = name[..idx];
 
             string user = System.Environment.GetEnvironmentVariable("USER");
@@ -137,49 +138,43 @@ public partial class WolfAPI : Resource
             string filepath = $"/home/{user}/.wolf-ui/tmp/{name}.png";
 
             Image image;
-            
+
             if (File.Exists(filepath))
             {
                 image = Image.LoadFromFile(filepath);
                 return ImageTexture.CreateFromImage(image);
             }
 
-            System.Net.Http.HttpClient httpClient = new();
-            var result = await httpClient.GetByteArrayAsync($"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png");
-            image = new();
-            image.LoadPngFromBuffer(result);
-            Directory.CreateDirectory(Path.GetDirectoryName(filepath));
-            image.SavePng(filepath);
-            Texture2D texture2D = ImageTexture.CreateFromImage(image);
-            return texture2D;
-        }
-        else
-        {
-            bool isURL = Uri.TryCreate(app.icon_png_path, UriKind.Absolute, out Uri uriResult)
-                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            var wildlife_url = $"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png";
+            var message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={wildlife_url}");
 
-            if (isURL)
+            if (message.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                try
-                {
-                    System.Net.Http.HttpClient httpClient = new();
-                    var result = await httpClient.GetByteArrayAsync(app.icon_png_path);
-                    Image image = new();
-                    image.LoadPngFromBuffer(result);
-                    return ImageTexture.CreateFromImage(image);
-                }
-                catch (HttpRequestException e)
-                {
-                    Logger.LogError("Could not access image url: {0}: {1}", app.icon_png_path, e.StatusCode);
-                    return null;
-                }
-            }
-            else
-            {
-                Image image = Image.LoadFromFile(app.icon_png_path);
+                var result = await message.Content.ReadAsByteArrayAsync();
+                image = new();
+                image.LoadPngFromBuffer(result);
+                Directory.CreateDirectory(Path.GetDirectoryName(filepath));
+                image.SavePng(filepath);
                 var texture = ImageTexture.CreateFromImage(image);
                 return texture;
             }
+            Logger.LogError("Could not access image url: {0}: {1}", wildlife_url, message.StatusCode);
+            return null;
+        }
+        else
+        {
+            var message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={app.icon_png_path}");
+
+            if (message.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var result = await message.Content.ReadAsByteArrayAsync();
+                Image image = new();
+                image.LoadPngFromBuffer(result);
+                var texture = ImageTexture.CreateFromImage(image);
+                return texture;
+            }
+            Logger.LogError("Could not access image url: {0}: {1}", app.icon_png_path, message.StatusCode);
+            return null;
         }
     }
     public async void StartListenToAPIEvents()

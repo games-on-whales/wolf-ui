@@ -21,8 +21,7 @@ title = 'Wolf UI'
     image = 'ghcr.io/games-on-whales/wolf-ui:main'
     mounts = [
         '/var/run/docker.sock:/var/run/docker.sock', 
-        '/var/run/wolf/wolf.sock:/var/run/wolf/wolf.sock', 
-        '/etc/wolf:/etc/wolf'
+        '/var/run/wolf/wolf.sock:/var/run/wolf/wolf.sock'
     ]
     name = 'Wolf-UI'
     ports = []
