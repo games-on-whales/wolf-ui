@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=22 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="Script" uid="uid://ej4uorvu6hbj" path="res://Resources/Docker/DockerController.cs" id="3_kxedh"]
@@ -13,8 +13,10 @@
 [ext_resource type="AudioStream" uid="uid://c7e7c53qiijki" path="res://Audio/click.ogg" id="11_ecuro"]
 [ext_resource type="PackedScene" uid="uid://b4qkc5ost514t" path="res://Scenes/Main/Body/Apps/AppList.tscn" id="11_epx8f"]
 [ext_resource type="AudioStream" uid="uid://csnwuih5mmn5g" path="res://Audio/accept.ogg" id="11_hdjvh"]
+[ext_resource type="Texture2D" uid="uid://5ljg2ifn2pfm" path="res://Icons/Controller/PS5/PS5_Right_Stick.png" id="11_udh0u"]
 [ext_resource type="Texture2D" uid="uid://bqmbshokjcw3n" path="res://Icons/Controller/Keyboard/Keyboard_Black_Enter.png" id="12_epx8f"]
 [ext_resource type="Script" uid="uid://bj71nhnsgexja" path="res://Scenes/Main/Footer/ControllerIcon.cs" id="13_epx8f"]
+[ext_resource type="Texture2D" uid="uid://0tdw5ixm6l7n" path="res://Icons/Controller/Directional_Arrow_Vertical.png" id="13_xggvw"]
 [ext_resource type="Texture2D" uid="uid://bo4v5wbplyq46" path="res://Icons/Controller/Keyboard/Keyboard_Black_Backspace_Alt.png" id="14_epx8f"]
 [ext_resource type="Texture2D" uid="uid://dru6vbmje5lxu" path="res://Icons/Controller/Keyboard/Keyboard_Black_Esc.png" id="14_hcu3t"]
 [ext_resource type="Script" uid="uid://d4ip3lrbe4d5p" path="res://Scenes/Main/PopupViewportContainer.cs" id="15_hcu3t"]
@@ -133,7 +135,50 @@ theme_override_constants/margin_bottom = 3
 layout_mode = 2
 size_flags_horizontal = 8
 
+[node name="ScrollHint" type="HBoxContainer" parent="Content/Footer/MarginContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Content/Footer/MarginContainer/HBoxContainer/ScrollHint"]
+layout_mode = 2
+text = "Text Scroll"
+
+[node name="Control" type="Control" parent="Content/Footer/MarginContainer/HBoxContainer/ScrollHint"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="ScrollIcon" type="TextureRect" parent="Content/Footer/MarginContainer/HBoxContainer/ScrollHint/Control"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("11_udh0u")
+expand_mode = 3
+stretch_mode = 6
+script = ExtResource("13_epx8f")
+controllerMap = ExtResource("4_hkvnm")
+
+[node name="TextureRect" type="TextureRect" parent="Content/Footer/MarginContainer/HBoxContainer/ScrollHint/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("13_xggvw")
+expand_mode = 2
+stretch_mode = 5
+
 [node name="AcceptHint" type="HBoxContainer" parent="Content/Footer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Content/Footer/MarginContainer/HBoxContainer/AcceptHint"]
+custom_minimum_size = Vector2(5, 0)
 layout_mode = 2
 
 [node name="Label" type="Label" parent="Content/Footer/MarginContainer/HBoxContainer/AcceptHint"]
@@ -177,7 +222,6 @@ metadata/_custom_type_script = "uid://bj71nhnsgexja"
 
 [node name="BackHint" type="HBoxContainer" parent="Content/Footer/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 
 [node name="Spacer" type="Control" parent="Content/Footer/MarginContainer/HBoxContainer/BackHint"]
