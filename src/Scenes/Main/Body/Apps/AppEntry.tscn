@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://chspw2lt1qcuc"]
+[gd_scene load_steps=7 format=3 uid="uid://chspw2lt1qcuc"]
 
 [ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/Body/Apps/AppEntry.cs" id="1_pyonv"]
 [ext_resource type="Texture2D" uid="uid://bki262gxvp4aq" path="res://Icons/steam.png" id="2_af2rq"]
@@ -6,9 +6,6 @@
 [ext_resource type="Script" uid="uid://dy3vko5i4jvi3" path="res://Scenes/Main/Body/Apps/ThemedSVG.cs" id="4_0urjt"]
 [ext_resource type="Texture2D" uid="uid://d1uaf1ivwb32x" path="res://Icons/play-circle-svgrepo-com.svg" id="5_tte3r"]
 [ext_resource type="Texture2D" uid="uid://cmj2w8tadwl8f" path="res://Icons/check-circle-svgrepo-com.svg" id="6_lnekl"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tte3r"]
-corner_detail = 1
 
 [node name="AppEntry" type="Control"]
 custom_minimum_size = Vector2(200, 295)
@@ -100,7 +97,6 @@ custom_minimum_size = Vector2(0, 15)
 layout_mode = 2
 size_flags_vertical = 1
 mouse_filter = 2
-theme_override_styles/fill = SubResource("StyleBoxFlat_tte3r")
 show_percentage = false
 
 [node name="AppName" type="Label" parent="HBoxContainer/AppButton/VBoxContainer/NameMargin"]
@@ -135,13 +131,13 @@ theme_override_constants/margin_bottom = 13
 [node name="DownloadHint" type="TextureRect" parent="HBoxContainer/AppButton/PanelContainer/LoadingMargin"]
 unique_name_in_owner = true
 visible = false
-self_modulate = Color(0.564962, 0.564962, 0.564962, 1)
+self_modulate = Color(0.564706, 0.564706, 0.564706, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
-theme_type_variation = &"AppCardStatusIcon"
+theme_type_variation = &"AppCardStatusIconDownload"
 texture = ExtResource("3_h5jnb")
 expand_mode = 4
 script = ExtResource("4_0urjt")
@@ -149,26 +145,26 @@ script = ExtResource("4_0urjt")
 [node name="PlayingHint" type="TextureRect" parent="HBoxContainer/AppButton/PanelContainer/LoadingMargin"]
 unique_name_in_owner = true
 visible = false
-self_modulate = Color(0.564962, 0.564962, 0.564962, 1)
+self_modulate = Color(0.564706, 0.564706, 0.564706, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
-theme_type_variation = &"AppCardStatusIcon"
+theme_type_variation = &"AppCardStatusIconPlaying"
 texture = ExtResource("5_tte3r")
 expand_mode = 4
 script = ExtResource("4_0urjt")
 
 [node name="OkHint" type="TextureRect" parent="HBoxContainer/AppButton/PanelContainer/LoadingMargin"]
 unique_name_in_owner = true
-self_modulate = Color(0.564962, 0.564962, 0.564962, 1)
+self_modulate = Color(0.564706, 0.564706, 0.564706, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
-theme_type_variation = &"AppCardStatusIcon"
+theme_type_variation = &"AppCardStatusIconOk"
 texture = ExtResource("6_lnekl")
 expand_mode = 4
 script = ExtResource("4_0urjt")

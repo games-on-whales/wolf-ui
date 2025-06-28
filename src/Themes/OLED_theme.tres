@@ -10,9 +10,6 @@ corner_detail = 1
 expand_margin_right = 17.0
 expand_margin_bottom = 17.0
 
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_f7dxq"]
-color = Color(0.548963, 0.548963, 0.548963, 1)
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f7dxq"]
 bg_color = Color(0, 0, 0, 1)
 
@@ -26,15 +23,22 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tte3r"]
+corner_detail = 1
+
 [resource]
 AppCardBackground/base_type = &"Panel"
 AppCardBackground/styles/panel = SubResource("StyleBoxFlat_rhp46")
 AppCardCorner/base_type = &"PanelContainer"
 AppCardCorner/styles/panel = SubResource("StyleBoxFlat_af2rq")
-AppCardStatusIcon/base_type = &"Label"
-AppCardStatusIcon/colors/font_color = Color(0.564962, 0.564962, 0.564962, 1)
-AppCardStatusIcon/styles/normal = SubResource("StyleBoxLine_f7dxq")
+AppCardStatusIconDownload/base_type = &"Label"
+AppCardStatusIconDownload/colors/font_color = Color(0.564706, 0.564706, 0.564706, 1)
+AppCardStatusIconOk/base_type = &"Label"
+AppCardStatusIconOk/colors/font_color = Color(0.564706, 0.564706, 0.564706, 1)
+AppCardStatusIconPlaying/base_type = &"Label"
+AppCardStatusIconPlaying/colors/font_color = Color(0.564706, 0.564706, 0.564706, 1)
 Panel/styles/panel = SubResource("StyleBoxFlat_f7dxq")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_awilq")
 PopupWindowContainer/base_type = &"PanelContainer"
 PopupWindowContainer/styles/panel = SubResource("StyleBoxFlat_ss67d")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_tte3r")
