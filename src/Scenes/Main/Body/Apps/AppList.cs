@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 namespace WolfUI;
 
 [Tool]
+[GlobalClass]
 public partial class AppList : Control
 {
 	[Export]
-	Container AppContainer;
+	GridContainer AppContainer;
     private static readonly ILogger<AppList> Logger = WolfUI.Main.GetLogger<AppList>();
     public event EventHandler<Resources.WolfAPI.Lobby> LobbyCreatedEvent;
     public event EventHandler<string> LobbyStoppedEvent;
@@ -21,14 +22,11 @@ public partial class AppList : Control
 	{
 		if (Engine.IsEditorHint())
 		{
-			AppContainer.EditorStateChanged += () =>
-			{
-				GD.Print("Called");
-			};
-
 			EditorMockupReady();
 			return;
 		}
+
+		AppContainer.Columns = Math.Min(6, Math.Max(1, GetTree().Root.Theme.GetConstant("columns", ThemeTypeVariation)));
 
 		// Ensure at least one element is focused when switching to controller.
 		Main.Singleton.controllerMap.UsedControllerChanged += (controller) =>
@@ -124,6 +122,23 @@ public partial class AppList : Control
 			AddAppEntry(entry);
 			i++;
 		}
+
+		ScrollContainer scroll = GetNode<ScrollContainer>("%AppScrollContainer");
+		AppContainer.GetChildren()[..AppContainer.Columns].ToList().ForEach(child =>
+		{
+			child.GetNode<Button>("%AppButton").FocusEntered += () =>
+			{
+				scroll.ScrollVertical = 0;
+			};
+		});
+		int idx = AppContainer.GetChildCount() - (AppContainer.GetChildCount() % AppContainer.Columns);
+		AppContainer.GetChildren()[idx..].ToList().ForEach(child =>
+		{
+			child.GetNode<Button>("%AppButton").FocusEntered += () =>
+			{
+				scroll.ScrollVertical = (int)scroll.GetChildren().Cast<Control>().First().Size.X;
+			};
+		});
 	}
 
 	private void EditorMockupReady()
@@ -159,7 +174,7 @@ public partial class AppList : Control
 
 			gridContainer.AddChild(NewAppEntry);
 			/*
-						if (AppEntryCount < GridColumns / 2)
+						if (AppEntryCount < GridColumns)
 						{
 							NewAppEntry.FocusNeighborTop = GetNode<Button>("%OptionsButton").GetPath();
 						}
