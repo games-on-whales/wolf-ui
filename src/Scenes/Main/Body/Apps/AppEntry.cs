@@ -210,7 +210,7 @@ public partial class AppEntry : Control
 			name = App.title,
 			multi_user = true,
 			stop_when_everyone_leaves = false,
-			runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{App.runner.name}-Coop",
+			runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{App.runner.name}",
 			runner = App.runner,
 			video_settings = new()
 			{
