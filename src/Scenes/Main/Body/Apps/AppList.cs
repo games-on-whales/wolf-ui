@@ -22,11 +22,10 @@ public partial class AppList : Control
 	{
 		if (Engine.IsEditorHint())
 		{
+			ThemeChanged += EditorMockupReady;
 			EditorMockupReady();
 			return;
 		}
-
-		AppContainer.Columns = Math.Min(6, Math.Max(1, GetTree().Root.Theme.GetConstant("columns", ThemeTypeVariation)));
 
 		// Ensure at least one element is focused when switching to controller.
 		Main.Singleton.controllerMap.UsedControllerChanged += (controller) =>
@@ -45,29 +44,34 @@ public partial class AppList : Control
 
 		};
 
-		VisibilityChanged += async () =>
-		{
-			Control BackHint = GetNode<Control>("%BackHint");
-			if (Visible)
-			{
-				BackHint.Visible = true;
-				await LoadAppList();
-
-				var lobbies = await WolfAPI.GetLobbies();
-				lobbies.ForEach(l => OnLobbyStarted(this, l));
-
-				var ctrl = (AppEntry)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
-				ctrl?.GrabFocus();
-				if (ctrl is null)
-					GetNode<Control>("%OptionsButton").GrabFocus();
-
-				return;
-			}
-			BackHint.Hide();
-		};
+		VisibilityChanged += RebuildAppList;
+		ThemeChanged += RebuildAppList;
 
 		WolfAPI.Singleton.LobbyCreatedEvent += OnLobbyStarted;
 		WolfAPI.Singleton.LobbyStoppedEvent += OnLobbyStopped;
+	}
+
+	private async void RebuildAppList()
+	{
+		Control BackHint = GetNode<Control>("%BackHint");
+		if (Visible)
+		{
+			AppContainer.Columns = Math.Min(6, Math.Max(1, AppContainer.GetThemeConstant("columns", "AppListGrid")));
+
+			BackHint.Visible = true;
+			await LoadAppList();
+
+			var lobbies = await WolfAPI.GetLobbies();
+			lobbies.ForEach(l => OnLobbyStarted(this, l));
+
+			var ctrl = (AppEntry)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
+			ctrl?.GrabFocus();
+			if (ctrl is null)
+				GetNode<Control>("%OptionsButton").GrabFocus();
+
+			return;
+		}
+		BackHint.Hide();
 	}
 
 	private void OnLobbyStopped(object caller, string lobby_id)
@@ -131,7 +135,7 @@ public partial class AppList : Control
 				scroll.ScrollVertical = 0;
 			};
 		});
-		int idx = AppContainer.GetChildCount() - (AppContainer.GetChildCount() % AppContainer.Columns);
+		int idx = AppContainer.GetChildCount() - AppContainer.Columns;
 		AppContainer.GetChildren()[idx..].ToList().ForEach(child =>
 		{
 			child.GetNode<Button>("%AppButton").FocusEntered += () =>
@@ -143,14 +147,15 @@ public partial class AppList : Control
 
 	private void EditorMockupReady()
 	{
-		if (AppContainer is GridContainer grid)
+		AppContainer.Columns = Math.Min(6, Math.Max(1, AppContainer.GetThemeConstant("columns", "AppListGrid")));
+		foreach (var child in AppContainer.GetChildren())
+			child.QueueFree();
+
+		for (int i = 0; i < 6; i++)
 		{
-			for (int i = 0; i < 6; i++)
+			for (int j = 0; j < AppContainer.Columns; j++)
 			{
-				for (int j = 0; j < grid.Columns; j++)
-				{
-					AppContainer.AddChild(AppEntry.Create(new()));
-				}
+				AppContainer.AddChild(AppEntry.Create(new()));
 			}
 		}
 
