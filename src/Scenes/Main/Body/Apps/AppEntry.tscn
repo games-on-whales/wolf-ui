@@ -1,7 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://chspw2lt1qcuc"]
+[gd_scene load_steps=6 format=3 uid="uid://chspw2lt1qcuc"]
 
 [ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/Body/Apps/AppEntry.cs" id="1_pyonv"]
-[ext_resource type="Texture2D" uid="uid://bki262gxvp4aq" path="res://Icons/steam.png" id="2_af2rq"]
 [ext_resource type="Texture2D" uid="uid://wpxb54l4wult" path="res://Icons/download-2-circle-svgrepo-com.svg" id="3_h5jnb"]
 [ext_resource type="Script" uid="uid://dy3vko5i4jvi3" path="res://Scenes/Main/Body/Apps/ThemedSVG.cs" id="4_0urjt"]
 [ext_resource type="Texture2D" uid="uid://d1uaf1ivwb32x" path="res://Icons/play-circle-svgrepo-com.svg" id="5_tte3r"]
@@ -65,7 +64,6 @@ layout_mode = 2
 offset_right = 198.0
 offset_bottom = 270.0
 size_flags_vertical = 3
-texture = ExtResource("2_af2rq")
 expand_mode = 4
 stretch_mode = 6
 

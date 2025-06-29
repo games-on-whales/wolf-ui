@@ -41,6 +41,10 @@ public partial class AppEntry : Control
 		return entry;
 	}
 
+	private bool WasInView = false;
+	[Signal]
+	private delegate void AppEnteredViewEventHandler();
+
 	[Signal]
 	private delegate void AppRunningEventHandler();
 
@@ -60,7 +64,7 @@ public partial class AppEntry : Control
 	}
 
 	// Called when the node enters the scene tree for the first time.
-	public async override void _Ready()
+	public override void _Ready()
 	{
 		AppProgress = GetNode<ProgressBar>("%ProgressBar");
 		AppLabel = GetNode<Label>("%AppName");
@@ -164,8 +168,10 @@ public partial class AppEntry : Control
 			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
 		};
 
-
-		AppIcon.Texture = await WolfAPI.GetAppIcon(App);
+		AppEnteredView += async () =>
+		{
+			AppIcon.Texture = await WolfAPI.GetAppIcon(App);
+		};
 	}
 
 	public override void _Process(double delta)
@@ -177,16 +183,22 @@ public partial class AppEntry : Control
 			return;
 		}
 
-		if (AppMenu.Visible && !(
-			MenuButtonCancle.HasFocus() ||
-			MenuButtonUpdate.HasFocus() ||
-			MenuButtonCoop.HasFocus() ||
-			MenuButtonStop.HasFocus() ||
-			MenuButtonStart.HasFocus())
-		)
+		if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%AppList").GetGlobalRect()).HasArea())
 		{
-			AppMenu.Hide();
+			EmitSignalAppEnteredView();
+			WasInView = true;
 		}
+
+		if (AppMenu.Visible && !(
+				MenuButtonCancle.HasFocus() ||
+				MenuButtonUpdate.HasFocus() ||
+				MenuButtonCoop.HasFocus() ||
+				MenuButtonStop.HasFocus() ||
+				MenuButtonStart.HasFocus())
+			)
+			{
+				AppMenu.Hide();
+			}
 
 		if (AppMenu.Visible && Input.IsActionPressed("ui_cancel"))
 		{
