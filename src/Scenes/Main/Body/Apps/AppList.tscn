@@ -12,7 +12,6 @@ grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
 mouse_filter = 1
-theme_type_variation = &"AppList"
 script = ExtResource("1_wixkc")
 AppContainer = NodePath("AppScrollContainer/MarginContainer/GridContainer")
 

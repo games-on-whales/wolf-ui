@@ -158,8 +158,6 @@ public partial class AppList : Control
 				AppContainer.AddChild(AppEntry.Create(new()));
 			}
 		}
-
-		//AppContainer.GetChildren().ToList().ForEach(n => n.Owner = GetTree().Root);
 	}
 
 	private static Control BuildSpacer()

@@ -113,12 +113,12 @@ script = ExtResource("7_axei7")
 
 [node name="UserList" parent="Content/Body/VisibilitySwitcher" node_paths=PackedStringArray("AppMenu") instance=ExtResource("10_hcu3t")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 AppMenu = NodePath("../AppList")
 
 [node name="AppList" parent="Content/Body/VisibilitySwitcher" instance=ExtResource("11_epx8f")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 
 [node name="Settings" parent="Content/Body/VisibilitySwitcher" instance=ExtResource("11_xggvw")]
