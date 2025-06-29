@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="Resource" uid="uid://3uu0v8l30oi5" path="res://Resources/Docker/DockerController.tres" id="3_xggvw"]
 [ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
-[ext_resource type="Texture2D" uid="uid://cy40vk6hnhpvd" path="res://Icons/exit.svg" id="5_tqvkx"]
-[ext_resource type="Texture2D" uid="uid://b1wng8q2m6i68" path="res://Icons/arrow-left-svgrepo-com.svg" id="6_hcu3t"]
+[ext_resource type="Texture2D" uid="uid://dn0pykgwnubwt" path="res://Icons/UI/backward-fill-svgrepo-com.svg" id="4_xggvw"]
+[ext_resource type="Texture2D" uid="uid://b20xk3rj6tqt0" path="res://Icons/UI/multiplication-circle-svgrepo-com.svg" id="6_xggvw"]
 [ext_resource type="Script" uid="uid://bpe8wv7q6ajud" path="res://Scenes/Main/Body/VisibilitySwitcher.cs" id="7_axei7"]
 [ext_resource type="Script" uid="uid://cnrk2pyyp3r1p" path="res://Scenes/Main/Header/OptionsButton.cs" id="7_qdkat"]
 [ext_resource type="Script" uid="uid://c4tkdw88qp173" path="res://Scenes/Main/Header/ExitButton.cs" id="8_qdkat"]
@@ -71,7 +71,8 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 focus_neighbor_right = NodePath("../ExitButton")
-icon = ExtResource("6_hcu3t")
+theme_type_variation = &"NavButtons"
+icon = ExtResource("4_xggvw")
 flat = true
 vertical_icon_alignment = 0
 expand_icon = true
@@ -90,7 +91,8 @@ custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
-icon = ExtResource("5_tqvkx")
+theme_type_variation = &"NavButtons"
+icon = ExtResource("6_xggvw")
 flat = true
 vertical_icon_alignment = 0
 expand_icon = true

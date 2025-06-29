@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://yj3etmvjfwcb"
-path="res://.godot/imported/delete-1487-svgrepo-com.svg-400bea8a78c73fcba5e5b2909d1dde01.ctex"
+uid="uid://dxrw1opabt8sw"
+path="res://.godot/imported/chevron-left-svgrepo-com.svg-50bbedaef3eeb4a837e1b72bd37c305e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Icons/delete-1487-svgrepo-com.svg"
-dest_files=["res://.godot/imported/delete-1487-svgrepo-com.svg-400bea8a78c73fcba5e5b2909d1dde01.ctex"]
+source_file="res://Icons/UI/chevron-left-svgrepo-com.svg"
+dest_files=["res://.godot/imported/chevron-left-svgrepo-com.svg-50bbedaef3eeb4a837e1b72bd37c305e.ctex"]
 
 [params]
 

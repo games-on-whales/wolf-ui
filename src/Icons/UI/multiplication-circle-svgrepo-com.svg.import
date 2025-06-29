@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqo00nildd0cw"
-path="res://.godot/imported/download-button-svgrepo-com.svg-a84ece1eb80859e5fca2b22a654a648f.ctex"
+uid="uid://b20xk3rj6tqt0"
+path="res://.godot/imported/multiplication-circle-svgrepo-com.svg-032f1382808f311623dbd156e191c24f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Icons/download-button-svgrepo-com.svg"
-dest_files=["res://.godot/imported/download-button-svgrepo-com.svg-a84ece1eb80859e5fca2b22a654a648f.ctex"]
+source_file="res://Icons/UI/multiplication-circle-svgrepo-com.svg"
+dest_files=["res://.godot/imported/multiplication-circle-svgrepo-com.svg-032f1382808f311623dbd156e191c24f.ctex"]
 
 [params]
 

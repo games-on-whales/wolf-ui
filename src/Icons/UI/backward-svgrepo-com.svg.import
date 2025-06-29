@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wpxb54l4wult"
-path="res://.godot/imported/download-2-circle-svgrepo-com.svg-91e70796ff6c4968809b6536220d338e.ctex"
+uid="uid://debhxrr84j1gt"
+path="res://.godot/imported/backward-svgrepo-com.svg-6ed21759571bf8dc7d85577494723e73.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Icons/download-2-circle-svgrepo-com.svg"
-dest_files=["res://.godot/imported/download-2-circle-svgrepo-com.svg-91e70796ff6c4968809b6536220d338e.ctex"]
+source_file="res://Icons/UI/backward-svgrepo-com.svg"
+dest_files=["res://.godot/imported/backward-svgrepo-com.svg-6ed21759571bf8dc7d85577494723e73.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bki262gxvp4aq"
-path="res://.godot/imported/steam.png-5516ae07c0d60ee9cbcb1f9538e1582a.ctex"
+uid="uid://dn0pykgwnubwt"
+path="res://.godot/imported/backward-fill-svgrepo-com.svg-152333105bfd3868007cf57efa210a2b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Icons/steam.png"
-dest_files=["res://.godot/imported/steam.png-5516ae07c0d60ee9cbcb1f9538e1582a.ctex"]
+source_file="res://Icons/UI/backward-fill-svgrepo-com.svg"
+dest_files=["res://.godot/imported/backward-fill-svgrepo-com.svg-152333105bfd3868007cf57efa210a2b.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
