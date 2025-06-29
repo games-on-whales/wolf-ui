@@ -123,6 +123,7 @@ public partial class WolfAPI : Resource
     }
     public static async Task<Texture2D> GetAppIcon(App app)
     {
+        Logger.LogInformation("Requesting icon for: {0}", app.title);
         if (app.icon_png_path == null) // no image set, get default from github
         {
             if (app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
@@ -163,14 +164,33 @@ public partial class WolfAPI : Resource
         }
         else
         {
-            var message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={app.icon_png_path}");
+            HttpResponseMessage message;
+            try
+            {
+                message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={app.icon_png_path}");
+            }
+            catch (HttpRequestException e)
+            {
+                Logger.LogWarning("Icon for {0} could not be accessed: {1} - {2} Retrying", app.title, e.Message, e.InnerException.Message);
+                return await GetAppIcon(app);
+            }
 
             if (message.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var result = await message.Content.ReadAsByteArrayAsync();
                 Image image = new();
                 image.LoadPngFromBuffer(result);
+                if (image is null)
+                {
+                    Logger.LogError("Icon for {0} could not be decoded properly", app.title);
+                    return default;
+                }
                 var texture = ImageTexture.CreateFromImage(image);
+                if (texture is null)
+                {
+                    Logger.LogError("Icon for {0} could not be decoded properly", app.title);
+                    return default;
+                }
                 return texture;
             }
             Logger.LogError("Could not access image url: {0}: {1}", app.icon_png_path, message.StatusCode);
@@ -374,13 +394,21 @@ public partial class WolfAPI : Resource
     }
     private static async Task<string> PostAsync<T>(string url, T obj)
     {
-        string data = JsonSerializer.Serialize<T>(obj);
-        Logger.LogDebug("API call POST: {0} - {1}", url, data);
-        StringContent content = new(data);
-        var result = await _httpClient.PostAsync(url, content);
-        var return_data = await result.Content.ReadAsStringAsync();
-        Logger.LogDebug("API answer from: {0} - {1}", url, return_data);
-        return return_data;
+        try
+        {
+            string data = JsonSerializer.Serialize<T>(obj);
+            Logger.LogDebug("API call POST: {0} - {1}", url, data);
+            StringContent content = new(data);
+            var result = await _httpClient.PostAsync(url, content);
+            var return_data = await result.Content.ReadAsStringAsync();
+            Logger.LogDebug("API answer from: {0} - {1}", url, return_data);
+            return return_data;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Error POST request failed: {0} Message: {1}", url, e.Message);
+            return default;
+        }
     }
     /**
         <summary>
@@ -393,10 +421,19 @@ public partial class WolfAPI : Resource
     */
     public static async Task<T> GetAsync<T>(string url)
     {
-        var result = await _httpClient.GetStringAsync(url);
-        Logger.LogDebug("API call GET: {0} - {1}", url, result);
-        T data = JsonSerializer.Deserialize<T>(result);
-        return data;
+        try
+        {
+            var result = await _httpClient.GetStringAsync(url);
+            Logger.LogDebug("API call GET: {0} - {1}", url, result);
+            T data = JsonSerializer.Deserialize<T>(result);
+            return data;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Error GET request failed: {0} Message: {1}", url, e.Message);
+            return default(T);
+        }
+
     }
 
     [Signal]
