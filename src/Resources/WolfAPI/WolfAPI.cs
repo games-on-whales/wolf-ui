@@ -128,7 +128,9 @@ public partial class WolfAPI : Resource
             Logger.LogError("Failed Loading {0} 5 times, skipping", app.icon_png_path);
         }
 
-        Logger.LogInformation("Requesting icon for: {0}", app.title);
+        string user = System.Environment.GetEnvironmentVariable("USER");
+        user = (user == "root" || user == null) ? "retro" : user;
+
         if (app.icon_png_path == null) // no image set, get default from github
         {
             if (app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
@@ -139,18 +141,24 @@ public partial class WolfAPI : Resource
             if (idx >= 0)
                 name = name[..idx];
 
-            string user = System.Environment.GetEnvironmentVariable("USER");
-            user = (user == "root" || user == null) ? "retro" : user;
             string filepath = $"/home/{user}/.wolf-ui/tmp/{name}.png";
 
             Image image;
 
             if (File.Exists(filepath))
             {
-                image = Image.LoadFromFile(filepath);
-                return ImageTexture.CreateFromImage(image);
+                if (File.GetCreationTime(filepath).AddHours(1).CompareTo(DateTime.Now) >= 0)
+                {
+                    image = Image.LoadFromFile(filepath);
+                    return ImageTexture.CreateFromImage(image);
+                }
+                else
+                {
+                    File.Delete(filepath);
+                }
             }
-
+    
+            Logger.LogInformation("Requesting icon for: {0}", app.title);
             var wildlife_url = $"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png";
             var message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={wildlife_url}");
 
@@ -169,9 +177,28 @@ public partial class WolfAPI : Resource
         }
         else
         {
+            string filepath = $"/home/{user}/.wolf-ui/tmp/{app.icon_png_path}.png";
+
+            Image image;
+            
+            if (File.Exists(filepath))
+            {
+                Random random = new();
+                if (File.GetCreationTime(filepath).AddHours(1).CompareTo(DateTime.Now) >= 0)
+                {
+                    image = Image.LoadFromFile(filepath);
+                    return ImageTexture.CreateFromImage(image);
+                }
+                else
+                {
+                    File.Delete(filepath);
+                }
+            }
+
             HttpResponseMessage message;
             try
             {
+                Logger.LogInformation("Requesting icon for: {0}", app.title);
                 message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={app.icon_png_path}");
             }
             catch (HttpRequestException e)
@@ -183,7 +210,7 @@ public partial class WolfAPI : Resource
             if (message.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var result = await message.Content.ReadAsByteArrayAsync();
-                Image image = new();
+                image = new();
 
                 Engine.PrintErrorMessages = false;
                 if (image.LoadPngFromBuffer(result) != Error.Ok)
@@ -192,7 +219,10 @@ public partial class WolfAPI : Resource
                     return await GetAppIcon(app, retrys+1);
                 }
                 Engine.PrintErrorMessages = true;
-                
+
+                Directory.CreateDirectory(Path.GetDirectoryName(filepath));
+                image.SavePng(filepath);
+
                 var texture = ImageTexture.CreateFromImage(image);
                 if (texture is null)
                 {
