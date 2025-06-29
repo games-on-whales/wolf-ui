@@ -121,8 +121,13 @@ public partial class WolfAPI : Resource
 
         value(data);
     }
-    public static async Task<Texture2D> GetAppIcon(App app)
+    public static async Task<Texture2D> GetAppIcon(App app, int retrys = 0)
     {
+        if (retrys >= 5)
+        {
+            Logger.LogError("Failed Loading {0} 5 times, skipping", app.icon_png_path);
+        }
+
         Logger.LogInformation("Requesting icon for: {0}", app.title);
         if (app.icon_png_path == null) // no image set, get default from github
         {
@@ -172,19 +177,22 @@ public partial class WolfAPI : Resource
             catch (HttpRequestException e)
             {
                 Logger.LogWarning("Icon for {0} could not be accessed: {1} - {2} Retrying", app.title, e.Message, e.InnerException.Message);
-                return await GetAppIcon(app);
+                return await GetAppIcon(app, retrys+1);
             }
 
             if (message.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var result = await message.Content.ReadAsByteArrayAsync();
                 Image image = new();
-                image.LoadPngFromBuffer(result);
-                if (image is null)
+
+                Engine.PrintErrorMessages = false;
+                if (image.LoadPngFromBuffer(result) != Error.Ok)
                 {
-                    Logger.LogError("Icon for {0} could not be decoded properly", app.title);
-                    return default;
+                    Logger.LogError("Icon for {0} could not be decoded properly, Retrying", app.title);
+                    return await GetAppIcon(app, retrys+1);
                 }
+                Engine.PrintErrorMessages = true;
+                
                 var texture = ImageTexture.CreateFromImage(image);
                 if (texture is null)
                 {
