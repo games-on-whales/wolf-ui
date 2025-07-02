@@ -6,11 +6,17 @@ using Godot;
 
 namespace Resources.WolfAPI;
 
+public class ErrorResponse
+{
+    public bool success { get; set; }
+    public string error { get; set; }
+}
+
 public class Starter
 {
-    public bool stop_stream_when_over {get;set;}
-    public string session_id {get;set;}
-    public Runner runner {get;set;}
+    public bool stop_stream_when_over { get; set; }
+    public string session_id { get; set; }
+    public Runner runner { get; set; }
 }
 
 public class Apps

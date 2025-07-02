@@ -157,7 +157,16 @@ public partial class WolfAPI : Resource
 
             Logger.LogInformation("Requesting icon for: {0}", app.title);
             var wildlife_url = $"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png";
-            var message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={wildlife_url}");
+            HttpResponseMessage message;
+            try
+            {
+                message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={wildlife_url}");
+            }
+            catch (HttpRequestException e)
+            {
+                Logger.LogWarning("Icon for {0} could not be accessed: {1} - {2} Retrying", app.title, e.Message, e.InnerException.Message);
+                return await GetAppIcon(app, h_cache_duration, retrys + 1);
+            }
 
             if (message.StatusCode == System.Net.HttpStatusCode.OK)
             {
@@ -525,11 +534,11 @@ public partial class WolfAPI : Resource
         var content = await PostAsync("http://localhost/api/v1/lobbies/create", lobby);
         return JsonSerializer.Deserialize<LobbyCreatedResponse>(content)?.lobby_id;
     }
-    public static async Task JoinLobby(string lobby_id, string session_id)
+    public static async Task<ErrorResponse> JoinLobby(string lobby_id, string session_id)
     {
-        await JoinLobby(lobby_id, session_id, null);
+        return await JoinLobby(lobby_id, session_id, null);
     }
-    public static async Task JoinLobby(string lobby_id, string session_id, List<int> pin)
+    public static async Task<ErrorResponse> JoinLobby(string lobby_id, string session_id, List<int> pin)
     {
         var lobbyobj = new LobbyJoin()
         {
@@ -539,6 +548,7 @@ public partial class WolfAPI : Resource
         };
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/join", lobbyobj);
+        return JsonSerializer.Deserialize<ErrorResponse>(result);
     }
     public static async Task LeaveLobby(string lobby_id, string session_id)
     {
