@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Runtime.Caching;
 using System.Text.Json;
@@ -118,16 +119,46 @@ public partial class WolfAPI : Resource
 
         value(data);
     }
+
+    private static async Task<Image> LoadImageFromHttpResonse(HttpResponseMessage message)
+    {
+        string mediaType = message.Content.Headers.ContentType.MediaType;
+        if (mediaType is null)
+            return default;
+
+        Image image = new();
+        Error error = mediaType switch
+        {
+            "image/png" => image.LoadPngFromBuffer(await message.Content.ReadAsByteArrayAsync()),
+            _ => Error.FileUnrecognized
+        };
+
+        if (error == Error.FileUnrecognized)
+        {
+            throw new NotSupportedException($"No Load function for {mediaType} currently implemented");
+        }
+
+        if (error != Error.Ok)
+        {
+            throw new FileLoadException();
+        }
+
+        return image;
+    }
+
     public static async Task<Texture2D> GetAppIcon(App app, double h_cache_duration = 1.0, int retrys = 0)
     {
         if (retrys >= 5)
         {
             Logger.LogError("Failed Loading {0} 5 times, skipping", app.icon_png_path);
+            return null;
         }
 
         string user = System.Environment.GetEnvironmentVariable("USER");
         user = (user == "root" || user == null) ? "retro" : user;
 
+        string address;
+        string filepath;
         if (app.icon_png_path == null) // no image set, get default from github
         {
             if (app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
@@ -138,107 +169,66 @@ public partial class WolfAPI : Resource
             if (idx >= 0)
                 name = name[..idx];
 
-            string filepath = $"/home/{user}/.wolf-ui/tmp/{name}.png";
-
-            Image image;
-
-            if (File.Exists(filepath))
-            {
-                if (File.GetCreationTime(filepath).AddHours(h_cache_duration).CompareTo(DateTime.Now) >= 0)
-                {
-                    image = Image.LoadFromFile(filepath);
-                    return ImageTexture.CreateFromImage(image);
-                }
-                else
-                {
-                    File.Delete(filepath);
-                }
-            }
-
-            Logger.LogInformation("Requesting icon for: {0}", app.title);
-            var wildlife_url = $"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png";
-            HttpResponseMessage message;
-            try
-            {
-                message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={wildlife_url}");
-            }
-            catch (HttpRequestException e)
-            {
-                Logger.LogWarning("Icon for {0} could not be accessed: {1} - {2} Retrying", app.title, e.Message, e.InnerException.Message);
-                return await GetAppIcon(app, h_cache_duration, retrys + 1);
-            }
-
-            if (message.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var result = await message.Content.ReadAsByteArrayAsync();
-                image = new();
-                image.LoadPngFromBuffer(result);
-                Directory.CreateDirectory(Path.GetDirectoryName(filepath));
-                image.SavePng(filepath);
-                var texture = ImageTexture.CreateFromImage(image);
-                return texture;
-            }
-            Logger.LogError("Could not access image url: {0}: {1}", wildlife_url, message.StatusCode);
-            return null;
+            address = $"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png";
+            filepath = $"/home/{user}/.wolf-ui/tmp/icons/{address}.png";
         }
         else
         {
-            string filepath = $"/home/{user}/.wolf-ui/tmp/{app.icon_png_path}.png";
+            address = app.icon_png_path;
+            filepath = $"/home/{user}/.wolf-ui/tmp/icons/{app.icon_png_path}.png";
+        }
+        Image image;
 
-            Image image;
-
-            if (File.Exists(filepath))
+        if (File.Exists(filepath))
+        {
+            if (File.GetCreationTime(filepath).AddHours(h_cache_duration).CompareTo(DateTime.Now) >= 0)
             {
-                if (File.GetCreationTime(filepath).AddHours(h_cache_duration).CompareTo(DateTime.Now) >= 0)
-                {
-                    image = Image.LoadFromFile(filepath);
-                    return ImageTexture.CreateFromImage(image);
-                }
-                else
-                {
-                    File.Delete(filepath);
-                }
+                image = Image.LoadFromFile(filepath);
+                return ImageTexture.CreateFromImage(image);
             }
+            else
+            {
+                File.Delete(filepath);
+            }
+        }
 
-            HttpResponseMessage message;
+        Logger.LogInformation("Requesting icon for: {0}", app.title);
+
+        HttpResponseMessage message;
+        try
+        {
+            message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={address}");
+        }
+        catch (HttpRequestException e)
+        {
+            Logger.LogWarning("Icon for {0} could not be accessed: {1} - {2} Retrying", app.title, e.Message, e.InnerException.Message);
+            return await GetAppIcon(app, h_cache_duration, retrys + 1);
+        }
+
+        if (message.StatusCode == System.Net.HttpStatusCode.OK)
+        {
             try
             {
-                Logger.LogInformation("Requesting icon for: {0}", app.title);
-                message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={app.icon_png_path}");
+                image = await LoadImageFromHttpResonse(message);
             }
-            catch (HttpRequestException e)
+            catch (FileLoadException)
             {
-                Logger.LogWarning("Icon for {0} could not be accessed: {1} - {2} Retrying", app.title, e.Message, e.InnerException.Message);
+                Logger.LogError("Icon for {0} could not be decoded properly, Retrying", app.title);
                 return await GetAppIcon(app, h_cache_duration, retrys + 1);
             }
-
-            if (message.StatusCode == System.Net.HttpStatusCode.OK)
+            catch (NotSupportedException e)
             {
-                var result = await message.Content.ReadAsByteArrayAsync();
-                image = new();
-
-                Engine.PrintErrorMessages = false;
-                if (image.LoadPngFromBuffer(result) != Error.Ok)
-                {
-                    Logger.LogError("Icon for {0} could not be decoded properly, Retrying", app.title);
-                    return await GetAppIcon(app, h_cache_duration, retrys + 1);
-                }
-                Engine.PrintErrorMessages = true;
-
-                Directory.CreateDirectory(Path.GetDirectoryName(filepath));
-                image.SavePng(filepath);
-
-                var texture = ImageTexture.CreateFromImage(image);
-                if (texture is null)
-                {
-                    Logger.LogError("Icon for {0} could not be decoded properly", app.title);
-                    return default;
-                }
-                return texture;
+                Logger.LogError(e.Message);
+                return null;
             }
-            Logger.LogError("Could not access image url: {0}: {1}", app.icon_png_path, message.StatusCode);
-            return null;
+            Directory.CreateDirectory(Path.GetDirectoryName(filepath));
+            image.SavePng(filepath);
+            var texture = ImageTexture.CreateFromImage(image);
+            return texture;
         }
+        Logger.LogError("Could not access image url: {0}: {1}", address, message.StatusCode);
+        return null;
+
     }
     public async void StartListenToAPIEvents()
     {
@@ -484,6 +474,30 @@ public partial class WolfAPI : Resource
         };
         var result = await PostAsync("http://localhost/api/v1/runners/start", starter);
     }
+
+    public static async void StopSession(string session_id)
+    {
+        string url = "http://localhost/api/v1/session/stop";
+        try
+        {
+            string data = $@"
+            {{
+                ""session_id"": ""{session_id}""
+            }}";
+            Logger.LogDebug("API call POST: {0} - {1}", url, data);
+            StringContent content = new(data);
+            var result = await _httpClient.PostAsync(url, content);
+            var return_data = await result.Content.ReadAsStringAsync();
+            Logger.LogDebug("API answer from: {0} - {1}", url, return_data);
+            return;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Error POST request failed: {0} Message: {1}", url, e.Message);
+            return;
+        }
+    }
+
     public static async Task<List<Lobby>> GetLobbies()
     {
         Lobbies lobbies = await GetAsync<Lobbies>("http://localhost/api/v1/lobbies");

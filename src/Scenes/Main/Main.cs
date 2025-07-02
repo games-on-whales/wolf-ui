@@ -133,6 +133,7 @@ public partial class Main : Control
 						}))
 					{
 						await WolfAPI.StartApp(Wolf_UI.runner);
+						await Task.Delay(500);
 						GetTree().Quit();
 					}
 				}
