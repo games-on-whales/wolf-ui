@@ -1,0 +1,112 @@
+[gd_scene load_steps=2 format=3 uid="uid://dr7lejj7fdlux"]
+
+[ext_resource type="Script" uid="uid://cley7t4oe81y0" path="res://Scenes/Main/Body/Settings/ColorSelector.cs" id="1_j3sfj"]
+
+[node name="ColorSelector" type="MarginContainer"]
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+script = ExtResource("1_j3sfj")
+
+[node name="Button" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+
+[node name="ElementName" type="Label" parent="HBoxContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+text = "Color Name"
+
+[node name="VSeparator" type="VSeparator" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ColorLabel" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "R"
+
+[node name="RSlider" type="HSlider" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+focus_neighbor_top = NodePath("../../HBoxContainer3/BSlider")
+focus_neighbor_bottom = NodePath("../../HBoxContainer2/GSlider")
+max_value = 255.0
+value = 255.0
+
+[node name="RLabel" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 0)
+layout_mode = 2
+text = "255"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ColorLabel" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "G"
+
+[node name="GSlider" type="HSlider" parent="HBoxContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+focus_neighbor_top = NodePath("../../HBoxContainer/RSlider")
+focus_neighbor_bottom = NodePath("../../HBoxContainer3/BSlider")
+max_value = 255.0
+value = 255.0
+
+[node name="GLabel" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 0)
+layout_mode = 2
+text = "255"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ColorLabel" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+text = "B"
+
+[node name="BSlider" type="HSlider" parent="HBoxContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+focus_neighbor_top = NodePath("../../HBoxContainer2/GSlider")
+focus_neighbor_bottom = NodePath("../../HBoxContainer/RSlider")
+max_value = 255.0
+value = 255.0
+
+[node name="BLabel" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 0)
+layout_mode = 2
+text = "255"
+
+[node name="FeedbackColor" type="ColorRect" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
