@@ -35,7 +35,7 @@ RUN <<_INSTALL_PACKAGES
 set -e
 
 mkdir ./bin
-dotnet add package Docker.DotNet
+dotnet add package System.Runtime.Caching --version 9.0.6
 Godot --headless --export-release "Linux" ./bin/wolf-ui
 ls -la ./bin
 

@@ -5,6 +5,6 @@
     <RootNamespace>WolfUI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Docker.DotNet" Version="3.125.15" />
+    <PackageReference Include="System.Runtime.Caching" Version="9.0.6" />
   </ItemGroup>
 </Project>

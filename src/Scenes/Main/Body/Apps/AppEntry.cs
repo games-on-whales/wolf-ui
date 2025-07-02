@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Threading.Tasks;
 using Godot;
 using Resources.WolfAPI;
-using WolfManagement.Resources;
 
 namespace WolfUI;
 
 [GlobalClass][Tool]
-public partial class AppEntry : Control
+public partial class AppEntry : MarginContainer
 {
 	ProgressBar AppProgress;
 	Label AppLabel;
@@ -91,9 +91,6 @@ public partial class AppEntry : Control
 			return;
 		}
 
-		if (DockerController.isDisabled)
-			MenuButtonUpdate.Hide();
-
 		AppLabel.Text = App.title;
 		DownloadIcon.Hide();
 		AppProgress.Hide();
@@ -168,13 +165,52 @@ public partial class AppEntry : Control
 			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
 		};
 
+		WolfAPI.Singleton.ImageUpdated += OnImageUpdated;
+		WolfAPI.Singleton.ImageAlreadyUptoDate += OnImageUpdated;
+		WolfAPI.Singleton.ImagePullProgress += OnImagePullProgress;
+
 		AppEnteredView += async () =>
 		{
 			AppIcon.Texture = await WolfAPI.GetAppIcon(App);
 		};
 	}
 
-	public override void _Process(double delta)
+	private void OnImageUpdated(string image)
+	{
+		if (image != App.runner.image)
+			return;
+
+		if (!IsInstanceValid(AppProgress) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator))
+			return;
+
+		AppProgress.Visible = false;
+		AppButton.Disabled = false;
+		DisabledIndicator.Visible = false;
+
+		DownloadIcon.Visible = false;
+		OKIcon.Visible = !PlayingIcon.Visible;
+		AppProgress.Value = 0;
+	}
+
+	private void OnImagePullProgress(string image, double progress)
+	{
+		if (image != App.runner.image)
+			return;
+
+		if (!IsInstanceValid(AppProgress) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator))
+			return;
+
+		if (!AppProgress.Visible || !AppButton.Disabled || !DisabledIndicator.Visible)
+		{
+			AppProgress.Visible = true;
+			AppButton.Disabled = true;
+			DisabledIndicator.Visible = true;
+		}				
+
+		AppProgress.Value = progress;
+	}
+
+	public override async void _Process(double delta)
 	{
 		base._Process(delta);
 
@@ -196,9 +232,9 @@ public partial class AppEntry : Control
 				MenuButtonStop.HasFocus() ||
 				MenuButtonStart.HasFocus())
 			)
-			{
-				AppMenu.Hide();
-			}
+		{
+			AppMenu.Hide();
+		}
 
 		if (AppMenu.Visible && Input.IsActionPressed("ui_cancel"))
 		{
@@ -207,9 +243,9 @@ public partial class AppEntry : Control
 
 		if (App.runner.image is not null)
 		{
-			var app_image_name = App.runner.image.Contains(':') ? App.runner.image : $"{App.runner.image}:latest";
-			var docker_images = DockerController.CachedImages;
-			IsImageOnDisc = docker_images.Contains(app_image_name) || DockerController.isDisabled;
+			//var app_image_name = App.runner.image.Contains(':') ? App.runner.image : $"{App.runner.image}:latest";
+			//var docker_images = DockerController.CachedImages;
+			IsImageOnDisc = await WolfAPI.IsImageOnDisk(App.runner.image);
 			DownloadIcon.Visible = !IsImageOnDisc;
 			OKIcon.Visible = IsImageOnDisc;
 		}
@@ -347,19 +383,16 @@ public partial class AppEntry : Control
 		AppButton.GrabFocus();
 	}
 
-	public async void PullImage()
+	public void PullImage()
 	{
-		if (DockerController.isDisabled)
-			return;
-
 		AppButton.GrabFocus();
-		if (App.runner.image.Contains(':'))
-		{
-			var image = App.runner.image.Split(":");
-			DisabledIndicator.Visible = true;
-			await Main.Singleton.docker.PullImage(image[0], image[1], AppProgress, AppButton);
-			DisabledIndicator.Visible = false;
-		}
+
+		AppProgress.Visible = true;
+		AppButton.Disabled = true;
+		DisabledIndicator.Visible = true;
+		AppProgress.Value = 0;
+
+		WolfAPI.PullImage(App.runner.image);
 	}
 
 	public string GetFocusPath()

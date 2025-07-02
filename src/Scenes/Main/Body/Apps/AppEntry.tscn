@@ -6,24 +6,17 @@
 [ext_resource type="Texture2D" uid="uid://d1uaf1ivwb32x" path="res://Icons/UI/play-circle-svgrepo-com.svg" id="5_tte3r"]
 [ext_resource type="Texture2D" uid="uid://cmj2w8tadwl8f" path="res://Icons/UI/check-circle-svgrepo-com.svg" id="6_lnekl"]
 
-[node name="AppEntry" type="Control"]
+[node name="AppEntry" type="MarginContainer"]
 custom_minimum_size = Vector2(200, 295)
-layout_mode = 3
-anchors_preset = 0
-offset_right = 200.0
+offset_right = 208.0
 offset_bottom = 295.0
 size_flags_horizontal = 6
 size_flags_vertical = 6
-mouse_filter = 1
 theme_type_variation = &"AppCard"
 script = ExtResource("1_pyonv")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 295.0
-grow_horizontal = 2
+layout_mode = 2
 mouse_filter = 2
 
 [node name="SpacerLeft" type="Control" parent="HBoxContainer"]

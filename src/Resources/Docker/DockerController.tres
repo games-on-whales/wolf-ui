@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="DockerController" load_steps=2 format=3 uid="uid://3uu0v8l30oi5"]
-
-[ext_resource type="Script" uid="uid://ej4uorvu6hbj" path="res://Resources/Docker/DockerController.cs" id="1_52uot"]
-
-[resource]
-script = ExtResource("1_52uot")

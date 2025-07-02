@@ -1,5 +1,4 @@
 using Godot;
-using WolfManagement.Resources;
 using Resources.WolfAPI;
 using System.Linq;
 //using Microsoft.Extensions.Logging;
@@ -8,14 +7,14 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using System.Resources;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace WolfUI;
 
 [GlobalClass]
 public partial class Main : Control
 {
-	[Export]
-	public DockerController docker;
 	[Export]
 	public ControllerMap controllerMap;
 	private readonly static ILoggerFactory factory;
@@ -84,7 +83,7 @@ public partial class Main : Control
 	}
 
 	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		if (Engine.IsEditorHint())
 			return;
@@ -111,31 +110,38 @@ public partial class Main : Control
 
 		AddChild(time);
 
-		if (!DockerController.isDisabled)
-		{
-			docker.UpdateCachedImages();
-			var time2 = new Timer
-			{
-				WaitTime = 10.0,
-				OneShot = false,
-				Autostart = true
-			};
-			time2.Timeout += () =>
-			{
-				docker.UpdateCachedImages();
-			};
-
-			AddChild(time2);
-		}
-
 		WolfAPI.Init();
 
-		CheckForUpdate();
+		string auto_update_env = System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE");
+		bool AutoupdateEnable = auto_update_env is null || auto_update_env == "True";
+		if (AutoupdateEnable)
+		{
+			var apps = await WolfAPI.GetApps();
+			App Wolf_UI = apps.apps.FindAll(app => app.runner.image is not null
+											&& app.runner.image.Contains("wolf-ui")
+											&& app.runner.env.Contains("WOLF_UI_AUTOUPDATE=True"))
+									.FirstOrDefault();
+
+			WolfAPI.Singleton.ImageUpdated += async (img) =>
+			{
+				if (img == Wolf_UI.runner.image)
+				{
+					if (await QuestionDialogue.OpenDialogue<bool>("Restart", "Wolf-UI has been updated, please restart.",
+						new Dictionary<string, bool> {
+							{ "Restart", true },
+							{ "Later", false }
+						}))
+					{
+						await WolfAPI.StartApp(Wolf_UI.runner);
+						GetTree().Quit();
+					}
+				}
+			};
+			WolfAPI.PullImage(Wolf_UI.runner.image);
+		}
 
 		Logger.LogInformation("This session's id: {0}", WolfAPI.session_id);
-		//GD.Print($"This session's id: {WolfAPI.session_id}");
 
-		
 		//GetTree().CreateTimer(10).Timeout += () =>
 		//	GetTree().Root.Theme = ResourceLoader.Load<Theme>("/home/sebastian/Test/OLED_theme.tres");//"uid://v418qqxvwy87");
 	}
@@ -143,7 +149,7 @@ public partial class Main : Control
 	public override void _EnterTree()
 	{
 		base._EnterTree();
-		GetTree().Root.Theme = ResourceLoader.Load<Theme>("uid://v418qqxvwy87");
+		//GetTree().Root.Theme = ResourceLoader.Load<Theme>("uid://v418qqxvwy87");
     }
 
 	public void LoadTheme(string theme_name)
@@ -177,37 +183,5 @@ public partial class Main : Control
 	public override void _Input(InputEvent @event)
 	{
 		controllerMap.SetController(@event);
-	}
-
-	private async void CheckForUpdate()
-	{
-		if (DockerController.isDisabled)
-			return;
-
-		string auto_update_env = System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE");
-		bool AutoupdateEnable = auto_update_env is null || auto_update_env == "True";
-		if (!AutoupdateEnable)
-			return;
-
-		var apps = await WolfAPI.GetAsync<Apps>("http://localhost/api/v1/apps");
-
-		App Wolf_UI = apps.apps.FindAll(app => app.runner.image is not null
-										&& app.runner.image.Contains("wolf-ui")
-										&& app.runner.env.Contains("WOLF_UI_AUTOUPDATE=True"))
-								.FirstOrDefault();
-
-		if (Wolf_UI is not null && Wolf_UI.runner.image.Contains(':'))
-		{
-			var image = Wolf_UI.runner.image.Split(":");
-			await docker.PullImage(image[0], image[1], null, null);
-		}
-
-		/* use after checking if a new version was pulled.
-		bool shouldRestart = await QuestionDialogue.OpenDialogue<bool>(this, "Restart", "Wolf-UI has been updated, please restart.",
-			new Dictionary<string, bool> {
-				{ "Restart", true },
-				{ "Later", false }
-			});
-		*/
 	}
 }

@@ -135,7 +135,8 @@ public partial class AppList : Control
 				scroll.ScrollVertical = 0;
 			};
 		});
-		int idx = AppContainer.GetChildCount() - AppContainer.Columns;
+		int remainder = AppContainer.GetChildCount() % AppContainer.Columns;
+		int idx = AppContainer.GetChildCount() - (remainder == 0 ? AppContainer.Columns : remainder);
 		AppContainer.GetChildren()[idx..].ToList().ForEach(child =>
 		{
 			child.GetNode<Button>("%AppButton").FocusEntered += () =>
@@ -143,6 +144,19 @@ public partial class AppList : Control
 				scroll.ScrollVertical = (int)scroll.GetChildren().Cast<Control>().First().Size.X;
 			};
 		});
+/*
+		int a = AppContainer.Columns - 1;
+		int b = idx + 1;
+		GD.Print(a, " - ", b);
+		AppContainer.GetChildren()[a..b].ToList().ForEach(child =>
+		{
+			GD.Print(child.Name);
+			child.GetNode<Button>("%AppButton").FocusEntered += () =>
+			{
+				scroll.ScrollVertical += AppContainer.GetThemeConstant("v_separation", "AppListGrid");
+			};
+		});
+*/
 	}
 
 	private void EditorMockupReady()

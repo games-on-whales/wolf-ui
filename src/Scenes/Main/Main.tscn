@@ -1,7 +1,6 @@
-[gd_scene load_steps=22 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=21 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
-[ext_resource type="Resource" uid="uid://3uu0v8l30oi5" path="res://Resources/Docker/DockerController.tres" id="3_xggvw"]
 [ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
 [ext_resource type="Texture2D" uid="uid://dn0pykgwnubwt" path="res://Icons/UI/backward-fill-svgrepo-com.svg" id="4_xggvw"]
 [ext_resource type="Texture2D" uid="uid://b20xk3rj6tqt0" path="res://Icons/UI/multiplication-circle-svgrepo-com.svg" id="6_xggvw"]
@@ -30,7 +29,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xobeq")
-docker = ExtResource("3_xggvw")
 controllerMap = ExtResource("4_hkvnm")
 
 [node name="Panel" type="Panel" parent="."]
