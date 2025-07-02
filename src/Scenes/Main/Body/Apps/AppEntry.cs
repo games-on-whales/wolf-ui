@@ -140,12 +140,6 @@ public partial class AppEntry : MarginContainer
 		AppRunning += () =>
 		{
 			State = AppState.PLAYING;
-
-			if (!RunningLobby.multi_user)
-			{
-				MenuButtonStart.Text = "Connect";
-				MenuButtonStop.Visible = true;
-			}
 		};
 
 		AppStopped += () =>
@@ -278,6 +272,7 @@ public partial class AppEntry : MarginContainer
 			MenuButtonStart.Text = "Start";
 			MenuButtonStop.Visible = false;
 			MenuButtonCoop.Disabled = false;
+			MenuButtonUpdate.Disabled = false;
 
 			MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
 			MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
@@ -291,6 +286,12 @@ public partial class AppEntry : MarginContainer
 			PlayingIcon.Visible = true;
 			OKIcon.Visible = false;
 			AppProgress.Value = 0;
+
+			if (!RunningLobby.multi_user)
+			{
+				MenuButtonStart.Text = "Connect";
+				MenuButtonStop.Visible = true;
+			}
 
 			MenuButtonCoop.Disabled = true;
 
@@ -313,6 +314,10 @@ public partial class AppEntry : MarginContainer
 			OKIcon.Visible = false;
 			AppProgress.Value = 0;
 
+			MenuButtonCoop.Disabled = true;
+			MenuButtonUpdate.Disabled = true;
+			MenuButtonStart.Text = "Download";
+
 			DisabledIndicator.Visible = true;
 		}
 		else if (State == AppState.DOWNLOADING)
@@ -329,15 +334,8 @@ public partial class AppEntry : MarginContainer
 
 	private void OnPressed()
 	{
-		if (!IsImageOnDisc)
-		{
-			PullImage();
-		}
-		else
-		{
-			AppMenu.Visible = true;
-			MenuButtonStart.GrabFocus();
-		}
+		AppMenu.Visible = true;
+		MenuButtonStart.GrabFocus();
 	}
 
 	private async void OnStartPressed()
@@ -345,6 +343,14 @@ public partial class AppEntry : MarginContainer
 		//TODO: check if user already has a open singleplayer lobby for the chosen app and if yes re-join.
 
 		MenuButtonStart.Disabled = true;
+
+		if (!IsImageOnDisc)
+		{
+			PullImage();
+			GrabFocus();
+			return;
+		}
+
 
 		var lobby = RunningLobby;
 
