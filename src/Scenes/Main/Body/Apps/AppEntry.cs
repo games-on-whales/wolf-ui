@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
@@ -11,6 +12,32 @@ namespace WolfUI;
 [GlobalClass][Tool]
 public partial class AppEntry : MarginContainer
 {
+	private enum AppState
+	{
+		NOTONDISK = 0,
+		DOWNLOADING,
+		PLAYING,
+		OK,
+		NONE
+	}
+	private AppState _State = AppState.NONE;
+	private AppState State
+	{
+		get
+		{
+			return _State;
+		}
+		set
+		{
+			if (_State != value)
+			{
+				if(Name == "App 1")
+					GD.Print("State changed to: ", value, " from: ", _State);
+				_State = value;
+				OnStateChanged();
+			}
+		}
+	}
 	ProgressBar AppProgress;
 	Label AppLabel;
 	Control DownloadIcon;
@@ -83,8 +110,8 @@ public partial class AppEntry : MarginContainer
 		MenuButtonUpdate = GetNode<Button>("%MenuButtonUpdate");
 		MenuButtonCancle = GetNode<Button>("%MenuButtonCancle");
 
-		MenuButtonStop.Visible = false;
-		DisabledIndicator.Visible = false;
+		//MenuButtonStop.Visible = false;
+		//DisabledIndicator.Visible = false;
 
 		if (Engine.IsEditorHint())
 		{
@@ -92,8 +119,8 @@ public partial class AppEntry : MarginContainer
 		}
 
 		AppLabel.Text = App.title;
-		DownloadIcon.Hide();
-		AppProgress.Hide();
+		//DownloadIcon.Hide();
+		//AppProgress.Hide();
 		AppButton.Pressed += OnPressed;
 
 		FocusEntered += AppMenu.Hide;
@@ -103,66 +130,27 @@ public partial class AppEntry : MarginContainer
 		MenuButtonStop.Pressed += OnStopPressed;
 		MenuButtonStart.Pressed += OnStartPressed;
 
-		var appList = Main.Singleton.GetNode<AppList>("%AppList");
-		appList.LobbyCreatedEvent += (caller, lobby) =>
-		{
-			if (IsAlreadyRunning(lobby))
-			{
-				RunningLobby = lobby;
-				EmitSignalAppRunning();
-			}
-		};
+		State = AppState.OK;
 
-		appList.LobbyStoppedEvent += (caller, lobby_id) =>
-		{
-			if (lobby_id == RunningLobby?.id)
-			{
-				RunningLobby = null;
-				EmitSignalAppStopped();
-			}
-		};
+		var appList = Main.Singleton.GetNode<AppList>("%AppList");
+		appList.LobbyCreatedEvent += OnLobbyCreatedEvent;
+		appList.LobbyStoppedEvent += OnLobbyStoppedEvent;
+
 
 		AppRunning += () =>
 		{
+			State = AppState.PLAYING;
+
 			if (!RunningLobby.multi_user)
 			{
 				MenuButtonStart.Text = "Connect";
 				MenuButtonStop.Visible = true;
 			}
-
-			OKIcon.Visible = false;
-			PlayingIcon.Visible = true;
-
-			MenuButtonCoop.Disabled = true;
-
-			MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
-			MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
-
-			MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
-			MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
-
-			MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
-			MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
-
-			MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
-			MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
 		};
 
 		AppStopped += () =>
 		{
-			MenuButtonStart.Text = "Start";
-			MenuButtonStop.Visible = false;
-
-			PlayingIcon.Visible = false;
-			OKIcon.Visible = IsImageOnDisc;
-
-			MenuButtonCoop.Disabled = false;
-
-			MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
-			MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
-
-			MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
-			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
+			State = IsImageOnDisc ? AppState.OK : AppState.NOTONDISK;
 		};
 
 		WolfAPI.Singleton.ImageUpdated += OnImageUpdated;
@@ -175,21 +163,44 @@ public partial class AppEntry : MarginContainer
 		};
 	}
 
+	public override void _ExitTree()
+	{
+		base._ExitTree();
+		var appList = Main.Singleton.GetNode<AppList>("%AppList");
+		appList.LobbyCreatedEvent -= OnLobbyCreatedEvent;
+		appList.LobbyStoppedEvent -= OnLobbyStoppedEvent;
+    }
+
+	private void OnLobbyCreatedEvent(object caller, Resources.WolfAPI.Lobby lobby)
+	{
+		if (!IsInstanceValid(this))
+			return;
+		if (IsAlreadyRunning(lobby))
+		{
+			RunningLobby = lobby;
+			EmitSignalAppRunning();
+		}
+	}
+
+	private void OnLobbyStoppedEvent(object caller, string lobby_id)
+	{
+		if (!IsInstanceValid(this))
+			return;
+		if (lobby_id == RunningLobby?.id)
+		{
+			RunningLobby = null;
+			EmitSignalAppStopped();
+		}
+	}
+
 	private void OnImageUpdated(string image)
 	{
+		if (!IsInstanceValid(this))
+			return;
 		if (image != App.runner.image)
 			return;
 
-		if (!IsInstanceValid(AppProgress) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator))
-			return;
-
-		AppProgress.Visible = false;
-		AppButton.Disabled = false;
-		DisabledIndicator.Visible = false;
-
-		DownloadIcon.Visible = false;
-		OKIcon.Visible = !PlayingIcon.Visible;
-		AppProgress.Value = 0;
+		State = RunningLobby is null ? AppState.OK : AppState.PLAYING;
 	}
 
 	private void OnImagePullProgress(string image, double progress)
@@ -199,6 +210,8 @@ public partial class AppEntry : MarginContainer
 
 		if (!IsInstanceValid(AppProgress) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator))
 			return;
+
+		State = AppState.DOWNLOADING;
 
 		if (!AppProgress.Visible || !AppButton.Disabled || !DisabledIndicator.Visible)
 		{
@@ -241,11 +254,76 @@ public partial class AppEntry : MarginContainer
 			AppButton.GrabFocus();
 		}
 
-		if (App.runner.image is not null)
+		if (App.runner.image is not null && State != AppState.DOWNLOADING)
 		{
 			IsImageOnDisc = await WolfAPI.IsImageOnDisk(App.runner.image);
-			DownloadIcon.Visible = !IsImageOnDisc;
-			OKIcon.Visible = IsImageOnDisc;
+			State = IsImageOnDisc ? RunningLobby is null ? AppState.OK : AppState.PLAYING : AppState.NOTONDISK;
+		}
+	}
+
+	private void OnStateChanged()
+	{
+		if (State == AppState.OK)
+		{
+			DownloadIcon.Visible = false;
+			PlayingIcon.Visible = false;
+			OKIcon.Visible = true;
+
+			DisabledIndicator.Visible = false;
+			AppProgress.Visible = false;
+
+			AppButton.Disabled = false;
+			AppProgress.Value = 0;
+
+			MenuButtonStart.Text = "Start";
+			MenuButtonStop.Visible = false;
+			MenuButtonCoop.Disabled = false;
+
+			MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
+			MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
+
+			MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
+			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
+		}
+		else if (State == AppState.PLAYING)
+		{
+			DownloadIcon.Visible = false;
+			PlayingIcon.Visible = true;
+			OKIcon.Visible = false;
+			AppProgress.Value = 0;
+
+			MenuButtonCoop.Disabled = true;
+
+			MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
+			MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
+
+			MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
+			MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
+
+			MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
+			MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
+
+			MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
+			MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
+		}
+		else if (State == AppState.NOTONDISK)
+		{
+			DownloadIcon.Visible = true;
+			PlayingIcon.Visible = false;
+			OKIcon.Visible = false;
+			AppProgress.Value = 0;
+
+			DisabledIndicator.Visible = true;
+		}
+		else if (State == AppState.DOWNLOADING)
+		{
+			DownloadIcon.Visible = true;
+			PlayingIcon.Visible = false;
+			OKIcon.Visible = false;
+
+			AppProgress.Visible = true;
+			AppButton.Disabled = true;
+			DisabledIndicator.Visible = true;
 		}
 	}
 
@@ -301,6 +379,8 @@ public partial class AppEntry : MarginContainer
 			lobby_id = await WolfAPI.CreateLobby(lobby);
 		}
 
+		State = AppState.PLAYING;
+
 		if (lobby_id is not null)
 			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
 		
@@ -318,6 +398,8 @@ public partial class AppEntry : MarginContainer
 		MenuButtonStop.Disabled = true;
 		await WolfAPI.StopLobby(RunningLobby.id);
 		MenuButtonStop.Disabled = false;
+
+		State = IsImageOnDisc ? AppState.NOTONDISK : AppState.OK;
 
 		AppButton.GrabFocus();
 	}
@@ -372,6 +454,8 @@ public partial class AppEntry : MarginContainer
 			lobby.pin = pin;
 		}
 
+		State = AppState.PLAYING;
+
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
 		if (lobby_id is not null)
 			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
@@ -383,12 +467,8 @@ public partial class AppEntry : MarginContainer
 
 	public void PullImage()
 	{
+		State = AppState.DOWNLOADING;
 		AppButton.GrabFocus();
-
-		AppProgress.Visible = true;
-		AppButton.Disabled = true;
-		DisabledIndicator.Visible = true;
-		AppProgress.Value = 0;
 
 		WolfAPI.PullImage(App.runner.image);
 	}
