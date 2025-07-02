@@ -24,12 +24,12 @@ public partial class WolfAPI : Resource
         get
         {
             Random random = new();
-            var variance = random.NextDouble() * 30;
+            var variance = random.NextDouble() * 50;
 
             var cacheItemPolicy = new CacheItemPolicy()
             {
                 //Set your Cache expiration.
-                AbsoluteExpiration = DateTime.Now.AddSeconds(10 + variance)
+                AbsoluteExpiration = DateTime.Now.AddSeconds(20 + variance)
             };
             return cacheItemPolicy;
         }
