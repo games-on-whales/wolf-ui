@@ -381,8 +381,19 @@ public partial class AppEntry : MarginContainer
 
 		State = AppState.PLAYING;
 
+
 		if (lobby_id is not null)
-			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
+		{
+			var response = await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
+			if (response.success == false)
+			{
+				await QuestionDialogue.OpenDialogue<bool>("Lobby full", "The Lobby you tried joining is Full.", new Dictionary<string, bool>()
+				{
+					{"OK", true}
+				});
+			}
+		}
+
 		
 		MenuButtonStart.Disabled = false;
 
