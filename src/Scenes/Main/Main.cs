@@ -142,8 +142,6 @@ public partial class Main : Control
 
 		Logger.LogInformation("This session's id: {0}", WolfAPI.session_id);
 
-		//GetTree().CreateTimer(10).Timeout += () =>
-		//	GetTree().Root.Theme = ResourceLoader.Load<Theme>("/home/sebastian/Test/OLED_theme.tres");//"uid://v418qqxvwy87");
 	}
 
 	public override void _EnterTree()

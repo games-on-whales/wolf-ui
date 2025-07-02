@@ -243,8 +243,6 @@ public partial class AppEntry : MarginContainer
 
 		if (App.runner.image is not null)
 		{
-			//var app_image_name = App.runner.image.Contains(':') ? App.runner.image : $"{App.runner.image}:latest";
-			//var docker_images = DockerController.CachedImages;
 			IsImageOnDisc = await WolfAPI.IsImageOnDisk(App.runner.image);
 			DownloadIcon.Visible = !IsImageOnDisc;
 			OKIcon.Visible = IsImageOnDisc;

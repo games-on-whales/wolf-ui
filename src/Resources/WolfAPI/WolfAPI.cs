@@ -14,26 +14,6 @@ using System.Threading.Tasks;
 
 namespace Resources.WolfAPI;
 
-/* Test for directly serializing and deserializing Godot Objects like Nodes.
-    public sealed class OptinJsonTypeInfoResolver : DefaultJsonTypeInfoResolver
-    {
-        public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
-        {
-            JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);
-
-            List<JsonPropertyInfo> prop_to_remove = [.. jsonTypeInfo.Properties
-                    .Where(prop => !prop.AttributeProvider.IsDefined(typeof(JsonIncludeAttribute), false))];
-
-            foreach (var prop in prop_to_remove)
-            {
-                jsonTypeInfo.Properties.Remove(prop);
-            }
-
-            return jsonTypeInfo;
-        }
-    }
-*/
-
 [GlobalClass]
 public partial class WolfAPI : Resource
 {
@@ -66,7 +46,7 @@ public partial class WolfAPI : Resource
             var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
             var endpoint = new UnixDomainSocketEndPoint(endpoint_path);
             await socket.ConnectAsync(endpoint);
-            return new NetworkStream(socket, ownsSocket: false);
+            return new NetworkStream(socket, ownsSocket: true);
         }
     });
     private static readonly ILogger<WolfAPI> Logger = WolfUI.Main.GetLogger<WolfAPI>();
@@ -93,7 +73,6 @@ public partial class WolfAPI : Resource
         if (session_id == null)
         {
             Logger.LogWarning("session_id not found!");
-            //GD.Print("session_id not found!");
             SessionId = "123456789";
         }
         APIEvent += FilterAPIEvents;
@@ -300,13 +279,6 @@ public partial class WolfAPI : Resource
         }));
     }
 
-    [Signal]
-    public delegate void ImageUpdatedEventHandler(string image_name);
-    [Signal]
-    public delegate void ImageAlreadyUptoDateEventHandler(string image_name);
-    [Signal]
-    public delegate void ImagePullProgressEventHandler(string image_name, double progress);
-
     //TODO Create Class for the Inspect return. 
     public static async Task InspectImage(string image_name)
     {
@@ -317,7 +289,7 @@ public partial class WolfAPI : Resource
         }
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            
+
         }
         return;
     }
@@ -387,19 +359,6 @@ public partial class WolfAPI : Resource
                 Content = new StringContent(json)
             };
 
-            System.Net.Http.HttpClient _httpClient = new(new SocketsHttpHandler
-            {
-                ConnectCallback = async (context, token) =>
-                {
-                    string endpoint_path = System.Environment.GetEnvironmentVariable("WOLF_SOCKET_PATH");
-                    endpoint_path ??= "/var/run/wolf/wolf.sock";
-                    var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-                    var endpoint = new UnixDomainSocketEndPoint(endpoint_path);
-                    await socket.ConnectAsync(endpoint);
-                    return new NetworkStream(socket, ownsSocket: false);
-                }
-            });
-
             var response = await _httpClient.SendAsync(req_msg, HttpCompletionOption.ResponseHeadersRead);
             Logger.LogInformation("Pull request: {0}", response.StatusCode);
             if (response.StatusCode != HttpStatusCode.OK)
@@ -422,7 +381,7 @@ public partial class WolfAPI : Resource
                 if (parsed.success is not null && parsed.success == true)
                 {
                     string cache_key = $"http://localhost/api/v1/docker/images/inspect?image_name={image_name}";
-                    if(_cache.Contains(cache_key))
+                    if (_cache.Contains(cache_key))
                         _cache.Remove(cache_key);
                     _cache.Add(cache_key, "exists", _cachePolicy);
 
@@ -478,8 +437,6 @@ public partial class WolfAPI : Resource
                 return profile.apps;
         }
         Logger.LogError("Profile: {0} not found", used_profile.name);
-        //GD.Print($"Profile: {used_profile.name} not found");
-
         return [];
     }
 
@@ -495,7 +452,6 @@ public partial class WolfAPI : Resource
         if (!profiles.success)
         {
             Logger.LogError("Error retrieving Profiles");
-            //GD.Print("Error retrieving Profiles");
             return [];
         }
 
@@ -518,13 +474,11 @@ public partial class WolfAPI : Resource
             runner = runner
         };
         var result = await PostAsync("http://localhost/api/v1/runners/start", starter);
-        //Logger.LogInformation("{0}", result);
-        //GD.Print(await result.Content.ReadAsStringAsync());
     }
     public static async Task<List<Lobby>> GetLobbies()
     {
         Lobbies lobbies = await GetAsync<Lobbies>("http://localhost/api/v1/lobbies");
-        if(lobbies?.success == true)
+        if (lobbies?.success == true)
             return lobbies.lobbies ?? [];
         return [];
     }
@@ -544,7 +498,7 @@ public partial class WolfAPI : Resource
         if (curr_session == null)
         {
             Logger.LogWarning("No owned Session found. Is this run without Wolf?");
-            //GD.Print("No owned Session found. Is this run without Wolf?");
+
             curr_session = new()
             {
                 video_width = 1920,
@@ -569,9 +523,6 @@ public partial class WolfAPI : Resource
     public static async Task<string> CreateLobby(Lobby lobby)
     {
         var content = await PostAsync("http://localhost/api/v1/lobbies/create", lobby);
-        //var content = await result.Content.ReadAsStringAsync();
-        //Logger.LogInformation("called lobbies/create: {0}", content);
-        //GD.Print($"called lobbies/create: {content}");
         return JsonSerializer.Deserialize<LobbyCreatedResponse>(content)?.lobby_id;
     }
     public static async Task JoinLobby(string lobby_id, string session_id)
@@ -588,8 +539,6 @@ public partial class WolfAPI : Resource
         };
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/join", lobbyobj);
-        //Logger.LogInformation("called lobbies/join: {0}", await result.Content.ReadAsStringAsync());
-        //GD.Print($"called lobbies/join: {await result.Content.ReadAsStringAsync()}");
     }
     public static async Task LeaveLobby(string lobby_id, string session_id)
     {
@@ -602,7 +551,6 @@ public partial class WolfAPI : Resource
         StringContent content = new(json);
         var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
         Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
-        //GD.Print(await result.Content.ReadAsStringAsync());
     }
     private record StopLobbyRecord
     {
@@ -620,7 +568,6 @@ public partial class WolfAPI : Resource
         };
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/stop", stop_lobby);
-        //Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
     }
     private static async Task<string> PostAsync<T>(string url, T obj)
     {
@@ -668,4 +615,10 @@ public partial class WolfAPI : Resource
 
     [Signal]
     private delegate void APIEventEventHandler(string eventType, string data);
+    [Signal]
+    public delegate void ImageUpdatedEventHandler(string image_name);
+    [Signal]
+    public delegate void ImageAlreadyUptoDateEventHandler(string image_name);
+    [Signal]
+    public delegate void ImagePullProgressEventHandler(string image_name, double progress);
 }
