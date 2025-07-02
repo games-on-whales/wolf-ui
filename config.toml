@@ -15,7 +15,7 @@ title = 'Wolf UI'
     env = [ 
         'GOW_REQUIRED_DEVICES=/dev/input/event* /dev/dri/* /dev/nvidia*', 
         'WOLF_SOCKET_PATH=/var/run/wolf/wolf.sock', 
-        'WOLF_UI_AUTOUPDATE=True',
+        'WOLF_UI_AUTOUPDATE=False',
         'LOGLEVEL=INFO'
     ]
     image = 'ghcr.io/games-on-whales/wolf-ui:main'
