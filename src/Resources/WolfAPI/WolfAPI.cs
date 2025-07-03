@@ -12,6 +12,7 @@ using System.Runtime.Caching;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using WolfUI;
 
 namespace Resources.WolfAPI;
 
@@ -347,8 +348,12 @@ public partial class WolfAPI : Resource
                 }
                 catch (HttpRequestException e)
                 {
-                    Logger.LogError("Failed connecting to the Wolf API: {0}; Retrying in 5s.", e.Message);
-                    await Task.Delay(5000);
+                    Logger.LogError("Failed connecting to the Wolf API: {0}.", e.Message);
+                    await QuestionDialogue.OpenDialogue<bool>("Error", $"Failed connecting to the Wolf API:\n {e.Message}.", new()
+                    {
+                        { "OK", true }
+                    });
+                    Main.Singleton.GetTree().Quit();
                 }
             }
         }));
@@ -524,7 +529,7 @@ public partial class WolfAPI : Resource
     {
         Profiles profiles = await GetAsync<Profiles>("http://localhost/api/v1/profiles");
 
-        if (!profiles.success)
+        if (profiles is null || !profiles.success)
         {
             Logger.LogError("Error retrieving Profiles");
             return [];

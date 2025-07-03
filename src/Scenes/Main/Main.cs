@@ -117,7 +117,7 @@ public partial class Main : Control
 		if (AutoupdateEnable)
 		{
 			var apps = await WolfAPI.GetApps();
-			App Wolf_UI = apps.apps.FindAll(app => app.runner.image is not null
+			App Wolf_UI = apps?.apps.FindAll(app => app.runner.image is not null
 											&& app.runner.image.Contains("wolf-ui")
 											&& app.runner.env.Contains("WOLF_UI_AUTOUPDATE=True"))
 									.FirstOrDefault();
@@ -138,7 +138,8 @@ public partial class Main : Control
 					}
 				}
 			};
-			WolfAPI.PullImage(Wolf_UI.runner.image);
+			if(Wolf_UI is not null)
+				WolfAPI.PullImage(Wolf_UI.runner.image);
 		}
 
 		Logger.LogInformation("This session's id: {0}", WolfAPI.session_id);

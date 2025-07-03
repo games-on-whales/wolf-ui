@@ -37,7 +37,7 @@ public partial class QuestionDialogue : CenterContainer
         dialogue.ContentLabel.Text = Content;
         dialogue.Keybinds = Keybinds;
 
-        Main.Singleton.TopLayer.AddChild(dialogue);
+        Main.Singleton.TopLayer.CallDeferred(Node.MethodName.AddChild, dialogue);
 
         T Answer = default(T);
         CancellationTokenSource Cancellation = new();

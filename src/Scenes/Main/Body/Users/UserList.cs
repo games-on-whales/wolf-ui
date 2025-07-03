@@ -73,6 +73,8 @@ public partial class UserList : Control
 			child.QueueFree();
 
 		var profiles = await WolfAPI.GetProfiles();
+		if (profiles is null)
+			return;
 
 		foreach (var profile in profiles)
 		{
@@ -90,7 +92,7 @@ public partial class UserList : Control
 							"The entered Pin is incorrect",
 							new Dictionary<string, bool>
 							{
-								{"OK", false}
+							{"OK", false}
 							});
 						focus.GrabFocus();
 						return;
@@ -104,7 +106,7 @@ public partial class UserList : Control
 		}
 
 		var ch = UserContainer.GetChildren();
-		if (ch[0] is Button b)
+		if (ch.Count > 0 && ch[0] is Button b)
 		{
 			b.CallDeferred(Button.MethodName.GrabFocus);
 		}

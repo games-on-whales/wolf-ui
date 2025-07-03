@@ -62,8 +62,8 @@ public partial class Lobby : Control
 
         LobbyEnteredView += async () =>
         {
-            if(LobbySettings.icon_path is not null && LobbySettings.icon_path != "")
-                LobbyMainButton.Icon = await WolfAPI.GetIcon(LobbySettings.icon_path);
+            if(LobbySettings.icon_png_path is not null && LobbySettings.icon_png_path != "")
+                LobbyMainButton.Icon = await WolfAPI.GetIcon(LobbySettings.icon_png_path);
         };
     }
 
