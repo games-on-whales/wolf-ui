@@ -29,6 +29,11 @@ public partial class User : Button
         {
             GetNode<Label>("%Name").Text = profile.name;
         }
+        
+		if (Engine.IsEditorHint())
+        {
+            return;
+        }
 
         UserEnteredView += async () =>
         {
@@ -39,10 +44,16 @@ public partial class User : Button
 
     public override void _Process(double delta)
     {
-		if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%UserList").GetGlobalRect()).HasArea())
+        if (Engine.IsEditorHint())
 		{
-			EmitSignalUserEnteredView();
-			WasInView = true;
+			return;
 		}
+
+
+		if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%UserList").GetGlobalRect()).HasArea())
+        {
+            EmitSignalUserEnteredView();
+            WasInView = true;
+        }
     }
 }

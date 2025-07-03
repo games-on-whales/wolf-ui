@@ -154,6 +154,7 @@ public class Lobby : EventArgs
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string id { get; set; }
     public string name { get; set; }
+    public string icon_path { get; set; }
     public bool pin_required { get; set; }
     public List<int> pin { get; set; }
     public bool multi_user { get; set; }

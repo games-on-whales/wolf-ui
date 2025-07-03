@@ -8,6 +8,10 @@ namespace WolfUI;
 
 public partial class Lobby : Control
 {
+    [Signal]
+    private delegate void LobbyEnteredViewEventHandler();
+    private bool WasInView = false;
+
     [Export]
     Label AppNameLabel;
     public string AppName;
@@ -55,6 +59,21 @@ public partial class Lobby : Control
         }
 
         MenuControl?.Hide();
+
+        LobbyEnteredView += async () =>
+        {
+            if(LobbySettings.icon_path is not null && LobbySettings.icon_path != "")
+                LobbyMainButton.Icon = await WolfAPI.GetIcon(LobbySettings.icon_path);
+        };
+    }
+
+    public override void _Process(double delta)
+    {
+		if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%UserList").GetGlobalRect()).HasArea())
+        {
+            EmitSignalLobbyEnteredView();
+            WasInView = true;
+        }
     }
 
     private void OpenLobbySubMenu()

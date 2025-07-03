@@ -7,11 +7,14 @@
 [node name="Lobby" type="Control" node_paths=PackedStringArray("AppNameLabel", "CreatorNameLabel", "MenuControl", "LobbyMainButton", "JoinButton", "StopButton", "CloseButton")]
 custom_minimum_size = Vector2(180, 250)
 layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
+anchor_left = 0.429688
+anchor_top = 0.326389
+anchor_right = 0.570312
+anchor_bottom = 0.673611
+offset_left = 90.0
+offset_top = 125.0
+offset_right = -90.0
+offset_bottom = -125.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_3xjn5")
@@ -22,6 +25,7 @@ LobbyMainButton = NodePath("MarginContainer/Button")
 JoinButton = NodePath("LobbyMenu/MarginContainer3/VBoxContainer/JoinButton")
 StopButton = NodePath("LobbyMenu/MarginContainer3/VBoxContainer/StopButton")
 CloseButton = NodePath("LobbyMenu/MarginContainer3/VBoxContainer/CloseButton")
+metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
