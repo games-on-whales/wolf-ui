@@ -17,7 +17,7 @@ run/max_fps=30
 run/low_processor_mode=true
 boot_splash/show_image=false
 boot_splash/fullsize=false
-config/icon="res://Icons/icon.svg"
+config/icon="uid://xf0e52qsi032"
 
 [display]
 

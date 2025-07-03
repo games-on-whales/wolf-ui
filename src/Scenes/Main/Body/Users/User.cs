@@ -6,6 +6,10 @@ namespace WolfUI;
 [Tool]
 public partial class User : Button
 {
+    [Signal]
+    private delegate void UserEnteredViewEventHandler();
+    private bool WasInView = false;
+
     public Profile profile = null;
     private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://i2pa0j4ijr4s");
     public static User Create(Profile profile)
@@ -25,5 +29,20 @@ public partial class User : Button
         {
             GetNode<Label>("%Name").Text = profile.name;
         }
+
+        UserEnteredView += async () =>
+        {
+            if(profile.icon_png_path != "")
+                Icon = await WolfAPI.GetIcon(profile.icon_png_path);
+        };
+    }
+
+    public override void _Process(double delta)
+    {
+		if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%UserList").GetGlobalRect()).HasArea())
+		{
+			EmitSignalUserEnteredView();
+			WasInView = true;
+		}
     }
 }

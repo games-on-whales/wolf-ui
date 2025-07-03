@@ -30,7 +30,7 @@ public partial class WolfAPI : Resource
             var cacheItemPolicy = new CacheItemPolicy()
             {
                 //Set your Cache expiration.
-                AbsoluteExpiration = DateTime.Now.AddSeconds(20 + variance)
+                AbsoluteExpiration = DateTime.Now.AddSeconds(45 + variance)
             };
             return cacheItemPolicy;
         }
@@ -79,6 +79,14 @@ public partial class WolfAPI : Resource
         APIEvent += FilterAPIEvents;
         StartListenToAPIEvents();
     }
+
+    private record DockerPullImageEvent
+    {
+        public string image_name { get; set; }
+        public bool? success { get; set; }
+    }
+
+
     private void InvokeEvent<T>(EventHandler<T> handler, string json_args)
     {
         handler?.Invoke(this, JsonSerializer.Deserialize<T>(json_args));
@@ -88,7 +96,10 @@ public partial class WolfAPI : Resource
         void InvokeLobbyStopped(string data) => LobbyStoppedEvent?.Invoke(this, data.TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\"}"));
         void InvokeLobbyCreated(string data) => InvokeEvent(LobbyCreatedEvent, data);
 
+
         var Operations = new Dictionary<string, Action<string>> {
+            { "DockerPullImageEndEvent", (data) => {}},
+            { "DockerPullImageStartEvent", (data) => {}},
             { "wolf::core::events::PlugDeviceEvent", (data)=>{}},
             { "wolf::core::events::UnplugDeviceEvent", (data)=>{}},
             { "wolf::core::events::PairSignal", (data)=>{}},
@@ -144,6 +155,71 @@ public partial class WolfAPI : Resource
         }
 
         return image;
+    }
+
+    public static async Task<Texture2D> GetIcon(string icon_path, double h_cache_duration = 1.0, int retrys = 0)
+    {
+        if (retrys >= 5)
+        {
+            Logger.LogError("Failed Loading {0} 5 times, skipping", icon_path);
+            return null;
+        }
+        string user = System.Environment.GetEnvironmentVariable("USER");
+        user = (user == "root" || user == null) ? "retro" : user;
+
+        string filepath = $"/home/{user}/.wolf-ui/tmp/icons/{icon_path}.png";
+
+        Image image;
+
+        if (File.Exists(filepath))
+        {
+            if (File.GetCreationTime(filepath).AddHours(h_cache_duration).CompareTo(DateTime.Now) >= 0)
+            {
+                image = Image.LoadFromFile(filepath);
+                return ImageTexture.CreateFromImage(image);
+            }
+            else
+            {
+                File.Delete(filepath);
+            }
+        }
+
+        Logger.LogInformation("Requesting icon: {0}", icon_path);
+
+        HttpResponseMessage message;
+        try
+        {
+            message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={icon_path}");
+        }
+        catch (HttpRequestException e)
+        {
+            Logger.LogWarning("Icon {0} could not be accessed: {1} - {2} Retrying", icon_path, e.Message, e.InnerException.Message);
+            return await GetIcon(icon_path, h_cache_duration, retrys + 1);
+        }
+
+        if (message.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            try
+            {
+                image = await LoadImageFromHttpResonse(message);
+            }
+            catch (FileLoadException)
+            {
+                Logger.LogError("Icon {0} could not be decoded properly, Retrying", icon_path);
+                return await GetIcon(icon_path, h_cache_duration, retrys + 1);
+            }
+            catch (NotSupportedException e)
+            {
+                Logger.LogError(e.Message);
+                return null;
+            }
+            Directory.CreateDirectory(Path.GetDirectoryName(filepath));
+            image.SavePng(filepath);
+            var texture = ImageTexture.CreateFromImage(image);
+            return texture;
+        }
+        Logger.LogError("Could not access image: {0}: {1}", icon_path, message.StatusCode);
+        return null;
     }
 
     public static async Task<Texture2D> GetAppIcon(App app, double h_cache_duration = 1.0, int retrys = 0)
