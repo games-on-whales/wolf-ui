@@ -31,8 +31,8 @@ public partial class AppEntry : MarginContainer
 		{
 			if (_State != value)
 			{
-				if(Name == "App 1")
-					GD.Print("State changed to: ", value, " from: ", _State);
+				//if(Name == "App 1")
+				//	GD.Print("State changed to: ", value, " from: ", _State);
 				_State = value;
 				OnStateChanged();
 			}
@@ -338,6 +338,28 @@ public partial class AppEntry : MarginContainer
 		MenuButtonStart.GrabFocus();
 	}
 
+	private string GetIconPath()
+	{
+		string icon;
+		if (App.icon_png_path is null)
+		{
+            if (App.runner == null || !App.runner.image.Contains("ghcr.io/games-on-whales/"))
+                return null;
+
+			var name = App.runner.image.TrimPrefix("ghcr.io/games-on-whales/");
+			int idx = name.LastIndexOf(':');
+			if (idx >= 0)
+				name = name[..idx];
+
+			icon = $"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png";
+		}
+		else
+		{
+			icon = App.icon_png_path;
+		}
+		return icon;
+	}
+
 	private async void OnStartPressed()
 	{
 		//TODO: check if user already has a open singleplayer lobby for the chosen app and if yes re-join.
@@ -364,6 +386,7 @@ public partial class AppEntry : MarginContainer
 				profile_id = WolfAPI.Profile.id,
 				name = App.title,
 				multi_user = false,
+				icon_path = GetIconPath(),
 				stop_when_everyone_leaves = false,
 				runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{App.runner.name}",
 				runner = App.runner,
@@ -400,7 +423,7 @@ public partial class AppEntry : MarginContainer
 			}
 		}
 
-		
+
 		MenuButtonStart.Disabled = false;
 
 		AppButton.GrabFocus();
@@ -437,6 +460,7 @@ public partial class AppEntry : MarginContainer
 			profile_id = WolfAPI.Profile.id,
 			name = App.title,
 			multi_user = true,
+			icon_path = GetIconPath(),
 			stop_when_everyone_leaves = false,
 			runner_state_folder = $"profile-data/{WolfAPI.Profile.id}/{App.runner.name}",
 			runner = App.runner,
@@ -471,8 +495,6 @@ public partial class AppEntry : MarginContainer
 			lobby.pin = pin;
 		}
 
-		State = AppState.PLAYING;
-
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
 		if (lobby_id is not null)
 			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
@@ -480,6 +502,8 @@ public partial class AppEntry : MarginContainer
 		MenuButtonCoop.Disabled = false;
 
 		AppButton.GrabFocus();
+
+		State = AppState.PLAYING;
 	}
 
 	public void PullImage()
