@@ -153,7 +153,16 @@ public class Lobby : EventArgs
     public string? id { get; set; }
     public string? name { get; set; }
     public string? icon_png_path { get; set; }
-    public bool pin_required { get; set; }
+    public bool? pin_required { get; set; }
+
+    public bool isPinLocked
+    {
+        get
+        {
+            return pin is not null || (pin_required is null ? false : pin_required == true);
+        }
+    }
+
     public List<int>? pin { get; set; }
     public bool multi_user { get; set; }
     public bool stop_when_everyone_leaves { get; set; }

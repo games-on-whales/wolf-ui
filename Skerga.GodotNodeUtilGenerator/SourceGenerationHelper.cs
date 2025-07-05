@@ -1,22 +1,35 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
+using Skerga.GodotNodeUtilGenerator;
 
+namespace Skerga.GodotNodeUtilGenerator
+{
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class SceneAutoConfigureAttribute : System.Attribute
+    {
+
+        public bool GenerateNewMethod
+        {
+            get;
+            set;
+        } = true;
+    }
+}
+
+[SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class SceneFile
 {
     enum State { Block, Values }
-    public string uid = "";
+    public string Uid = "";
 
     public List<(string, string)> UniqueNodes = [];
 
     private void ParseBlock(string block)
     {
-        bool hasKwd = block.Split('\n').Where(l => l == "unique_name_in_owner = true").Any();
+        bool hasKwd = block.Split('\n').Any(l => l == "unique_name_in_owner = true");
 
         if (hasKwd)
         {
@@ -47,7 +60,7 @@ public partial class SceneFile
             var block = Regex.Matches(line, @"\[.+\]");
             if (uidmatches.Count > 0)
             {
-                uid = uidmatches[0].Groups[1].Value;
+                Uid = uidmatches[0].Groups[1].Value;
             }
 
             if (state == State.Values || (state == State.Block && lastState == state))
@@ -73,6 +86,12 @@ namespace Skerga.GodotNodeUtilGenerator
     [System.AttributeUsage(System.AttributeTargets.Class)]
     public class SceneAutoConfigureAttribute : System.Attribute
     {
+
+        public bool GenerateNewMethod
+        {
+            get;
+            set;
+        } = true;
     }
 }";
 
@@ -81,6 +100,17 @@ namespace Skerga.GodotNodeUtilGenerator
 
     public static string ParseSceneFileOfScriptFile((string, string) TscnFiles, INamedTypeSymbol symbol)
     {
+        var attributes = symbol.GetAttributes();
+        var skipNewGeneration = attributes
+            .Where(a => a.AttributeClass.ToDisplayString() ==
+                        "Skerga.GodotNodeUtilGenerator.SceneAutoConfigureAttribute")
+            .Select(a => a.NamedArguments.IsEmpty ? default : a.NamedArguments.First(kv => kv.Key == "GenerateNewMethod"))
+            .Where(kv => kv.Key is not null)
+            .Any(kv => kv.Value.Value is bool);
+            
+            
+            //.Any(a => a.NamedArguments["GenerateNewMethod"].Value == "false");    
+        //.Select(a => a.NamedArguments);//.Where(kv_array => kv_array.)
         SceneFile scene = new(TscnFiles.Item2);
 
         var builder = new StringBuilder();
@@ -99,7 +129,14 @@ namespace Skerga.GodotNodeUtilGenerator
             """);
         }
 
-
+        var NewMethodSourceCode = $$"""
+        private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("{{scene.Uid}}");
+        public static {{symbol.Name}} New()
+        {
+            {{symbol.Name}} obj = SelfRef.Instantiate<{{symbol.Name}}>();
+            return obj;
+        }
+        """;
 
         return $$"""
         using Godot;
@@ -110,12 +147,7 @@ namespace Skerga.GodotNodeUtilGenerator
             {
         {{builder.ToString()}}
 
-                private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("{{scene.uid}}");
-                public static {{symbol.Name}} New()
-                {
-                    {{symbol.Name}} obj = SelfRef.Instantiate<{{symbol.Name}}>();
-                    return obj;
-                }
+        {{(skipNewGeneration ? "" : NewMethodSourceCode)}}
 
                 public static void Yell()
                 {

@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Skerga.GodotNodeUtilGenerator;
@@ -38,16 +33,16 @@ public class SceneNodeCtorGenerator : IIncrementalGenerator
         var compilation = context.CompilationProvider.Combine(provider.Collect());
 
         context.RegisterSourceOutput(compilationAndFiles,
-            (productionContext, sourceContext) => Generate(productionContext, sourceContext.Left, sourceContext.Right));
+            (productionContext, sourceContext) => RegisterTscnFile(productionContext, sourceContext.Left, sourceContext.Right));
 
         context.RegisterSourceOutput(compilation,
             (spc, source) => Execute(spc, source.Left, source.Right));
 
     }
 
-    void Generate(SourceProductionContext context, Compilation compilation, ImmutableArray<(string, string)> files)
+    private static void RegisterTscnFile(SourceProductionContext context, Compilation compilation, ImmutableArray<(string, string)> files)
     {
-        if (files.Count() <= 0)
+        if (!files.Any())
             return;
 
         foreach (var n in files)
@@ -57,38 +52,35 @@ public class SceneNodeCtorGenerator : IIncrementalGenerator
 
     }
     
-    private void Execute(SourceProductionContext context, Compilation compilation, ImmutableArray<SyntaxNode> typeList)
+    private static void Execute(SourceProductionContext context, Compilation compilation, ImmutableArray<SyntaxNode> typeList)
     {
-        //if (!Debugger.IsAttached) Debugger.Launch();
         var builder = new StringBuilder();
 
         foreach (var syntax in typeList)
         {
-            var symbol = compilation
-                .GetSemanticModel(syntax.SyntaxTree)
-                .GetDeclaredSymbol(syntax) as INamedTypeSymbol;
-
-            if (symbol is not null)
-            {
-                var tscn = SourceGenerationHelper.TscnFiles
-                    .Where(e => Path.GetFileNameWithoutExtension(e.Item1) == Path.GetFileNameWithoutExtension(syntax.SyntaxTree.FilePath))
-                    .First();
+            if (compilation
+                    .GetSemanticModel(syntax.SyntaxTree)
+                    .GetDeclaredSymbol(syntax) is not INamedTypeSymbol symbol)
+                continue;
+            
+            var tscn = SourceGenerationHelper.TscnFiles
+                .First(e => Path.GetFileNameWithoutExtension(e.Item1) == Path.GetFileNameWithoutExtension(syntax.SyntaxTree.FilePath));
 
 
-                var sourceCode = SourceGenerationHelper.ParseSceneFileOfScriptFile(tscn, symbol);
+            var sourceCode = SourceGenerationHelper.ParseSceneFileOfScriptFile(tscn, symbol);
 
-                context.AddSource($"{symbol.Name}Extension.g.cs", sourceCode);
+            context.AddSource($"{symbol.Name}Extension.g.cs", sourceCode);
 
-                builder.AppendLine();
-                builder.Append($"\"\"\"");
-                builder.AppendLine();
-                builder.Append($"{symbol.Name}Extension.g.cs ->");
-                builder.AppendLine();
-                builder.Append($"{sourceCode}");
-                builder.AppendLine();
-                builder.Append($"\"\"\",");
-                //SourceGenerationHelper.ParseSceneFileOfScriptFile(syntax.SyntaxTree.FilePath);
-            }
+            builder.AppendLine();
+            builder.Append($"\"\"\"");
+            builder.AppendLine();
+            builder.Append($"{symbol.Name}Extension.g.cs ->");
+            builder.AppendLine();
+            builder.Append($"{sourceCode}");
+            builder.AppendLine();
+            builder.Append($"\"\"\",");
+            //SourceGenerationHelper.ParseSceneFileOfScriptFile(syntax.SyntaxTree.FilePath);
+            
         }
 
         if (builder.Length > 0) builder.Length--;

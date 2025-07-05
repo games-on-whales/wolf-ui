@@ -6,23 +6,16 @@ using System.Text;
 
 namespace WolfUI;
 
-[GlobalClass][SceneAutoConfigure]
+[GlobalClass][SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class Main : Control
 {
 	[Export]
 	public ControllerMap? controllerMap;
-	private static Main _Singleton;
-	public static Main Singleton
-	{
-		get
-		{
-			return _Singleton;
-		}
-	}
+	public static Main Singleton { get; private set; }
 
 	public Main() 
 	{
-		_Singleton ??= this;
+		Singleton ??= this;
 	}
 
 	// Called when the node enters the scene tree for the first time.
@@ -82,11 +75,11 @@ public partial class Main : Control
 		//GetTree().Root.Theme = ResourceLoader.Load<Theme>("uid://v418qqxvwy87");
     }
 
-	public void LoadTheme(string theme_name)
+	public void LoadTheme(string themeName)
 	{
 		string user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
 		user = user == "root" ? "retro" : user;
-		string filepath = $"/home/{user}/.wolf-ui/{theme_name}.tres";
+		string filepath = $"/home/{user}/.wolf-ui/{themeName}.tres";
 
 		if (File.Exists(filepath))
 		{
@@ -96,11 +89,11 @@ public partial class Main : Control
 		GetTree().Root.Theme = ResourceLoader.Load<Theme>(filepath);
 	}
 
-	public void SaveTheme(string theme_name)
+	public void SaveTheme(string themeName)
 	{
-		string user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
+		var user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
 		user = user == "root" ? "retro" : user;
-		string filepath = $"/home/{user}/.wolf-ui/{theme_name}.tres";
+		var filepath = $"/home/{user}/.wolf-ui/{themeName}.tres";
 
 		if (File.Exists(filepath))
 		{

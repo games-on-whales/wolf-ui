@@ -1,7 +1,4 @@
 using Godot;
-using System;
-using System.Collections.Generic;
-using System.Resources;
 
 [GlobalClass]
 public partial class DynamicTheme : Theme

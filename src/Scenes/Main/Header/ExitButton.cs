@@ -1,6 +1,5 @@
 using Godot;
 using Resources.WolfAPI;
-using System;
 
 
 public partial class ExitButton : Button

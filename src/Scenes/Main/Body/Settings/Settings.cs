@@ -1,7 +1,5 @@
 using Godot;
 using Skerga.GodotNodeUtilGenerator;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace WolfUI;

@@ -60,8 +60,8 @@ public partial class Lobby : Control
         if (Engine.IsEditorHint())
             return;
 
-
-        if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%UserList").GetGlobalRect()).HasArea())
+        UserList list = (UserList)Main.Singleton.UserList;
+        if (!WasInView && GetGlobalRect().Intersection(list.GetGlobalRect()).HasArea())
             {
                 EmitSignalLobbyEnteredView();
                 WasInView = true;
@@ -78,7 +78,7 @@ public partial class Lobby : Control
     {
         List<int>? pin = null;
 
-        if (LobbySettings.pin_required)
+        if (LobbySettings.isPinLocked)
         {
             pin = await PinInput.RequestPin();
         }
@@ -104,7 +104,7 @@ public partial class Lobby : Control
         var lobbies = await WolfAPI.GetLobbies();
         var lobby = lobbies.Find(lobby => lobby.id == LobbySettings.id);
 
-        if (lobby is not null && owner?.pin is not null && !lobby.pin_required)
+        if (lobby is not null && owner?.pin is not null && !lobby.isPinLocked)
         {
             var focus = GetViewport().GuiGetFocusOwner();
             _ = await QuestionDialogue.OpenDialogue<bool>(
@@ -129,7 +129,7 @@ public partial class Lobby : Control
             }
             await WolfAPI.StopLobby(Name);
         }
-        else if (lobby is not null && lobby.pin_required)
+        else if (lobby is not null && lobby.isPinLocked)
         {
             var focus = GetViewport().GuiGetFocusOwner();
             _ = await QuestionDialogue.OpenDialogue<bool>(

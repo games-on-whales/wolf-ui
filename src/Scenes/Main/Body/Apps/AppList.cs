@@ -2,7 +2,6 @@ using Godot;
 using Resources.WolfAPI;
 using System;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace WolfUI;
@@ -38,13 +37,12 @@ public partial class AppList : Control
 					return;
 
 				var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
-				if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
-				{
-					var ctrl = (AppEntry?)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
-					ctrl?.GrabFocus();
-					if (ctrl is null)
-						GetNode<Control>("%OptionsButton").GrabFocus();
-				}
+				if (focus is not null || Main.Singleton.TopLayer.GetChildCount() > 0) 
+					return;
+				var ctrl = (AppEntry?)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
+				ctrl?.GrabFocus();
+				if (ctrl is null)
+					GetNode<Control>("%OptionsButton").GrabFocus();
 
 			};
 		}
