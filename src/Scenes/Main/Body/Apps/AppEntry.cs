@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
 using Godot;
 using Resources.WolfAPI;
+using Skerga.GodotNodeUtilGenerator;
 
 namespace WolfUI;
 
-[GlobalClass][Tool]
+[GlobalClass]
+[Tool]
+[SceneAutoConfigure]
 public partial class AppEntry : MarginContainer
 {
 	private enum AppState
@@ -31,35 +30,21 @@ public partial class AppEntry : MarginContainer
 		{
 			if (_State != value)
 			{
-				//if(Name == "App 1")
-				//	GD.Print("State changed to: ", value, " from: ", _State);
 				_State = value;
 				OnStateChanged();
 			}
 		}
 	}
-	ProgressBar AppProgress;
-	Label AppLabel;
-	Control DownloadIcon;
-	Control OKIcon;
-	Control PlayingIcon;
-	Control DisabledIndicator;
-	Control AppMenu;
-	Button AppButton;
-	Button MenuButtonStart;
-	Button MenuButtonStop;
-	Button MenuButtonCoop;
-	Button MenuButtonUpdate;
-	Button MenuButtonCancle;
-	TextureRect AppIcon;
-	private Resources.WolfAPI.Lobby RunningLobby = null;
+	private Resources.WolfAPI.Lobby? RunningLobby = null;
 	private App App;
-    private static readonly ILogger<WolfAPI> Logger = WolfUI.Main.GetLogger<WolfAPI>();
+	private static readonly ILogger<WolfAPI> Logger = WolfUI.Main.GetLogger<WolfAPI>();
 	private bool IsImageOnDisc = true;
 
-	public static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://chspw2lt1qcuc");
+	//private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://chspw2lt1qcuc");
 
-	private AppEntry(){}
+#nullable disable
+	private AppEntry() { }
+#nullable enable
 
 	public static AppEntry Create(App app)
 	{
@@ -84,7 +69,7 @@ public partial class AppEntry : MarginContainer
 		if (lobby.name == App.title)
 			return true;
 		//check if this app uses the same folder as the lobby 
-		if (lobby.runner_state_folder == $"profile-data/{WolfAPI.Profile.id}/{App.runner.name}")
+		if (App?.runner?.name is null || lobby.runner_state_folder == $"profile-data/{WolfAPI.Profile.id}/{App.runner.name}")
 			return true;
 
 		return false;
@@ -93,32 +78,12 @@ public partial class AppEntry : MarginContainer
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		AppProgress = GetNode<ProgressBar>("%ProgressBar");
-		AppLabel = GetNode<Label>("%AppName");
-		DownloadIcon = GetNode<Control>("%DownloadHint");
-		OKIcon = GetNode<Control>("%OkHint");
-		PlayingIcon = GetNode<Control>("%PlayingHint");
-		DisabledIndicator = GetNode<Control>("%DisabledIndicator");
-
-		AppMenu = GetNode<Control>("%AppMenu");
-		AppIcon = GetNode<TextureRect>("%AppIcon");
-
-		AppButton = GetNode<Button>("%AppButton");
-		MenuButtonStart = GetNode<Button>("%MenuButtonStart");
-		MenuButtonStop = GetNode<Button>("%MenuButtonStop");
-		MenuButtonCoop = GetNode<Button>("%MenuButtonCoop");
-		MenuButtonUpdate = GetNode<Button>("%MenuButtonUpdate");
-		MenuButtonCancle = GetNode<Button>("%MenuButtonCancle");
-
-		//MenuButtonStop.Visible = false;
-		//DisabledIndicator.Visible = false;
-
 		if (Engine.IsEditorHint())
 		{
 			return;
 		}
 
-		AppLabel.Text = App.title;
+		AppName.Text = App.title;
 		//DownloadIcon.Hide();
 		//AppProgress.Hide();
 		AppButton.Pressed += OnPressed;
@@ -160,12 +125,18 @@ public partial class AppEntry : MarginContainer
 	public override void _ExitTree()
 	{
 		base._ExitTree();
+
+		if (Engine.IsEditorHint())
+		{
+			return;
+		}
+
 		var appList = Main.Singleton.GetNode<AppList>("%AppList");
 		appList.LobbyCreatedEvent -= OnLobbyCreatedEvent;
 		appList.LobbyStoppedEvent -= OnLobbyStoppedEvent;
-    }
+	}
 
-	private void OnLobbyCreatedEvent(object caller, Resources.WolfAPI.Lobby lobby)
+	private void OnLobbyCreatedEvent(object? caller, Resources.WolfAPI.Lobby lobby)
 	{
 		if (!IsInstanceValid(this))
 			return;
@@ -176,7 +147,7 @@ public partial class AppEntry : MarginContainer
 		}
 	}
 
-	private void OnLobbyStoppedEvent(object caller, string lobby_id)
+	private void OnLobbyStoppedEvent(object? caller, string lobby_id)
 	{
 		if (!IsInstanceValid(this))
 			return;
@@ -191,7 +162,7 @@ public partial class AppEntry : MarginContainer
 	{
 		if (!IsInstanceValid(this))
 			return;
-		if (image != App.runner.image)
+		if (App?.runner?.image is null || image != App.runner.image)
 			return;
 
 		State = RunningLobby is null ? AppState.OK : AppState.PLAYING;
@@ -199,22 +170,22 @@ public partial class AppEntry : MarginContainer
 
 	private void OnImagePullProgress(string image, double progress)
 	{
-		if (image != App.runner.image)
+		if (App?.runner?.image is null || image != App.runner.image)
 			return;
 
-		if (!IsInstanceValid(AppProgress) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator))
+		if (!IsInstanceValid(ProgressBar) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator))
 			return;
 
 		State = AppState.DOWNLOADING;
 
-		if (!AppProgress.Visible || !AppButton.Disabled || !DisabledIndicator.Visible)
+		if (!ProgressBar.Visible || !AppButton.Disabled || !DisabledIndicator.Visible)
 		{
-			AppProgress.Visible = true;
+			ProgressBar.Visible = true;
 			AppButton.Disabled = true;
 			DisabledIndicator.Visible = true;
-		}				
+		}
 
-		AppProgress.Value = progress;
+		ProgressBar.Value = progress;
 	}
 
 	public override async void _Process(double delta)
@@ -248,7 +219,7 @@ public partial class AppEntry : MarginContainer
 			AppButton.GrabFocus();
 		}
 
-		if (App.runner.image is not null && State != AppState.DOWNLOADING)
+		if (App?.runner?.image is not null && State != AppState.DOWNLOADING)
 		{
 			IsImageOnDisc = await WolfAPI.IsImageOnDisk(App.runner.image);
 			State = IsImageOnDisc ? RunningLobby is null ? AppState.OK : AppState.PLAYING : AppState.NOTONDISK;
@@ -259,15 +230,15 @@ public partial class AppEntry : MarginContainer
 	{
 		if (State == AppState.OK)
 		{
-			DownloadIcon.Visible = false;
-			PlayingIcon.Visible = false;
-			OKIcon.Visible = true;
+			DownloadHint.Visible = false;
+			PlayingHint.Visible = false;
+			OkHint.Visible = true;
 
 			DisabledIndicator.Visible = false;
-			AppProgress.Visible = false;
+			ProgressBar.Visible = false;
 
 			AppButton.Disabled = false;
-			AppProgress.Value = 0;
+			ProgressBar.Value = 0;
 
 			MenuButtonStart.Text = "Start";
 			MenuButtonStop.Visible = false;
@@ -282,12 +253,12 @@ public partial class AppEntry : MarginContainer
 		}
 		else if (State == AppState.PLAYING)
 		{
-			DownloadIcon.Visible = false;
-			PlayingIcon.Visible = true;
-			OKIcon.Visible = false;
-			AppProgress.Value = 0;
+			DownloadHint.Visible = false;
+			PlayingHint.Visible = true;
+			OkHint.Visible = false;
+			ProgressBar.Value = 0;
 
-			if (!RunningLobby.multi_user)
+			if (RunningLobby is not null && !RunningLobby.multi_user)
 			{
 				MenuButtonStart.Text = "Connect";
 				MenuButtonStop.Visible = true;
@@ -309,10 +280,10 @@ public partial class AppEntry : MarginContainer
 		}
 		else if (State == AppState.NOTONDISK)
 		{
-			DownloadIcon.Visible = true;
-			PlayingIcon.Visible = false;
-			OKIcon.Visible = false;
-			AppProgress.Value = 0;
+			DownloadHint.Visible = true;
+			PlayingHint.Visible = false;
+			OkHint.Visible = false;
+			ProgressBar.Value = 0;
 
 			MenuButtonCoop.Disabled = true;
 			MenuButtonUpdate.Disabled = true;
@@ -322,11 +293,11 @@ public partial class AppEntry : MarginContainer
 		}
 		else if (State == AppState.DOWNLOADING)
 		{
-			DownloadIcon.Visible = true;
-			PlayingIcon.Visible = false;
-			OKIcon.Visible = false;
+			DownloadHint.Visible = true;
+			PlayingHint.Visible = false;
+			OkHint.Visible = false;
 
-			AppProgress.Visible = true;
+			ProgressBar.Visible = true;
 			AppButton.Disabled = true;
 			DisabledIndicator.Visible = true;
 		}
@@ -338,13 +309,13 @@ public partial class AppEntry : MarginContainer
 		MenuButtonStart.GrabFocus();
 	}
 
-	private string GetIconPath()
+	private string? GetIconPath()
 	{
 		string icon;
 		if (App.icon_png_path is null)
 		{
-            if (App.runner == null || !App.runner.image.Contains("ghcr.io/games-on-whales/"))
-                return null;
+			if (App?.runner?.image is null || !App.runner.image.Contains("ghcr.io/games-on-whales/"))
+				return null;
 
 			var name = App.runner.image.TrimPrefix("ghcr.io/games-on-whales/");
 			int idx = name.LastIndexOf(':');
@@ -364,6 +335,9 @@ public partial class AppEntry : MarginContainer
 	{
 		//TODO: check if user already has a open singleplayer lobby for the chosen app and if yes re-join.
 
+		if (App?.runner?.name is null)
+			return;
+
 		MenuButtonStart.Disabled = true;
 
 		if (!IsImageOnDisc)
@@ -379,7 +353,9 @@ public partial class AppEntry : MarginContainer
 		var lobby_id = lobby?.id;
 		if (lobby == null)
 		{
-			Session session = await WolfAPI.GetSession();
+			var session = await WolfAPI.GetSession();
+			if (session?.client_settings is null)
+				return;
 
 			lobby = new()
 			{
@@ -392,18 +368,18 @@ public partial class AppEntry : MarginContainer
 				runner = App.runner,
 				video_settings = new()
 				{
-					width = session.video_width,
-					height = session.video_height,
-					refresh_rate = session.video_refresh_rate,
+					width = session?.video_width ?? 1920,
+					height = session?.video_height ?? 1080,
+					refresh_rate = session?.video_refresh_rate ?? 60,
 					runner_render_node = App.render_node,
 					wayland_render_node = App.render_node,
 					video_producer_buffer_caps = System.Environment.GetEnvironmentVariable("WOLF_VIDEO_BUFFER_CAPS") ?? ""
 				},
 				audio_settings = new()
 				{
-					channel_count = session.audio_channel_count
+					channel_count = session?.audio_channel_count ?? 2
 				},
-				client_settings = session.client_settings
+				client_settings = session?.client_settings
 			};
 			lobby_id = await WolfAPI.CreateLobby(lobby);
 		}
@@ -413,8 +389,8 @@ public partial class AppEntry : MarginContainer
 
 		if (lobby_id is not null)
 		{
-			var response = await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id);
-			if (response.success == false)
+			var response = await WolfAPI.JoinLobby(lobby_id, WolfAPI.Session_id);
+			if (response?.success == false)
 			{
 				await QuestionDialogue.OpenDialogue<bool>("Lobby full", "The Lobby you tried joining is Full.", new Dictionary<string, bool>()
 				{
@@ -431,7 +407,7 @@ public partial class AppEntry : MarginContainer
 
 	private async void OnStopPressed()
 	{
-		if (RunningLobby is null)
+		if (RunningLobby is null || RunningLobby.id is null)
 			return;
 
 
@@ -451,9 +427,14 @@ public partial class AppEntry : MarginContainer
 
 	private async void OnCoopPressed()
 	{
+		if (App?.runner?.name is null)
+			return;
+
 		MenuButtonCoop.Disabled = true;
 
-		Session session = await WolfAPI.GetSession();
+		var session = await WolfAPI.GetSession();
+		if (session?.client_settings is null)
+			return;
 
 		Resources.WolfAPI.Lobby lobby = new()
 		{
@@ -466,18 +447,18 @@ public partial class AppEntry : MarginContainer
 			runner = App.runner,
 			video_settings = new()
 			{
-				width = session.video_width,
-				height = session.video_height,
-				refresh_rate = session.video_refresh_rate,
+				width = session?.video_width ?? 1920,
+				height = session?.video_height ?? 1080,
+				refresh_rate = session?.video_refresh_rate ?? 60,
 				runner_render_node = App.render_node,
 				wayland_render_node = App.render_node,
 				video_producer_buffer_caps = System.Environment.GetEnvironmentVariable("WOLF_VIDEO_BUFFER_CAPS") ?? ""
 			},
 			audio_settings = new()
 			{
-				channel_count = session.audio_channel_count
+				channel_count = session?.audio_channel_count ?? 2
 			},
-			client_settings = session.client_settings
+			client_settings = session?.client_settings
 		};
 
 		if (await QuestionDialogue.OpenDialogue("Pin", "Add Pin to Lobby?",
@@ -497,7 +478,7 @@ public partial class AppEntry : MarginContainer
 
 		var lobby_id = await WolfAPI.CreateLobby(lobby);
 		if (lobby_id is not null)
-			await WolfAPI.JoinLobby(lobby_id, WolfAPI.session_id, lobby.pin);
+			await WolfAPI.JoinLobby(lobby_id, WolfAPI.Session_id, lobby.pin);
 
 		MenuButtonCoop.Disabled = false;
 
@@ -510,6 +491,8 @@ public partial class AppEntry : MarginContainer
 	{
 		State = AppState.DOWNLOADING;
 		AppButton.GrabFocus();
+		if (App is null || App.runner is null || App.runner.image is null)
+			return;
 
 		WolfAPI.PullImage(App.runner.image);
 	}

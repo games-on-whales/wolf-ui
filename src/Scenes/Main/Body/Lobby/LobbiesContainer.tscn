@@ -1,14 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://dylvrnd6it8e6"]
+[gd_scene load_steps=2 format=3 uid="uid://dylvrnd6it8e6"]
 
 [ext_resource type="Script" uid="uid://ba5e67ap55vwb" path="res://Scenes/Main/Body/Lobby/LobbiesContainer.cs" id="1_4f5y8"]
-[ext_resource type="PackedScene" uid="uid://b8hqqrgs44qe1" path="res://Scenes/Main/Body/Lobby/Lobby.tscn" id="2_ira46"]
 
 [node name="LobbiesContainer" type="VBoxContainer"]
 offset_right = 951.0
 offset_bottom = 283.0
 size_flags_vertical = 3
 script = ExtResource("1_4f5y8")
-LobbyScene = ExtResource("2_ira46")
 
 [node name="LobbiesHeader" type="PanelContainer" parent="."]
 layout_mode = 2

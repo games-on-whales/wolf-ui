@@ -1,50 +1,27 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using System.Data;
+using WolfUI;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Sockets;
-using System.Runtime.Caching;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Net.Sockets;
 using System.Threading.Tasks;
-using WolfUI;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Resources.WolfAPI;
 
 [GlobalClass]
 public partial class WolfAPI : Resource
 {
-    private static readonly MemoryCache _cache = MemoryCache.Default;
-
-    private static CacheItemPolicy _cachePolicy
-    {
-        get
-        {
-            Random random = new();
-            var variance = random.NextDouble() * 50;
-
-            var cacheItemPolicy = new CacheItemPolicy()
-            {
-                //Set your Cache expiration.
-                AbsoluteExpiration = DateTime.Now.AddSeconds(45 + variance)
-            };
-            return cacheItemPolicy;
-        }
-    }
-
-    public event EventHandler<Lobby> LobbyCreatedEvent;
-    public event EventHandler<string> LobbyStoppedEvent;
+    public event EventHandler<Lobby>? LobbyCreatedEvent;
+    public event EventHandler<string>? LobbyStoppedEvent;
     private static readonly System.Net.Http.HttpClient _httpClient = new(new SocketsHttpHandler
     {
         ConnectCallback = async (context, token) =>
         {
-            string endpoint_path = System.Environment.GetEnvironmentVariable("WOLF_SOCKET_PATH");
-            endpoint_path ??= "/var/run/wolf/wolf.sock";
+            string endpoint_path = System.Environment.GetEnvironmentVariable("WOLF_SOCKET_PATH") ?? "/etc/wolf/cfg/wolf.sock";
             var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
             var endpoint = new UnixDomainSocketEndPoint(endpoint_path);
             await socket.ConnectAsync(endpoint);
@@ -53,10 +30,15 @@ public partial class WolfAPI : Resource
     });
     private static readonly ILogger<WolfAPI> Logger = WolfUI.Main.GetLogger<WolfAPI>();
     private static string SessionId = "";
-    public static string session_id { get { return SessionId; } }
+    public static string Session_id { get { return SessionId; } }
+
+#nullable disable
     public static Profile Profile = null;
-    private static bool StartedListening = false;
     private static WolfAPI _Singleton = null;
+#nullable enable
+
+    private static bool StartedListening = false;
+
     public static WolfAPI Singleton
     {
         get
@@ -71,8 +53,8 @@ public partial class WolfAPI : Resource
     }
     private WolfAPI()
     {
-        SessionId = System.Environment.GetEnvironmentVariable("WOLF_SESSION_ID");
-        if (session_id == null)
+        SessionId = System.Environment.GetEnvironmentVariable("WOLF_SESSION_ID") ?? "";
+        if (Session_id == "")
         {
             Logger.LogWarning("session_id not found!");
             SessionId = "123456789";
@@ -81,16 +63,15 @@ public partial class WolfAPI : Resource
         StartListenToAPIEvents();
     }
 
-    private record DockerPullImageEvent
+    private void InvokeEvent<T>(EventHandler<T>? handler, string json_args)
     {
-        public string image_name { get; set; }
-        public bool? success { get; set; }
-    }
-
-
-    private void InvokeEvent<T>(EventHandler<T> handler, string json_args)
-    {
-        handler?.Invoke(this, JsonSerializer.Deserialize<T>(json_args));
+        T? arg_obj = JsonSerializer.Deserialize<T>(json_args);
+        if (arg_obj is null)
+        {
+            Logger.LogError("{0} cant be Deserialized to {1}", json_args, typeof(T));
+            return;
+        }
+        handler?.Invoke(this, arg_obj);
     }
     private void FilterAPIEvents(string @event, string data)
     {
@@ -132,51 +113,24 @@ public partial class WolfAPI : Resource
         value(data);
     }
 
-    private static async Task<Image> LoadImageFromHttpResonse(HttpResponseMessage message)
-    {
-        string mediaType = message.Content.Headers.ContentType.MediaType;
-        if (mediaType is null)
-            return default;
-
-        Image image = new();
-        Error error = mediaType switch
-        {
-            "image/png" => image.LoadPngFromBuffer(await message.Content.ReadAsByteArrayAsync()),
-            _ => Error.FileUnrecognized
-        };
-
-        if (error == Error.FileUnrecognized)
-        {
-            throw new NotSupportedException($"No Load function for {mediaType} currently implemented");
-        }
-
-        if (error != Error.Ok)
-        {
-            throw new FileLoadException();
-        }
-
-        return image;
-    }
-
-    public static async Task<Texture2D> GetIcon(string icon_path, double h_cache_duration = 1.0, int retrys = 0)
+    public static async Task<Texture2D?> GetIcon(string icon_path, double h_cache_duration = 1.0, int retrys = 0)
     {
         if (retrys >= 5)
         {
             Logger.LogError("Failed Loading {0} 5 times, skipping", icon_path);
             return null;
         }
-        string user = System.Environment.GetEnvironmentVariable("USER");
-        user = (user == "root" || user == null) ? "retro" : user;
+        string user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
+        user = user == "root" ? "retro" : user;
 
         string filepath = $"/home/{user}/.wolf-ui/tmp/icons/{icon_path}.png";
 
-        Image image;
 
         if (File.Exists(filepath))
         {
             if (File.GetCreationTime(filepath).AddHours(h_cache_duration).CompareTo(DateTime.Now) >= 0)
             {
-                image = Image.LoadFromFile(filepath);
+                Image image = Image.LoadFromFile(filepath);
                 return ImageTexture.CreateFromImage(image);
             }
             else
@@ -194,28 +148,34 @@ public partial class WolfAPI : Resource
         }
         catch (HttpRequestException e)
         {
-            Logger.LogWarning("Icon {0} could not be accessed: {1} - {2} Retrying", icon_path, e.Message, e.InnerException.Message);
+            if(e.InnerException is not null)
+                Logger.LogWarning("Icon {0} could not be accessed: {1} - {2} Retrying", icon_path, e.Message, e.InnerException.Message);
+            else
+                Logger.LogWarning("Icon {0} could not be accessed: {1} Retrying", icon_path, e.Message);
             return await GetIcon(icon_path, h_cache_duration, retrys + 1);
         }
 
         if (message.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            try
+            Image image = new();
+            var error = await image.LoadImageFromHttpResonseMessage(message);
+            if (error != Error.Ok)
             {
-                image = await LoadImageFromHttpResonse(message);
-            }
-            catch (FileLoadException)
-            {
+                if (error == Error.FileUnrecognized)
+                {
+                    return null;
+                }
+
                 Logger.LogError("Icon {0} could not be decoded properly, Retrying", icon_path);
                 return await GetIcon(icon_path, h_cache_duration, retrys + 1);
             }
-            catch (NotSupportedException e)
+
+            var directoryPath = Path.GetDirectoryName(filepath);
+            if (directoryPath is not null)
             {
-                Logger.LogError(e.Message);
-                return null;
+                Directory.CreateDirectory(directoryPath);
+                image.SavePng(filepath);
             }
-            Directory.CreateDirectory(Path.GetDirectoryName(filepath));
-            image.SavePng(filepath);
             var texture = ImageTexture.CreateFromImage(image);
             return texture;
         }
@@ -223,89 +183,20 @@ public partial class WolfAPI : Resource
         return null;
     }
 
-    public static async Task<Texture2D> GetAppIcon(App app, double h_cache_duration = 1.0, int retrys = 0)
+    public static async Task<Texture2D?> GetAppIcon(App app)
     {
-        if (retrys >= 5)
-        {
-            Logger.LogError("Failed Loading {0} 5 times, skipping", app.icon_png_path);
+        if (app.icon_png_path is not null) // no image set, get default from github
+            return await GetIcon(app.icon_png_path);
+
+        if (app.runner == null || app.runner.image is null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
             return null;
-        }
 
-        string user = System.Environment.GetEnvironmentVariable("USER");
-        user = (user == "root" || user == null) ? "retro" : user;
+        var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/");//.TrimSuffix(":edge");
+        int idx = name.LastIndexOf(':');
+        if (idx >= 0)
+            name = name[..idx];
 
-        string address;
-        string filepath;
-        if (app.icon_png_path == null) // no image set, get default from github
-        {
-            if (app.runner == null || !app.runner.image.Contains("ghcr.io/games-on-whales/"))
-                return null;
-
-            var name = app.runner.image.TrimPrefix("ghcr.io/games-on-whales/");//.TrimSuffix(":edge");
-            int idx = name.LastIndexOf(':');
-            if (idx >= 0)
-                name = name[..idx];
-
-            address = $"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png";
-            filepath = $"/home/{user}/.wolf-ui/tmp/icons/{address}.png";
-        }
-        else
-        {
-            address = app.icon_png_path;
-            filepath = $"/home/{user}/.wolf-ui/tmp/icons/{app.icon_png_path}.png";
-        }
-        Image image;
-
-        if (File.Exists(filepath))
-        {
-            if (File.GetCreationTime(filepath).AddHours(h_cache_duration).CompareTo(DateTime.Now) >= 0)
-            {
-                image = Image.LoadFromFile(filepath);
-                return ImageTexture.CreateFromImage(image);
-            }
-            else
-            {
-                File.Delete(filepath);
-            }
-        }
-
-        Logger.LogInformation("Requesting icon for: {0}", app.title);
-
-        HttpResponseMessage message;
-        try
-        {
-            message = await _httpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={address}");
-        }
-        catch (HttpRequestException e)
-        {
-            Logger.LogWarning("Icon for {0} could not be accessed: {1} - {2} Retrying", app.title, e.Message, e.InnerException.Message);
-            return await GetAppIcon(app, h_cache_duration, retrys + 1);
-        }
-
-        if (message.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            try
-            {
-                image = await LoadImageFromHttpResonse(message);
-            }
-            catch (FileLoadException)
-            {
-                Logger.LogError("Icon for {0} could not be decoded properly, Retrying", app.title);
-                return await GetAppIcon(app, h_cache_duration, retrys + 1);
-            }
-            catch (NotSupportedException e)
-            {
-                Logger.LogError(e.Message);
-                return null;
-            }
-            Directory.CreateDirectory(Path.GetDirectoryName(filepath));
-            image.SavePng(filepath);
-            var texture = ImageTexture.CreateFromImage(image);
-            return texture;
-        }
-        Logger.LogError("Could not access image url: {0}: {1}", address, message.StatusCode);
-        return null;
-
+        return await GetIcon($"https://games-on-whales.github.io/wildlife/apps/{name}/assets/icon.png");
     }
     public async void StartListenToAPIEvents()
     {
@@ -394,11 +285,11 @@ public partial class WolfAPI : Resource
             var response = await _httpClient.GetAsync(cache_key);
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                _cache.Add(cache_key, "", _cachePolicy);
+                _cache.Add(cache_key, "", WolfAPICachePolicy);
                 return false;
             }
             var str = await response.Content.ReadAsStringAsync();
-            _cache.Add(cache_key, str, _cachePolicy);
+            _cache.Add(cache_key, str, WolfAPICachePolicy);
             return true;
         }
         catch (HttpRequestException e)
@@ -411,7 +302,7 @@ public partial class WolfAPI : Resource
     private sealed record PullImageResponse
     {
         public bool? success { get; set; }
-        public string layer_id { get; set; }
+        public string? layer_id { get; set; }
         public long current_progress { get; set; }
         public long total { get; set; }
     }
@@ -456,14 +347,20 @@ public partial class WolfAPI : Resource
             while (!reader.EndOfStream)
             {
                 var line = await reader.ReadLineAsync();
+                if (line is null)
+                    continue;
+
                 var parsed = JsonSerializer.Deserialize<PullImageResponse>(line);
+                if (parsed is null)
+                    continue;
+
 
                 if (parsed.success is not null && parsed.success == true)
                 {
                     string cache_key = $"http://localhost/api/v1/docker/images/inspect?image_name={image_name}";
                     if (_cache.Contains(cache_key))
                         _cache.Remove(cache_key);
-                    _cache.Add(cache_key, "exists", _cachePolicy);
+                    _cache.Add(cache_key, "exists", WolfAPICachePolicy);
 
                     if (hasDownloaded)
                         EmitSignalDefered_ImageUpdated(image_name);
@@ -475,6 +372,9 @@ public partial class WolfAPI : Resource
                 }
 
                 hasDownloaded = true;
+
+                if (parsed.layer_id is null)
+                    continue;
 
                 LayerSizes[parsed.layer_id] = new()
                 {
@@ -513,21 +413,22 @@ public partial class WolfAPI : Resource
 
         foreach (var profile in profiles)
         {
-            if (profile.id == used_profile.id)
-                return profile.apps;
+            if (profile.id is not null && used_profile.id is not null && profile.id == used_profile.id)
+                return profile.apps ?? [];
         }
-        Logger.LogError("Profile: {0} not found", used_profile.name);
+        Logger.LogError("Profile: {0} not found", used_profile.name ?? "NULL");
         return [];
     }
 
-    public static async Task<Apps> GetApps()
+    public static async Task<Apps?> GetApps()
     {
-        return await GetAsync<Apps>("http://localhost/api/v1/apps");
+        var ret = await GetAsync<Apps>("http://localhost/api/v1/apps");
+        return ret;
     }
 
     public static async Task<List<Profile>> GetProfiles()
     {
-        Profiles profiles = await GetAsync<Profiles>("http://localhost/api/v1/profiles");
+        var profiles = await GetAsync<Profiles>("http://localhost/api/v1/profiles");
 
         if (profiles is null || !profiles.success)
         {
@@ -535,14 +436,14 @@ public partial class WolfAPI : Resource
             return [];
         }
 
-        return profiles.profiles;
+        return profiles.profiles ?? [];
     }
     public static async Task<List<Client>> GetClients()
     {
-        Clients wolfClients = await GetAsync<Clients>("http://localhost/api/v1/clients");
+        var wolfClients = await GetAsync<Clients>("http://localhost/api/v1/clients");
 
         if (wolfClients?.success == true)
-            return wolfClients.clients;
+            return wolfClients.clients ?? [];
         return [];
     }
     public static async Task StartApp(Runner runner, bool joinable = false)
@@ -550,7 +451,7 @@ public partial class WolfAPI : Resource
         var starter = new Starter()
         {
             stop_stream_when_over = false,
-            session_id = session_id,
+            session_id = Session_id,
             runner = runner
         };
         var result = await PostAsync("http://localhost/api/v1/runners/start", starter);
@@ -581,25 +482,29 @@ public partial class WolfAPI : Resource
 
     public static async Task<List<Lobby>> GetLobbies()
     {
-        Lobbies lobbies = await GetAsync<Lobbies>("http://localhost/api/v1/lobbies");
+        var lobbies = await GetAsync<Lobbies>("http://localhost/api/v1/lobbies");
+        if (lobbies is null)
+            return [];
         if (lobbies?.success == true)
             return lobbies.lobbies ?? [];
         return [];
     }
-    public static async Task<Session> GetSession()
+    public static async Task<Session?> GetSession()
     {
         var sessions = await WolfAPI.GetAsync<Sessions>("http://localhost/api/v1/sessions");
-        Session curr_session = null;
-        foreach (var session in sessions?.sessions)
+        if (sessions is null || sessions.sessions is null)
+            return null;
+        Session? curr_session = null;
+        foreach (var session in sessions.sessions)
         {
-            if (session.client_id == session_id)
+            if (session.client_id == Session_id)
             {
                 curr_session = session;
                 break;
             }
         }
 
-        if (curr_session == null)
+        if (curr_session is null)
         {
             Logger.LogWarning("No owned Session found. Is this run without Wolf?");
 
@@ -624,16 +529,18 @@ public partial class WolfAPI : Resource
         A string containing the Lobbies ID.
         </returns>
     */
-    public static async Task<string> CreateLobby(Lobby lobby)
+    public static async Task<string?> CreateLobby(Lobby lobby)
     {
         var content = await PostAsync("http://localhost/api/v1/lobbies/create", lobby);
+        if (content is null)
+            return null;
         return JsonSerializer.Deserialize<LobbyCreatedResponse>(content)?.lobby_id;
     }
-    public static async Task<ErrorResponse> JoinLobby(string lobby_id, string session_id)
+    public static async Task<ErrorResponse?> JoinLobby(string lobby_id, string session_id)
     {
         return await JoinLobby(lobby_id, session_id, null);
     }
-    public static async Task<ErrorResponse> JoinLobby(string lobby_id, string session_id, List<int> pin)
+    public static async Task<ErrorResponse?> JoinLobby(string lobby_id, string session_id, List<int>? pin)
     {
         var lobbyobj = new LobbyJoin()
         {
@@ -643,6 +550,8 @@ public partial class WolfAPI : Resource
         };
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/join", lobbyobj);
+        if (result is null)
+            return null;
         return JsonSerializer.Deserialize<ErrorResponse>(result);
     }
     public static async Task LeaveLobby(string lobby_id, string session_id)
@@ -659,12 +568,12 @@ public partial class WolfAPI : Resource
     }
     private record StopLobbyRecord
     {
-        public string lobby_id { get; set; }
+        public required string lobby_id { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<int> pin { get; set; }
+        public List<int>? pin { get; set; }
     }
-    public static async Task StopLobby(string lobby_id, List<int> pin = null)
+    public static async Task StopLobby(string lobby_id, List<int>? pin = null)
     {
         var stop_lobby = new StopLobbyRecord()
         {
@@ -674,7 +583,7 @@ public partial class WolfAPI : Resource
 
         var result = await PostAsync("http://localhost/api/v1/lobbies/stop", stop_lobby);
     }
-    private static async Task<string> PostAsync<T>(string url, T obj)
+    private static async Task<string?> PostAsync<T>(string url, T obj)
     {
         try
         {
@@ -701,13 +610,20 @@ public partial class WolfAPI : Resource
         A object of choosen type containing the data returned by the API.
         </returns>
     */
-    public static async Task<T> GetAsync<T>(string url)
+    public static async Task<T?> GetAsync<T>(string url)
     {
         try
         {
             var result = await _httpClient.GetStringAsync(url);
             Logger.LogDebug("API call GET: {0} - {1}", url, result);
-            T data = JsonSerializer.Deserialize<T>(result);
+            T? data = JsonSerializer.Deserialize<T>(result);
+            if (data is null)
+            {
+                Logger.LogError("Could not Deserialize {0} to {1}", result, typeof(T));
+                return default;
+            }
+
+
             return data;
         }
         catch (Exception e)

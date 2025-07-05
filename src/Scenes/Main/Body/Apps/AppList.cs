@@ -11,11 +11,13 @@ namespace WolfUI;
 [GlobalClass]
 public partial class AppList : Control
 {
+#nullable disable
 	[Export]
 	GridContainer AppContainer;
+#nullable enable
     private static readonly ILogger<AppList> Logger = WolfUI.Main.GetLogger<AppList>();
-    public event EventHandler<Resources.WolfAPI.Lobby> LobbyCreatedEvent;
-    public event EventHandler<string> LobbyStoppedEvent;
+    public event EventHandler<Resources.WolfAPI.Lobby>? LobbyCreatedEvent;
+    public event EventHandler<string>? LobbyStoppedEvent;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -27,22 +29,25 @@ public partial class AppList : Control
 			return;
 		}
 
-		// Ensure at least one element is focused when switching to controller.
-		Main.Singleton.controllerMap.UsedControllerChanged += (controller) =>
+		if (Main.Singleton?.controllerMap is not null)
 		{
-			if (!Visible)
-				return;
-
-			var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
-			if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
+			// Ensure at least one element is focused when switching to controller.
+			Main.Singleton.controllerMap.UsedControllerChanged += (controller) =>
 			{
-				var ctrl = (AppEntry)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
-				ctrl?.GrabFocus();
-				if (ctrl is null)
-					GetNode<Control>("%OptionsButton").GrabFocus();
-			}
+				if (!Visible)
+					return;
 
-		};
+				var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
+				if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
+				{
+					var ctrl = (AppEntry?)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
+					ctrl?.GrabFocus();
+					if (ctrl is null)
+						GetNode<Control>("%OptionsButton").GrabFocus();
+				}
+
+			};
+		}
 
 		VisibilityChanged += RebuildAppList;
 		ThemeChanged += RebuildAppList;
@@ -64,7 +69,7 @@ public partial class AppList : Control
 			var lobbies = await WolfAPI.GetLobbies();
 			lobbies.ForEach(l => OnLobbyStarted(this, l));
 
-			var ctrl = (AppEntry)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
+			var ctrl = (AppEntry?)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
 			ctrl?.GrabFocus();
 			if (ctrl is null)
 				GetNode<Control>("%OptionsButton").GrabFocus();
@@ -74,7 +79,7 @@ public partial class AppList : Control
 		BackHint.Hide();
 	}
 
-	private void OnLobbyStopped(object caller, string lobby_id)
+	private void OnLobbyStopped(object? caller, string lobby_id)
 	{
 		if (!Visible)
 			return;
@@ -82,17 +87,18 @@ public partial class AppList : Control
 		LobbyStoppedEvent?.Invoke(this, lobby_id);
 	}
 
-	private void OnLobbyStarted(object sender, Resources.WolfAPI.Lobby lobby)
+	private void OnLobbyStarted(object? sender, Resources.WolfAPI.Lobby? lobby)
 	{
 		if (!Visible)
 			return;
 
-		if (lobby.profile_id == WolfAPI.Profile.id ||
-			lobby.started_by_profile_id == WolfAPI.Profile.id
+		if (lobby?.profile_id == WolfAPI.Profile.id ||
+			lobby?.started_by_profile_id == WolfAPI.Profile.id
 		)
 		{
+			if (lobby is null)
+				return;
 			LobbyCreatedEvent?.Invoke(this, lobby);
-			//EmitSignalSingleplayerLobbyStarted(lobbyJson);
 		}
 	}
 
@@ -144,19 +150,6 @@ public partial class AppList : Control
 				scroll.ScrollVertical = (int)scroll.GetChildren().Cast<Control>().First().Size.X;
 			};
 		});
-/*
-		int a = AppContainer.Columns - 1;
-		int b = idx + 1;
-		GD.Print(a, " - ", b);
-		AppContainer.GetChildren()[a..b].ToList().ForEach(child =>
-		{
-			GD.Print(child.Name);
-			child.GetNode<Button>("%AppButton").FocusEntered += () =>
-			{
-				scroll.ScrollVertical += AppContainer.GetThemeConstant("v_separation", "AppListGrid");
-			};
-		});
-*/
 	}
 
 	private void EditorMockupReady()
@@ -190,17 +183,7 @@ public partial class AppList : Control
 			int GridColumns = gridContainer.Columns;
 
 			gridContainer.AddChild(NewAppEntry);
-			/*
-						if (AppEntryCount < GridColumns)
-						{
-							NewAppEntry.FocusNeighborTop = GetNode<Button>("%OptionsButton").GetPath();
-						}
 
-						if (AppEntryCount >= GridColumns / 2 && AppEntryCount < GridColumns)
-						{
-							NewAppEntry.FocusNeighborTop = GetNode<Button>("%ExitButton").GetPath();
-						}
-			*/
 			if (AppEntryCount >= GridColumns)
 			{
 				AppEntry AboveAppEntry = gridContainer.GetChild<AppEntry>(AppEntryCount - GridColumns);

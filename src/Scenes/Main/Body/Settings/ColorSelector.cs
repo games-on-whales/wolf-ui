@@ -1,8 +1,8 @@
 using Godot;
+using Skerga.GodotNodeUtilGenerator;
 using System;
 using System.Runtime.InteropServices;
 
-[Tool]
 public partial class ColorSelector : MarginContainer
 {
     Button button;
@@ -32,7 +32,9 @@ public partial class ColorSelector : MarginContainer
 
     private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://dr7lejj7fdlux");
 
+#nullable disable
     private ColorSelector() { }
+#nullable enable
 
     public static ColorSelector Create()
     {

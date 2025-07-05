@@ -8,6 +8,7 @@ namespace WolfUI;
 [GlobalClass]
 public partial class SoundEffects : Node
 {
+#nullable disable
 	[Export]
 	AudioStream AcceptSound;
 	[Export]
@@ -15,7 +16,8 @@ public partial class SoundEffects : Node
 
 	private AudioStreamPlayer2D HoverSoundPlayer;
 	private AudioStreamPlayer2D AcceptSoundPlayer;
-	private HashSet<Button> hasSound;
+#nullable enable
+	private HashSet<Button> hasSound = [];
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()

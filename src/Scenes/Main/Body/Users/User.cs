@@ -1,43 +1,43 @@
 using Godot;
 using Resources.WolfAPI;
+using Skerga.GodotNodeUtilGenerator;
 
 namespace WolfUI;
 
-[Tool]
+[Tool][SceneAutoConfigure]
 public partial class User : Button
 {
     [Signal]
     private delegate void UserEnteredViewEventHandler();
     private bool WasInView = false;
+    public Profile profile;
 
-    public Profile profile = null;
-    private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://i2pa0j4ijr4s");
-    public static User Create(Profile profile)
+    public static User New(Profile profile)
     {
-        User user = SelfRef.Instantiate<User>();
-
-        user.profile = profile;
-        return user;
+        var obj = New();
+        obj.profile = profile;
+        return obj;
     }
-
+#nullable disable
     private User() { }
+#nullable enable
 
     public override void _Ready()
     {
-        GetNode<Label>("%Name").Text = Name;
+        NameLabel.Text = Name;
         if (profile != null)
         {
-            GetNode<Label>("%Name").Text = profile.name;
+            NameLabel.Text = profile.name;
         }
-        
-		if (Engine.IsEditorHint())
+
+        if (Engine.IsEditorHint())
         {
             return;
         }
 
         UserEnteredView += async () =>
         {
-            if(profile.icon_png_path != "")
+            if (profile?.icon_png_path is not null && profile.icon_png_path != "")
                 Icon = await WolfAPI.GetIcon(profile.icon_png_path);
         };
     }

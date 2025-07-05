@@ -1,11 +1,12 @@
 using Godot;
+using Skerga.GodotNodeUtilGenerator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace WolfUI;
 
-[Tool]
+[SceneAutoConfigure]
 public partial class Settings : Control
 {
     [Export]
@@ -24,14 +25,8 @@ public partial class Settings : Control
 
     //private readonly List<Node> InstanciatedNodes = [];
 
-    Control ProfileSettings;
-    Control AppSettings;
-
     public override void _Ready()
     {
-        ProfileSettings = GetNode<Control>("%ProfileSettings");
-        AppSettings = GetNode<Control>("%AppSettings");
-
         if (Engine.IsEditorHint())
         {
             ChildOrderChanged += EditorDynamicRebuild;

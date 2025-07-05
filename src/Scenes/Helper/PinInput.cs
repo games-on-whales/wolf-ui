@@ -41,7 +41,9 @@ public partial class PinInput : CenterContainer
         return ints;
     }
 
+#nullable disable
     private PinInput() { }
+#nullable enable
 
     private List<int> GetPinBlocking()
     {

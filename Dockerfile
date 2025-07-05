@@ -29,16 +29,15 @@ mv $HOME/.local/share/godot/export_templates/templates $HOME/.local/share/godot/
 
 _INSTALL_DOTNET
 
-WORKDIR /src
-COPY ./src .
+WORKDIR /project
+COPY ./src ./src
+COPY ./Skerga.GodotNodeUtilGenerator ./Skerga.GodotNodeUtilGenerator
+WORKDIR /project/src
 RUN <<_INSTALL_PACKAGES
 set -e
 
 mkdir ./bin
-dotnet add package System.Runtime.Caching --version 9.0.6
 Godot --headless --export-release "Linux" ./bin/wolf-ui
-ls -la ./bin
-
 
 test -f ./bin/wolf-ui
 test -d ./bin/data_Wolf-UI_linuxbsd_x86_64
@@ -59,7 +58,7 @@ ENV PUID=0 \
     PGID=0 \
     UNAME="root"
 
-COPY --from=builder /src/bin /usr/local/bin
+COPY --from=builder /project/src/bin /usr/local/bin
 COPY --chmod=777 scripts/startup.sh /opt/gow/startup-app.sh
 
 ENV XDG_RUNTIME_DIR=/tmp/.X11-unix

@@ -11,11 +11,10 @@ public partial class ExitButton : Button
         {
             Engine.PrintErrorMessages = false;
 
-		    string auto_update_env = System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE");
-		    bool AutoupdateEnable = auto_update_env is null || auto_update_env == "True";
+		    bool AutoupdateEnable = (System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE") ?? "False") == "True";
             if (AutoupdateEnable)
             {
-                WolfAPI.StopSession(WolfAPI.session_id);
+                WolfAPI.StopSession(WolfAPI.Session_id);
             }
 
             GetTree().Quit();

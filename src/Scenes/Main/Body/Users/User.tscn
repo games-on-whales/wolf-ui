@@ -38,7 +38,7 @@ theme_override_constants/margin_bottom = 25
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="Name" type="Label" parent="MarginContainer/PanelContainer"]
+[node name="NameLabel" type="Label" parent="MarginContainer/PanelContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "User"

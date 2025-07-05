@@ -1,28 +1,15 @@
 using Godot;
 using Resources.WolfAPI;
+using Skerga.GodotNodeUtilGenerator;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace WolfUI;
 
-[Tool]
+[Tool][SceneAutoConfigure]
 public partial class UserList : Control
 {
-	[Export]
-	Control AppMenu;//{ get { return GetNode<Control>(""); } }
-	private Container _UserContainer = null;
-	Container UserContainer
-	{
-		get
-		{
-			if (_UserContainer != null)
-				return _UserContainer;
-			_UserContainer = GetNode<Container>("%UserContainer");
-			return _UserContainer;
-		}
-	}
-
 	// Called when the node enters the scene tree for the first time.
 	public override async void _Ready()
 	{
@@ -58,7 +45,7 @@ public partial class UserList : Control
 			var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
 			if (focus is null && Main.Singleton.TopLayer.GetChildCount() <= 0)
 			{
-				var ctrl = (Control)UserContainer.GetChildren().ToList<Node>().Find(c => c is Control);
+				var ctrl = (Control?)UserContainer.GetChildren().ToList<Node>().Find(c => c is Control);
 				ctrl?.GrabFocus();
 			}
 		}
@@ -78,7 +65,7 @@ public partial class UserList : Control
 
 		foreach (var profile in profiles)
 		{
-			User userNode = User.Create(profile);
+			User userNode = User.New(profile);
 			userNode.Pressed += async () =>
 			{
 				if (profile.pin is not null)
@@ -100,7 +87,9 @@ public partial class UserList : Control
 				}
 
 				WolfAPI.Profile = profile;
-				AppMenu.Visible = true;
+
+				if(Main.Singleton.AppList is AppList appmenu)
+					appmenu.Visible = true;
 			};
 			UserContainer.AddChild(userNode);
 		}
@@ -127,7 +116,7 @@ public partial class UserList : Control
 		};
 		foreach(var usr in UserList)
 		{
-			User user = User.Create(usr);
+			User user = User.New(usr);
 			UserContainer.AddChild(user);
 		}
 	}

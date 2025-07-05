@@ -48,10 +48,12 @@ public partial class ControllerMap : Resource
         }
     }
 
+#nullable disable // Export Variables are Godots Job
     public ControllerMap()
     {
         Input.JoyConnectionChanged += JoyConnectionChanged;
     }
+#nullable enable
 
     private void JoyConnectionChanged(long deviceID, bool connected)
     {

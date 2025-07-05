@@ -2,11 +2,13 @@
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolf-UI", "Wolf-UI.csproj", "{E9455476-9CD9-4E6F-93F1-2DA7DD77A8B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skerga.GodotNodeUtilGenerator", "..\Skerga.GodotNodeUtilGenerator\Skerga.GodotNodeUtilGenerator.csproj", "{79792EDF-85E9-40F8-9C90-FA63355E0E15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-	Debug|Any CPU = Debug|Any CPU
-	ExportDebug|Any CPU = ExportDebug|Any CPU
-	ExportRelease|Any CPU = ExportRelease|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E9455476-9CD9-4E6F-93F1-2DA7DD77A8B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -15,5 +17,11 @@ Global
 		{E9455476-9CD9-4E6F-93F1-2DA7DD77A8B7}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{E9455476-9CD9-4E6F-93F1-2DA7DD77A8B7}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{E9455476-9CD9-4E6F-93F1-2DA7DD77A8B7}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{79792EDF-85E9-40F8-9C90-FA63355E0E15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79792EDF-85E9-40F8-9C90-FA63355E0E15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79792EDF-85E9-40F8-9C90-FA63355E0E15}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79792EDF-85E9-40F8-9C90-FA63355E0E15}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{79792EDF-85E9-40F8-9C90-FA63355E0E15}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{79792EDF-85E9-40F8-9C90-FA63355E0E15}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

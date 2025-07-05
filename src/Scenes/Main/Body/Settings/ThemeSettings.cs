@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-[Tool]
 public partial class ThemeSettings : Control
 {
     private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bf1rpu61x753h");
+#nullable disable
     private ThemeSettings() { }
+#nullable enable
     private DynamicTheme ModifyableTheme;
     public static ThemeSettings Create()
     {

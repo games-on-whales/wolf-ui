@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,15 +17,17 @@ public partial class QuestionDialogue : CenterContainer
     [Export]
     Control ButtonContainer;
     private readonly static PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bnq13qdhpc2km");
+#nullable disable
     private QuestionDialogue() { }
+#nullable enable
     private ScrollContainer scrollContainer;
 
-    Dictionary<string, Func<bool>> Keybinds;
+    Dictionary<string, Func<bool>>? Keybinds;
 
     [Signal]
     private delegate void KeybindPressedEventHandler(string ChoiceKey);
 
-    public static async Task<T> OpenDialogue<T>(string Title, string Content, Dictionary<string, T> Choices, Dictionary<string, Func<bool>> Keybinds = null)
+    public static async Task<T> OpenDialogue<T>(string Title, string Content, Dictionary<string, T> Choices, Dictionary<string, Func<bool>>? Keybinds = null)
     {
         if (Choices.Count <= 0)
             throw new ArgumentException("Dialogue requires at least one Choice");
@@ -39,7 +42,7 @@ public partial class QuestionDialogue : CenterContainer
 
         Main.Singleton.TopLayer.CallDeferred(Node.MethodName.AddChild, dialogue);
 
-        T Answer = default(T);
+        T? Answer = default(T);
         CancellationTokenSource Cancellation = new();
 
         if (Keybinds is not null)
@@ -76,7 +79,7 @@ public partial class QuestionDialogue : CenterContainer
         if (IsInstanceValid(FocusOwner))
             FocusOwner?.GrabFocus();
 
-        return Answer;
+        return Answer ?? Choices[Choices.Keys.Last()];
     }
 
     public override void _Process(double delta)

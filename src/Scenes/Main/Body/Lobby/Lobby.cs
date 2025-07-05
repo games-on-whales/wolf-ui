@@ -2,96 +2,96 @@ using Godot;
 using Resources.WolfAPI;
 using System.Collections.Generic;
 using System.Linq;
+using Skerga.GodotNodeUtilGenerator;
 
 //TODO Add User counter, Add check if Lobby is empty on Stop and if not ask again.
 namespace WolfUI;
 
+[Tool][SceneAutoConfigure]
 public partial class Lobby : Control
 {
     [Signal]
     private delegate void LobbyEnteredViewEventHandler();
     private bool WasInView = false;
-
-    [Export]
-    Label AppNameLabel;
-    public string AppName;
-    [Export]
-    Label CreatorNameLabel;
-    public string CreatorName;
-    [Export]
-    Control MenuControl;
-    [Export]
-    Button LobbyMainButton;
-    [Export]
-    Button JoinButton;
-    [Export]
-    Button StopButton;
-    [Export]
-    Button CloseButton;
-    private WolfAPI wolfAPI;
+    public string AppName = string.Empty;
+    public string CreatorName = string.Empty;
     public Resources.WolfAPI.Lobby LobbySettings;
+#nullable disable
+    private Lobby(){}
+#nullable enable
+    public static Lobby New(Resources.WolfAPI.Lobby lobby)
+    {
+        var obj = New();
+        obj.LobbySettings = lobby;
+        if (lobby?.id is null || lobby?.name is null)
+            return obj;
+
+        obj.Name = lobby.id;
+        obj.AppName = lobby.name;
+        return obj;
+    }
+
     public override void _Ready()
     {
-        if (AppNameLabel != null)
-        {
-            AppNameLabel.Text = AppName;
-        }
-        if (CreatorNameLabel != null)
-        {
-            CreatorNameLabel.Text = CreatorName;
-        }
-        if (LobbyMainButton != null)
-        {
-            LobbyMainButton.Pressed += OpenLobbySubMenu;
-            LobbyMainButton.FocusEntered += () => MenuControl?.Hide();
-        }
-        if (CloseButton != null)
-        {
-            CloseButton.Pressed += () => LobbyMainButton.GrabFocus();
-        }
-        if (JoinButton != null)
-        {
-            JoinButton.Pressed += JoinLobby;
-        }
-        if (StopButton != null)
-        {
-            StopButton.Pressed += StopLobby;
-        }
+        if (Engine.IsEditorHint())
+            return;
 
-        MenuControl?.Hide();
+        AppNameLabel.Text = AppName;
+        CreatorNameLabel.Text = CreatorName;
+
+        LobbyMainButton.Pressed += OpenLobbySubMenu;
+        LobbyMainButton.FocusEntered += () => LobbyMenu?.Hide();
+
+        CloseButton.Pressed += LobbyMainButton.GrabFocus;
+        JoinButton.Pressed += JoinLobby;
+        StopButton.Pressed += StopLobby;
+
+        LobbyMenu?.Hide();
 
         LobbyEnteredView += async () =>
         {
-            if(LobbySettings.icon_png_path is not null && LobbySettings.icon_png_path != "")
+            if (LobbySettings.icon_png_path is not null && LobbySettings.icon_png_path != "")
                 LobbyMainButton.Icon = await WolfAPI.GetIcon(LobbySettings.icon_png_path);
         };
     }
 
     public override void _Process(double delta)
     {
-		if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%UserList").GetGlobalRect()).HasArea())
-        {
-            EmitSignalLobbyEnteredView();
-            WasInView = true;
-        }
+        if (Engine.IsEditorHint())
+            return;
+
+
+        if (!WasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%UserList").GetGlobalRect()).HasArea())
+            {
+                EmitSignalLobbyEnteredView();
+                WasInView = true;
+            }
     }
 
     private void OpenLobbySubMenu()
     {
-        MenuControl.Visible = true;
+        LobbyMenu.Visible = true;
         JoinButton.GrabFocus();
     }
 
     private async void JoinLobby()
     {
-        List<int> pin = null;
+        List<int>? pin = null;
 
         if (LobbySettings.pin_required)
         {
             pin = await PinInput.RequestPin();
         }
 
-        await WolfAPI.JoinLobby(Name, WolfAPI.session_id, pin);
+        var error = await WolfAPI.JoinLobby(Name, WolfAPI.Session_id, pin);
+        if (error is not null && error.success == false)
+        {
+            GD.Print(error.error);
+            await QuestionDialogue.OpenDialogue<bool>($"{error.error}", $"Could not Join Lobby:\n{error.error}.", new Dictionary<string, bool>()
+            {
+                {"OK", true}
+            });
+        }
     }
 
     private async void StopLobby()
@@ -104,10 +104,10 @@ public partial class Lobby : Control
         var lobbies = await WolfAPI.GetLobbies();
         var lobby = lobbies.Find(lobby => lobby.id == LobbySettings.id);
 
-        if (owner.pin is not null && !lobby.pin_required)
+        if (lobby is not null && owner?.pin is not null && !lobby.pin_required)
         {
             var focus = GetViewport().GuiGetFocusOwner();
-            await QuestionDialogue.OpenDialogue<bool>(
+            _ = await QuestionDialogue.OpenDialogue<bool>(
                 "Pin required",
                 "Please enter the Profiles access Pin",
                 new Dictionary<string, bool>
@@ -129,10 +129,10 @@ public partial class Lobby : Control
             }
             await WolfAPI.StopLobby(Name);
         }
-        else if (lobby.pin_required)
+        else if (lobby is not null && lobby.pin_required)
         {
             var focus = GetViewport().GuiGetFocusOwner();
-            await QuestionDialogue.OpenDialogue<bool>(
+            _ = await QuestionDialogue.OpenDialogue<bool>(
                 "Pin required",
                 "Please enter the Lobby Pin",
                 new Dictionary<string, bool>
