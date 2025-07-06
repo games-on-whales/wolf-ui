@@ -71,7 +71,6 @@ public partial class QuestionDialogue : CenterContainer
 
             dialogue.ButtonContainer.AddChild(b);
         }
-        dialogue.ButtonContainer.GetChild<Button>(0).GrabFocus();
 
         await Task.Run(() => { Cancellation.Token.WaitHandle.WaitOne(); });
 
@@ -112,6 +111,7 @@ public partial class QuestionDialogue : CenterContainer
 
     public override void _Ready()
     {
+        ButtonContainer.GetChild<Button>(0).GrabFocus();
         scrollContainer = GetNode<ScrollContainer>("%ScrollContainer");
 
         if (Engine.IsEditorHint())

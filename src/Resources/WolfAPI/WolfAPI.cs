@@ -626,12 +626,12 @@ public partial class WolfApi : Resource
         var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
         Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
     }
-    private record StopLobbyRecord
+    private class StopLobbyRecord
     {
-        [JsonPropertyName("lobby_id")]
+        [JsonInclude, JsonPropertyName("lobby_id")]
         public required string LobbyId { get; set; }
 
-        [JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonInclude, JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<int>? Pin { get; set; }
     }
     public static async Task StopLobby(string lobbyId, List<int>? pin = null)
@@ -650,6 +650,7 @@ public partial class WolfApi : Resource
         try
         {
             var data = JsonSerializer.Serialize(obj, JsonOptions);
+            if(data == "{}") Logger.LogError("Type {0}, has no JsonIncludeAttribute set!", obj.GetType());
             Logger.LogDebug("API call POST: {0} - {1}", url, data);
             StringContent content = new(data);
             var result = await _httpClient.PostAsync(url, content);
