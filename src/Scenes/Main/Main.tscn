@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://cnrk2pyyp3r1p" path="res://Scenes/Main/Header/OptionsButton.cs" id="7_qdkat"]
 [ext_resource type="Script" uid="uid://c4tkdw88qp173" path="res://Scenes/Main/Header/ExitButton.cs" id="8_qdkat"]
 [ext_resource type="PackedScene" uid="uid://dn04imsbhqte8" path="res://Scenes/Main/Body/Users/UserList.tscn" id="10_hcu3t"]
-[ext_resource type="Script" uid="uid://dcscvb3d1pva5" path="res://Scenes/Main/SoundEffects.cs" id="10_ykwdk"]
+[ext_resource type="Script" uid="uid://dcscvb3d1pva5" path="res://Misc/SoundEffects.cs" id="10_ykwdk"]
 [ext_resource type="AudioStream" uid="uid://c7e7c53qiijki" path="res://Audio/click.ogg" id="11_ecuro"]
 [ext_resource type="PackedScene" uid="uid://b4qkc5ost514t" path="res://Scenes/Main/Body/Apps/AppList.tscn" id="11_epx8f"]
 [ext_resource type="AudioStream" uid="uid://csnwuih5mmn5g" path="res://Audio/accept.ogg" id="11_hdjvh"]
@@ -19,7 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://0tdw5ixm6l7n" path="res://Icons/Controller/Directional_Arrow_Vertical.png" id="13_xggvw"]
 [ext_resource type="Texture2D" uid="uid://bo4v5wbplyq46" path="res://Icons/Controller/Keyboard/Keyboard_Black_Backspace_Alt.png" id="14_epx8f"]
 [ext_resource type="Texture2D" uid="uid://dru6vbmje5lxu" path="res://Icons/Controller/Keyboard/Keyboard_Black_Esc.png" id="14_hcu3t"]
-[ext_resource type="Script" uid="uid://d4ip3lrbe4d5p" path="res://Scenes/Main/PopupViewportContainer.cs" id="15_hcu3t"]
+[ext_resource type="Script" uid="uid://d4ip3lrbe4d5p" path="res://Misc/PopupViewportContainer.cs" id="15_hcu3t"]
 
 [node name="Main" type="Control"]
 layout_mode = 3

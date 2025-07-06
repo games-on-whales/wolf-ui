@@ -32,9 +32,7 @@ public partial class App : MarginContainer
 	//private Resources.WolfAPI.AppEntry _appEntry;
 	private static readonly ILogger<WolfApi> Logger = Main.GetLogger<WolfApi>();
 	private bool _isImageOnDisc = true;
-
-	//private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://chspw2lt1qcuc");
-
+	
 #nullable disable
 	private App() { }
 #nullable enable
@@ -114,7 +112,7 @@ public partial class App : MarginContainer
 
 		AppEnteredView += async () =>
 		{
-			AppIcon.Texture = await WolfApi.GetAppIcon(this);
+			AppIcon.Texture = await WolfApi.GetIcon(this);
 		};
 	}
 

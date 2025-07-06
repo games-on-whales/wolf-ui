@@ -3,17 +3,14 @@ using Resources.WolfAPI;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Skerga.GodotNodeUtilGenerator;
+using WolfUI.Misc;
 
 namespace WolfUI;
 
-[Tool]
-[GlobalClass]
+[Tool, GlobalClass, SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class AppList : Control
 {
-#nullable disable
-	[Export]
-	GridContainer AppContainer;
-#nullable enable
     private static readonly ILogger<AppList> Logger = WolfUI.Main.GetLogger<AppList>();
     public event EventHandler<Resources.WolfAPI.Lobby>? LobbyCreatedEvent;
     public event EventHandler<string>? LobbyStoppedEvent;
@@ -27,7 +24,7 @@ public partial class AppList : Control
 			EditorMockupReady();
 			return;
 		}
-
+		
 		if (Main.Singleton?.controllerMap is not null)
 		{
 			// Ensure at least one element is focused when switching to controller.
@@ -39,10 +36,10 @@ public partial class AppList : Control
 				var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
 				if (focus is not null || Main.Singleton.TopLayer.GetChildCount() > 0) 
 					return;
-				var ctrl = (App?)AppContainer.GetChildren().ToList<Node>().Find(c => c is App);
+				var ctrl = (App?)AppGrid.GetChildren().ToList<Node>().Find(c => c is App);
 				ctrl?.GrabFocus();
 				if (ctrl is null)
-					GetNode<Control>("%OptionsButton").GrabFocus();
+					Main.Singleton.OptionsButton.GrabFocus();
 
 			};
 		}
@@ -56,33 +53,32 @@ public partial class AppList : Control
 
 	private async void RebuildAppList()
 	{
-		Control BackHint = GetNode<Control>("%BackHint");
-		if (Visible)
+		if (!Visible)
 		{
-			AppContainer.Columns = Math.Min(6, Math.Max(1, AppContainer.GetThemeConstant("columns", "AppListGrid")));
-
-			BackHint.Visible = true;
-			await LoadAppList();
-
-			var lobbies = await WolfApi.GetLobbies();
-			lobbies.ForEach(l => OnLobbyStarted(this, l));
-
-			var ctrl = (App?)AppContainer.GetChildren().ToList<Node>().Find(c => c is App);
-			ctrl?.GrabFocus();
-			if (ctrl is null)
-				GetNode<Control>("%OptionsButton").GrabFocus();
-
+			Main.Singleton.BackHint.Hide();
 			return;
 		}
-		BackHint.Hide();
+
+		AppGrid.Columns = AppGrid.GetThemeConstant("columns", "AppListGrid").Between(1, 6);
+		Main.Singleton.BackHint.Visible = true;
+		await LoadAppList();
+
+		var lobbies = await WolfApi.GetLobbies();
+		lobbies.ForEach(l => OnLobbyStarted(this, l));
+
+		var ctrl = (App?)AppGrid.GetChildren().ToList<Node>().Find(c => c is App);
+		ctrl?.GrabFocus();
+		if (ctrl is null)
+			Main.Singleton.OptionsButton.GrabFocus();
+
 	}
 
-	private void OnLobbyStopped(object? caller, string lobby_id)
+	private void OnLobbyStopped(object? caller, string lobbyId)
 	{
 		if (!Visible)
 			return;
 
-		LobbyStoppedEvent?.Invoke(this, lobby_id);
+		LobbyStoppedEvent?.Invoke(this, lobbyId);
 	}
 
 	private void OnLobbyStarted(object? sender, Resources.WolfAPI.Lobby? lobby)
@@ -90,14 +86,11 @@ public partial class AppList : Control
 		if (!Visible)
 			return;
 
-		if (lobby?.ProfileId == WolfApi.Profile.Id ||
-			lobby?.StartedByProfileId == WolfApi.Profile.Id
-		)
-		{
-			if (lobby is null)
-				return;
-			LobbyCreatedEvent?.Invoke(this, lobby);
-		}
+		if (lobby?.ProfileId != WolfApi.Profile.Id &&
+		    lobby?.StartedByProfileId != WolfApi.Profile.Id) return;
+		if (lobby is null)
+			return;
+		LobbyCreatedEvent?.Invoke(this, lobby);
 	}
 
 	public override void _Process(double delta)
@@ -107,63 +100,60 @@ public partial class AppList : Control
 			return;
 		}
 
-		if (Input.IsActionJustPressed("ui_select"))
+		if (Input.IsActionJustPressed("ui_select") && Main.Singleton.UserList is Control userList)
 		{
-			GetNode<Control>("%UserList").Visible = true;
+			userList.Visible = false;
 		}
-
 	}
 
-	public async Task LoadAppList()
+	private async Task LoadAppList()
 	{
-		GetNode<Control>("%OptionsButton").Visible = true;
-		GetNode<Label>("%HeaderLabel").Text = "Select Application";
+		Main.Singleton.OptionsButton.Visible = true;
+		Main.Singleton.HeaderLabel.Text = "Select Application";
 
-		foreach (var child in AppContainer.GetChildren())
+		foreach (var child in AppGrid.GetChildren())
 			child.QueueFree();
-
-		int i = 1;
-		foreach (var app in await WolfApi.GetApps(WolfApi.Profile))
+		
+		var enumerator = (await WolfApi.GetApps(WolfApi.Profile))
+			.Select((value, i) => (value, i));
+		
+		foreach (var vi in enumerator)
 		{
-			//AppEntry entry = AppEntry.Create(app);
-			app.Name = $"App {i}";
-			AddAppEntry(app);
-			i++;
+			vi.value.Name = $"App {vi.i}";
+			AddAppEntry(vi.value);
 		}
-
-		ScrollContainer scroll = GetNode<ScrollContainer>("%AppScrollContainer");
-		AppContainer.GetChildren()[..AppContainer.Columns].ToList().ForEach(child =>
+		
+		AppGrid.GetChildren()[..AppGrid.Columns].OfType<App>().ToList().ForEach(child =>
 		{
-			child.GetNode<Button>("%AppButton").FocusEntered += () =>
+			child.AppButton.FocusEntered += () =>
 			{
-				scroll.ScrollVertical = 0;
+				AppScrollContainer.ScrollVertical = 0;
 			};
 		});
-		int remainder = AppContainer.GetChildCount() % AppContainer.Columns;
-		int idx = AppContainer.GetChildCount() - (remainder == 0 ? AppContainer.Columns : remainder);
-		AppContainer.GetChildren()[idx..].ToList().ForEach(child =>
+		var remainder = AppGrid.GetChildCount() % AppGrid.Columns;
+		var idx = AppGrid.GetChildCount() - (remainder == 0 ? AppGrid.Columns : remainder);
+		AppGrid.GetChildren()[idx..].OfType<App>().ToList().ForEach(child =>
 		{
-			child.GetNode<Button>("%AppButton").FocusEntered += () =>
+			child.AppButton.FocusEntered += () =>
 			{
-				scroll.ScrollVertical = (int)scroll.GetChildren().Cast<Control>().First().Size.X;
+				AppScrollContainer.ScrollVertical = (int)AppScrollContainer.GetChildren().Cast<Control>().First().Size.X;
 			};
 		});
 	}
 
 	private void EditorMockupReady()
 	{
-		AppContainer.Columns = Math.Min(6, Math.Max(1, AppContainer.GetThemeConstant("columns", "AppListGrid")));
-		foreach (var child in AppContainer.GetChildren())
+		
+		AppGrid.Columns = AppGrid.GetThemeConstant("columns", "AppListGrid").Between(1, 6);
+		foreach (var child in AppGrid.GetChildren())
 			child.QueueFree();
 
 		var scene = ResourceLoader.Load<PackedScene>("uid://chspw2lt1qcuc");
 		for (var i = 0; i < 6; i++)
 		{
-			for (var j = 0; j < AppContainer.Columns; j++)
+			for (var j = 0; j < AppGrid.Columns; j++)
 			{
-				
-				
-				AppContainer.AddChild(scene.Instantiate());
+				AppGrid.AddChild(scene.Instantiate());
 			}
 		}
 	}
@@ -178,26 +168,19 @@ public partial class AppList : Control
 
 	private void AddAppEntry(App newApp)
 	{
-		if (AppContainer is GridContainer gridContainer)
-		{
-			int AppEntryCount = gridContainer.GetChildCount();
-			int GridColumns = gridContainer.Columns;
+		if (AppGrid is not { } gridContainer) return;
+		var appEntryCount = gridContainer.GetChildCount();
+		var gridColumns = gridContainer.Columns;
 
-			gridContainer.AddChild(newApp);
+		gridContainer.AddChild(newApp);
 
-			if (AppEntryCount >= GridColumns)
-			{
-				App aboveApp = gridContainer.GetChild<App>(AppEntryCount - GridColumns);
-				newApp.FocusNeighborTop = aboveApp.GetFocusPath();
+		if (appEntryCount < gridColumns) return;
+		var aboveApp = gridContainer.GetChild<App>(appEntryCount - gridColumns);
+		newApp.FocusNeighborTop = aboveApp.GetFocusPath();
 
-				if (AppEntryCount % GridColumns == 0)
-				{
-					App app = gridContainer.GetChild<App>(AppEntryCount - 1);
-					app.FocusNeighborRight = gridContainer.GetChild<App>(-1).GetFocusPath();
-					gridContainer.GetChild<App>(-1).FocusNeighborLeft = app.GetFocusPath();
-				}
-
-			}
-		}
+		if (appEntryCount % gridColumns != 0) return;
+		var app = gridContainer.GetChild<App>(appEntryCount - 1);
+		app.FocusNeighborRight = gridContainer.GetChild<App>(-1).GetFocusPath();
+		gridContainer.GetChild<App>(-1).FocusNeighborLeft = app.GetFocusPath();
 	}
 }

@@ -13,7 +13,7 @@ size_flags_horizontal = 6
 size_flags_vertical = 3
 mouse_filter = 1
 script = ExtResource("1_wixkc")
-AppContainer = NodePath("AppScrollContainer/MarginContainer/GridContainer")
+AppContainer = NodePath("AppScrollContainer/MarginContainer/AppGrid")
 
 [node name="AppScrollContainer" type="ScrollContainer" parent="."]
 unique_name_in_owner = true
@@ -34,7 +34,8 @@ size_flags_vertical = 3
 theme_override_constants/margin_top = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="GridContainer" type="GridContainer" parent="AppScrollContainer/MarginContainer"]
+[node name="AppGrid" type="GridContainer" parent="AppScrollContainer/MarginContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 2

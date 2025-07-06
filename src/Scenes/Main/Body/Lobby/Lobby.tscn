@@ -1,21 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://b8hqqrgs44qe1"]
+[gd_scene load_steps=5 format=3 uid="uid://b8hqqrgs44qe1"]
 
 [ext_resource type="Script" uid="uid://btyr21nbgvoog" path="res://Scenes/Main/Body/Lobby/Lobby.cs" id="1_3xjn5"]
 [ext_resource type="Texture2D" uid="uid://ccvjhrr7m5vxe" path="res://Scenes/Main/Body/Lobby/icon.png.png" id="2_np18r"]
+[ext_resource type="Texture2D" uid="uid://cgbtl2q1omo44" path="res://Icons/UI/group-of-people-svgrepo-com.svg" id="3_vfn8t"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3xjn5"]
 
 [node name="Lobby" type="Control"]
-custom_minimum_size = Vector2(180, 250)
+custom_minimum_size = Vector2(200, 265)
 layout_mode = 3
-anchor_left = 0.429688
-anchor_top = 0.326389
-anchor_right = 0.570312
-anchor_bottom = 0.673611
-offset_left = 90.0
-offset_top = 125.0
-offset_right = -90.0
-offset_bottom = -125.0
+anchor_left = 0.421875
+anchor_top = 0.315972
+anchor_right = 0.578125
+anchor_bottom = 0.684028
+offset_top = 1.52588e-05
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_3xjn5")
@@ -28,16 +26,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 2
-theme_override_constants/margin_top = 2
-theme_override_constants/margin_right = 2
-theme_override_constants/margin_bottom = 2
 
 [node name="LobbyMainButton" type="Button" parent="MarginContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 240)
 layout_mode = 2
 icon = ExtResource("2_np18r")
+icon_alignment = 1
 expand_icon = true
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/LobbyMainButton"]
@@ -47,7 +42,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_top = 15
+theme_override_constants/margin_top = 30
 theme_override_constants/margin_bottom = 15
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/LobbyMainButton/MarginContainer"]
@@ -56,6 +51,7 @@ layout_mode = 2
 [node name="AppNameLabel" type="Label" parent="MarginContainer/LobbyMainButton/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/outline_size = 3
 text = "Lobby"
 horizontal_alignment = 1
@@ -63,6 +59,7 @@ horizontal_alignment = 1
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/LobbyMainButton/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 1
 theme_override_constants/separation = 8
 theme_override_styles/separator = SubResource("StyleBoxEmpty_3xjn5")
 
@@ -79,6 +76,37 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/outline_size = 3
 text = "Creator"
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/LobbyMainButton"]
+layout_mode = 1
+offset_right = 53.0
+offset_bottom = 43.0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/LobbyMainButton/MarginContainer2"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/LobbyMainButton/MarginContainer2/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("3_vfn8t")
+expand_mode = 2
+stretch_mode = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/LobbyMainButton/MarginContainer2/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = -4
+
+[node name="PlayerCountLabel" type="Label" parent="MarginContainer/LobbyMainButton/MarginContainer2/HBoxContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/outline_size = 2
+text = "0"
 
 [node name="LobbyMenu" type="MarginContainer" parent="."]
 unique_name_in_owner = true

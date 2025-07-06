@@ -6,7 +6,7 @@ using System.Text;
 
 namespace WolfUI;
 
-[GlobalClass][SceneAutoConfigure(GenerateNewMethod = false)]
+[GlobalClass, SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class Main : Control
 {
 	[Export]
@@ -51,22 +51,6 @@ public partial class Main : Control
 		SelfUpdateAsync();
 
 		Logger.LogInformation("This session's id: {0}", WolfApi.SessionId);
-
-		var stream = File.OpenRead("/home/sebastian/Dokumente/Godot Projekte/wolf-ui/src/Scenes/Main/Body/Lobby/Lobby.tscn");
-		var reader = new StreamReader(stream);
-		var builder = new StringBuilder();
-		while (!reader.EndOfStream)
-		{
-			var line = await reader.ReadLineAsync();
-			if (line is null)
-				continue;
-
-			builder.Append(line);
-			builder.AppendLine();
-		}
-		var text = builder.ToString();
-
-		Scenes.Main.SceneFile scene = new(text);
 	}
 
 	public override void _EnterTree()

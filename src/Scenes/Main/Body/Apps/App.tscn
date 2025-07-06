@@ -8,12 +8,14 @@
 
 [node name="App" type="MarginContainer"]
 custom_minimum_size = Vector2(200, 295)
-offset_right = 208.0
-offset_bottom = 295.0
+anchors_preset = -1
+anchor_right = 0.1625
+anchor_bottom = 0.409722
 size_flags_horizontal = 6
 size_flags_vertical = 6
 theme_type_variation = &"AppCard"
 script = ExtResource("1_u3jln")
+metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2

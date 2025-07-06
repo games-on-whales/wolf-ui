@@ -8,14 +8,14 @@ public interface ILoggerFactory
 {
 	public enum LogLevelEnum { NONE, ERROR, WARN, INFO, DEBUG }
 	public void SetLogLevel(LogLevelEnum logLevel);
-	public abstract static ILoggerFactory Create();
+	public static abstract ILoggerFactory Create();
 	public ILogger<T> CreateLogger<T>();
 }
 
 public sealed class LoggerFactory : ILoggerFactory
 {
-    readonly System.Type Implemetnation = typeof(MyTempLogger<>);
-	private ILoggerFactory.LogLevelEnum logLevel = ILoggerFactory.LogLevelEnum.INFO;
+	private readonly Type _implementation = typeof(MyTempLogger<>);
+	private ILoggerFactory.LogLevelEnum _logLevel = ILoggerFactory.LogLevelEnum.INFO;
 
 	private LoggerFactory()
 	{
@@ -24,7 +24,7 @@ public sealed class LoggerFactory : ILoggerFactory
 
 	public void SetLogLevel(ILoggerFactory.LogLevelEnum logLevel)
 	{
-		this.logLevel = logLevel;
+		this._logLevel = logLevel;
 	}
 
 	public static ILoggerFactory Create()
@@ -34,10 +34,10 @@ public sealed class LoggerFactory : ILoggerFactory
 
 	public ILogger<T> CreateLogger<T>()
 	{
-		var a = Implemetnation.MakeGenericType(typeof(T));
-		var logger_obj = Activator.CreateInstance(a);
-        var logger = logger_obj as ILogger<T> ?? throw new TypeAccessException("Logger creation failed");
-        logger.SetLogLevel(logLevel);
+		var a = _implementation.MakeGenericType(typeof(T));
+		var loggerObj = Activator.CreateInstance(a);
+        var logger = loggerObj as ILogger<T> ?? throw new TypeAccessException("Logger creation failed");
+        logger.SetLogLevel(_logLevel);
 		return logger;
 	}
 }
@@ -53,25 +53,25 @@ public interface ILogger<T>
 
 public sealed class MyTempLogger<T> : ILogger<T>
 {
-	private ILoggerFactory.LogLevelEnum logLevel = ILoggerFactory.LogLevelEnum.INFO;
+	private ILoggerFactory.LogLevelEnum _logLevel = ILoggerFactory.LogLevelEnum.INFO;
 	public void SetLogLevel(ILoggerFactory.LogLevelEnum logLevel)
 	{
-		this.logLevel = logLevel;
+		this._logLevel = logLevel;
 	}
 
-	private Action<string> Writer = Console.Write;//GD.Print;
+	private readonly Action<string> _writer = Console.Write;//GD.Print;
 
 	private void Write(string text, string level, params object[] args)
 	{
-		string Msg = String.Format(new CultureInfo("en-US"), text, args);
-		Writer($"{DateTime.Now} ");
-		Writer(level);
-		Writer($": {typeof(T).FullName} {Msg}\n");
+		var msg = string.Format(new CultureInfo("en-US"), text, args);
+		_writer($"{DateTime.Now} ");
+		_writer(level);
+		_writer($": {typeof(T).FullName} {msg}\n");
 	}
 
 	public void LogDebug(string text, params object[] args)
 	{
-		if (logLevel < ILoggerFactory.LogLevelEnum.DEBUG)
+		if (_logLevel < ILoggerFactory.LogLevelEnum.DEBUG)
 			return;
 
 		Write(text, $"{(char)0x1b}[1;40;35mdebug{(char)0x1b}[0m", args);
@@ -79,7 +79,7 @@ public sealed class MyTempLogger<T> : ILogger<T>
 
 	public void LogError(string text, params object[] args)
 	{
-		if (logLevel < ILoggerFactory.LogLevelEnum.ERROR)
+		if (_logLevel < ILoggerFactory.LogLevelEnum.ERROR)
 			return;
 
 		Write(text, $"{(char)0x1b}[1;40;31merror{(char)0x1b}[0m", args);
@@ -87,7 +87,7 @@ public sealed class MyTempLogger<T> : ILogger<T>
 
 	public void LogInformation(string text, params object[] args)
 	{
-		if (logLevel < ILoggerFactory.LogLevelEnum.INFO)
+		if (_logLevel < ILoggerFactory.LogLevelEnum.INFO)
 			return;
 
 		Write(text, $"{(char)0x1b}[1;40;32minfo{(char)0x1b}[0m", args);
@@ -95,7 +95,7 @@ public sealed class MyTempLogger<T> : ILogger<T>
 
 	public void LogWarning(string text, params object[] args)
 	{
-		if (logLevel < ILoggerFactory.LogLevelEnum.WARN)
+		if (_logLevel < ILoggerFactory.LogLevelEnum.WARN)
 			return;
 
 		Write(text, $"{(char)0x1b}[1;40;33mwarn{(char)0x1b}[0m", args);
@@ -104,13 +104,13 @@ public sealed class MyTempLogger<T> : ILogger<T>
 
 public partial class Main
 {
-	private readonly static ILoggerFactory factory;
+	private static readonly ILoggerFactory Factory;
 	private static readonly ILogger<Main> Logger;
 
 #nullable disable
 	static Main()
 	{
-		var str_to_enum = new Dictionary<string, ILoggerFactory.LogLevelEnum>
+		var strToEnum = new Dictionary<string, ILoggerFactory.LogLevelEnum>
 		{
 			{ "NONE", ILoggerFactory.LogLevelEnum.NONE},
 			{ "ERROR", ILoggerFactory.LogLevelEnum.ERROR},
@@ -120,22 +120,19 @@ public partial class Main
 			{ "INFO", ILoggerFactory.LogLevelEnum.INFO},
 			{ "DEBUG", ILoggerFactory.LogLevelEnum.DEBUG}
 		};
-		var log_level_env = System.Environment.GetEnvironmentVariable("LOGLEVEL") ?? "INFO";
-		if (!str_to_enum.TryGetValue(log_level_env.ToUpper(), out var logLevel))
-		{
-			logLevel = ILoggerFactory.LogLevelEnum.INFO;
-		}
+		var logLevelEnv = Environment.GetEnvironmentVariable("LOGLEVEL") ?? "INFO";
+		var logLevel = strToEnum.GetValueOrDefault(logLevelEnv.ToUpper(), ILoggerFactory.LogLevelEnum.INFO);
 
-		factory = LoggerFactory.Create();
+		Factory = LoggerFactory.Create();
 
-		factory.SetLogLevel(logLevel);
-		Logger = factory.CreateLogger<Main>();
+		Factory.SetLogLevel(logLevel);
+		Logger = Factory.CreateLogger<Main>();
 		Logger.LogInformation("Wolf-UI started.");
 	}
 
 	public static ILogger<T> GetLogger<T>()
 	{
-		return factory.CreateLogger<T>();
+		return Factory.CreateLogger<T>();
 	}
 #nullable enable
 }

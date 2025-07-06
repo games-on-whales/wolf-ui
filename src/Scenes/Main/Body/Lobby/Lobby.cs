@@ -7,7 +7,7 @@ using Skerga.GodotNodeUtilGenerator;
 //TODO Add User counter, Add check if Lobby is empty on Stop and if not ask again.
 namespace WolfUI;
 
-[Tool][SceneAutoConfigure]
+[Tool, SceneAutoConfigure]
 public partial class Lobby : Control
 {
     [Signal]
@@ -43,6 +43,8 @@ public partial class Lobby : Control
         StopButton.Pressed += StopLobby;
 
         LobbyMenu?.Hide();
+
+        PlayerCountLabel.Text = "1";
 
         LobbyEnteredView += async () =>
         {

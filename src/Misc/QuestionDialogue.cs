@@ -4,81 +4,74 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Skerga.GodotNodeUtilGenerator;
 
 namespace WolfUI;
 
-[Tool]
+[Tool, SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class QuestionDialogue : CenterContainer
 {
-    [Export]
-    Label TitleLabel;
-    [Export]
-    Label ContentLabel;
-    [Export]
-    Control ButtonContainer;
-    private readonly static PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bnq13qdhpc2km");
+    private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bnq13qdhpc2km");
 #nullable disable
     private QuestionDialogue() { }
 #nullable enable
-    private ScrollContainer scrollContainer;
 
-    Dictionary<string, Func<bool>>? Keybinds;
+    private Dictionary<string, Func<bool>>? _keybinds;
 
     [Signal]
-    private delegate void KeybindPressedEventHandler(string ChoiceKey);
+    private delegate void KeybindPressedEventHandler(string choiceKey);
 
-    public static async Task<T> OpenDialogue<T>(string Title, string Content, Dictionary<string, T> Choices, Dictionary<string, Func<bool>>? Keybinds = null)
+    public static async Task<T> OpenDialogue<T>(string title, string content, Dictionary<string, T> choices, Dictionary<string, Func<bool>>? keybinds = null)
     {
-        if (Choices.Count <= 0)
+        if (choices.Count <= 0)
             throw new ArgumentException("Dialogue requires at least one Choice");
 
-        //Save current Focus, so focus can restored after
-        Control FocusOwner = Main.Singleton.GetViewport().GuiGetFocusOwner();
+        //Save current Focus, so focus can be restored after
+        var focusOwner = Main.Singleton.GetViewport().GuiGetFocusOwner();
 
-        QuestionDialogue dialogue = SelfRef.Instantiate<QuestionDialogue>();
-        dialogue.TitleLabel.Text = Title;
-        dialogue.ContentLabel.Text = Content;
-        dialogue.Keybinds = Keybinds;
+        var dialogue = SelfRef.Instantiate<QuestionDialogue>();
+        dialogue.TitleLabel.Text = title;
+        dialogue.ContentLabel.Text = content;
+        dialogue._keybinds = keybinds;
 
         Main.Singleton.TopLayer.CallDeferred(Node.MethodName.AddChild, dialogue);
 
-        T? Answer = default(T);
-        CancellationTokenSource Cancellation = new();
+        var answer = default(T);
+        CancellationTokenSource cancellation = new();
 
-        if (Keybinds is not null)
+        if (keybinds is not null)
         {
             dialogue.KeybindPressed += (key) =>
             {
-                Answer = Choices[key];
-                Cancellation.Cancel();
+                answer = choices[key];
+                cancellation.Cancel();
             };
         }
 
-        foreach (KeyValuePair<string, T> kv in Choices)
+        foreach (var (key, capturedAnswer) in choices)
         {
             //GD.Print($"k:{kv.Key} v:{kv.Value}");
-            T CapuredAnswer = kv.Value;
             Button b = new()
             {
-                Text = kv.Key,
+                Text = key,
                 SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
             b.Pressed += () =>
             {
-                Answer = CapuredAnswer;
-                Cancellation.Cancel();
+                answer = capturedAnswer;
+                cancellation.Cancel();
             };
 
             dialogue.ButtonContainer.AddChild(b);
         }
 
-        await Task.Run(() => { Cancellation.Token.WaitHandle.WaitOne(); });
+        await Task.Run(() => { cancellation.Token.WaitHandle.WaitOne(); });
 
         dialogue.QueueFree();
-        if (IsInstanceValid(FocusOwner))
-            FocusOwner?.GrabFocus();
+        if (IsInstanceValid(focusOwner))
+            focusOwner.GrabFocus();
 
-        return Answer ?? Choices[Choices.Keys.Last()];
+        return answer ?? choices[choices.Keys.Last()];
     }
 
     public override void _Process(double delta)
@@ -90,30 +83,24 @@ public partial class QuestionDialogue : CenterContainer
 
         if (Input.IsActionPressed("ui_text_scroll_up"))
         {
-            scrollContainer.ScrollVertical -= (int)(10.0 * Input.GetActionStrength("ui_text_scroll_up"));
+            ScrollContainer.ScrollVertical -= (int)(10.0 * Input.GetActionStrength("ui_text_scroll_up"));
         }
         if (Input.IsActionPressed("ui_text_scroll_down"))
         {
-            scrollContainer.ScrollVertical += (int)(10.0 * Input.GetActionStrength("ui_text_scroll_down"));
+            ScrollContainer.ScrollVertical += (int)(10.0 * Input.GetActionStrength("ui_text_scroll_down"));
         }
 
-        if (Keybinds is null)
+        if (_keybinds is null)
             return;
 
-        foreach (var kv in Keybinds)
+        foreach (var kv in _keybinds.Where(kv => kv.Value()))
         {
-            if (kv.Value())
-            {
-                EmitSignalKeybindPressed(kv.Key);
-            }
+            EmitSignalKeybindPressed(kv.Key);
         }
     }
 
     public override void _Ready()
     {
-        ButtonContainer.GetChild<Button>(0).GrabFocus();
-        scrollContainer = GetNode<ScrollContainer>("%ScrollContainer");
-
         if (Engine.IsEditorHint())
         {
             TitleLabel.Text = "QuestionDialogue";
@@ -124,7 +111,8 @@ public partial class QuestionDialogue : CenterContainer
                 SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
             ButtonContainer.AddChild(b);
-            return;
         }
+        
+        ButtonContainer.GetChild<Button>(0).GrabFocus();
     }
 }
