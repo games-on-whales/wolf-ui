@@ -39,7 +39,7 @@ public partial class AppList : Control
 				var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
 				if (focus is not null || Main.Singleton.TopLayer.GetChildCount() > 0) 
 					return;
-				var ctrl = (AppEntry?)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
+				var ctrl = (App?)AppContainer.GetChildren().ToList<Node>().Find(c => c is App);
 				ctrl?.GrabFocus();
 				if (ctrl is null)
 					GetNode<Control>("%OptionsButton").GrabFocus();
@@ -50,8 +50,8 @@ public partial class AppList : Control
 		VisibilityChanged += RebuildAppList;
 		ThemeChanged += RebuildAppList;
 
-		WolfAPI.Singleton.LobbyCreatedEvent += OnLobbyStarted;
-		WolfAPI.Singleton.LobbyStoppedEvent += OnLobbyStopped;
+		WolfApi.Singleton.LobbyCreatedEvent += OnLobbyStarted;
+		WolfApi.Singleton.LobbyStoppedEvent += OnLobbyStopped;
 	}
 
 	private async void RebuildAppList()
@@ -64,10 +64,10 @@ public partial class AppList : Control
 			BackHint.Visible = true;
 			await LoadAppList();
 
-			var lobbies = await WolfAPI.GetLobbies();
+			var lobbies = await WolfApi.GetLobbies();
 			lobbies.ForEach(l => OnLobbyStarted(this, l));
 
-			var ctrl = (AppEntry?)AppContainer.GetChildren().ToList<Node>().Find(c => c is AppEntry);
+			var ctrl = (App?)AppContainer.GetChildren().ToList<Node>().Find(c => c is App);
 			ctrl?.GrabFocus();
 			if (ctrl is null)
 				GetNode<Control>("%OptionsButton").GrabFocus();
@@ -90,8 +90,8 @@ public partial class AppList : Control
 		if (!Visible)
 			return;
 
-		if (lobby?.profile_id == WolfAPI.Profile.id ||
-			lobby?.started_by_profile_id == WolfAPI.Profile.id
+		if (lobby?.ProfileId == WolfApi.Profile.Id ||
+			lobby?.StartedByProfileId == WolfApi.Profile.Id
 		)
 		{
 			if (lobby is null)
@@ -123,11 +123,11 @@ public partial class AppList : Control
 			child.QueueFree();
 
 		int i = 1;
-		foreach (var app in await WolfAPI.GetApps(WolfAPI.Profile))
+		foreach (var app in await WolfApi.GetApps(WolfApi.Profile))
 		{
-			AppEntry entry = AppEntry.Create(app);
-			entry.Name = $"App {i}";
-			AddAppEntry(entry);
+			//AppEntry entry = AppEntry.Create(app);
+			app.Name = $"App {i}";
+			AddAppEntry(app);
 			i++;
 		}
 
@@ -156,11 +156,14 @@ public partial class AppList : Control
 		foreach (var child in AppContainer.GetChildren())
 			child.QueueFree();
 
-		for (int i = 0; i < 6; i++)
+		var scene = ResourceLoader.Load<PackedScene>("uid://chspw2lt1qcuc");
+		for (var i = 0; i < 6; i++)
 		{
-			for (int j = 0; j < AppContainer.Columns; j++)
+			for (var j = 0; j < AppContainer.Columns; j++)
 			{
-				AppContainer.AddChild(AppEntry.Create(new()));
+				
+				
+				AppContainer.AddChild(scene.Instantiate());
 			}
 		}
 	}
@@ -173,25 +176,25 @@ public partial class AppList : Control
 		};
 	}
 
-	private void AddAppEntry(AppEntry NewAppEntry)
+	private void AddAppEntry(App newApp)
 	{
 		if (AppContainer is GridContainer gridContainer)
 		{
 			int AppEntryCount = gridContainer.GetChildCount();
 			int GridColumns = gridContainer.Columns;
 
-			gridContainer.AddChild(NewAppEntry);
+			gridContainer.AddChild(newApp);
 
 			if (AppEntryCount >= GridColumns)
 			{
-				AppEntry AboveAppEntry = gridContainer.GetChild<AppEntry>(AppEntryCount - GridColumns);
-				NewAppEntry.FocusNeighborTop = AboveAppEntry.GetFocusPath();
+				App aboveApp = gridContainer.GetChild<App>(AppEntryCount - GridColumns);
+				newApp.FocusNeighborTop = aboveApp.GetFocusPath();
 
 				if (AppEntryCount % GridColumns == 0)
 				{
-					AppEntry AppEntry = gridContainer.GetChild<AppEntry>(AppEntryCount - 1);
-					AppEntry.FocusNeighborRight = gridContainer.GetChild<AppEntry>(-1).GetFocusPath();
-					gridContainer.GetChild<AppEntry>(-1).FocusNeighborLeft = AppEntry.GetFocusPath();
+					App app = gridContainer.GetChild<App>(AppEntryCount - 1);
+					app.FocusNeighborRight = gridContainer.GetChild<App>(-1).GetFocusPath();
+					gridContainer.GetChild<App>(-1).FocusNeighborLeft = app.GetFocusPath();
 				}
 
 			}

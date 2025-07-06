@@ -13,7 +13,7 @@ public partial class ExitButton : Button
 		    bool AutoupdateEnable = (System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE") ?? "False") == "True";
             if (AutoupdateEnable)
             {
-                WolfAPI.StopSession(WolfAPI.Session_id);
+                WolfApi.StopSession(WolfApi.SessionId);
             }
 
             GetTree().Quit();

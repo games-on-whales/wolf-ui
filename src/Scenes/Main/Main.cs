@@ -46,11 +46,11 @@ public partial class Main : Control
 
 		AddChild(time);
 
-		WolfAPI.Init();
+		WolfApi.Init();
 
 		SelfUpdateAsync();
 
-		Logger.LogInformation("This session's id: {0}", WolfAPI.Session_id);
+		Logger.LogInformation("This session's id: {0}", WolfApi.SessionId);
 
 		var stream = File.OpenRead("/home/sebastian/Dokumente/Godot Projekte/wolf-ui/src/Scenes/Main/Body/Lobby/Lobby.tscn");
 		var reader = new StreamReader(stream);

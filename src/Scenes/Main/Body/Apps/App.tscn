@@ -1,19 +1,19 @@
 [gd_scene load_steps=6 format=3 uid="uid://chspw2lt1qcuc"]
 
-[ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/Body/Apps/AppEntry.cs" id="1_pyonv"]
-[ext_resource type="Texture2D" uid="uid://wpxb54l4wult" path="res://Icons/UI/download-2-circle-svgrepo-com.svg" id="3_h5jnb"]
-[ext_resource type="Script" uid="uid://dy3vko5i4jvi3" path="res://Scenes/Main/Body/Apps/ThemedSVG.cs" id="4_0urjt"]
-[ext_resource type="Texture2D" uid="uid://d1uaf1ivwb32x" path="res://Icons/UI/play-circle-svgrepo-com.svg" id="5_tte3r"]
-[ext_resource type="Texture2D" uid="uid://cmj2w8tadwl8f" path="res://Icons/UI/check-circle-svgrepo-com.svg" id="6_lnekl"]
+[ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/Body/Apps/App.cs" id="1_u3jln"]
+[ext_resource type="Texture2D" uid="uid://wpxb54l4wult" path="res://Icons/UI/download-2-circle-svgrepo-com.svg" id="2_is3or"]
+[ext_resource type="Script" uid="uid://dy3vko5i4jvi3" path="res://Scenes/Main/Body/Apps/ThemedSVG.cs" id="3_8t7no"]
+[ext_resource type="Texture2D" uid="uid://d1uaf1ivwb32x" path="res://Icons/UI/play-circle-svgrepo-com.svg" id="4_nooyg"]
+[ext_resource type="Texture2D" uid="uid://cmj2w8tadwl8f" path="res://Icons/UI/check-circle-svgrepo-com.svg" id="5_2ceq8"]
 
-[node name="AppEntry" type="MarginContainer"]
+[node name="App" type="MarginContainer"]
 custom_minimum_size = Vector2(200, 295)
 offset_right = 208.0
 offset_bottom = 295.0
 size_flags_horizontal = 6
 size_flags_vertical = 6
 theme_type_variation = &"AppCard"
-script = ExtResource("1_pyonv")
+script = ExtResource("1_u3jln")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
@@ -123,9 +123,9 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
 theme_type_variation = &"AppCardStatusIconDownload"
-texture = ExtResource("3_h5jnb")
+texture = ExtResource("2_is3or")
 expand_mode = 4
-script = ExtResource("4_0urjt")
+script = ExtResource("3_8t7no")
 
 [node name="PlayingHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
 unique_name_in_owner = true
@@ -137,9 +137,9 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
 theme_type_variation = &"AppCardStatusIconPlaying"
-texture = ExtResource("5_tte3r")
+texture = ExtResource("4_nooyg")
 expand_mode = 4
-script = ExtResource("4_0urjt")
+script = ExtResource("3_8t7no")
 
 [node name="OkHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
 unique_name_in_owner = true
@@ -150,9 +150,9 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
 theme_type_variation = &"AppCardStatusIconOk"
-texture = ExtResource("6_lnekl")
+texture = ExtResource("5_2ceq8")
 expand_mode = 4
-script = ExtResource("4_0urjt")
+script = ExtResource("3_8t7no")
 
 [node name="AppMenu" type="CenterContainer" parent="HBoxContainer/AppButton"]
 unique_name_in_owner = true

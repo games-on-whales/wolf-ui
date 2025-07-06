@@ -14,7 +14,7 @@ public partial class User : Button
 
     public static User New(Profile profile)
     {
-        var obj = New();
+        var obj = Create();
         obj.profile = profile;
         return obj;
     }
@@ -27,7 +27,7 @@ public partial class User : Button
         NameLabel.Text = Name;
         if (profile != null)
         {
-            NameLabel.Text = profile.name;
+            NameLabel.Text = profile.Name;
         }
 
         if (Engine.IsEditorHint())
@@ -37,8 +37,8 @@ public partial class User : Button
 
         UserEnteredView += async () =>
         {
-            if (profile?.icon_png_path is not null && profile.icon_png_path != "")
-                Icon = await WolfAPI.GetIcon(profile.icon_png_path);
+            if (profile?.IconPngPath is not null && profile.IconPngPath != "")
+                Icon = await WolfApi.GetIcon(profile.IconPngPath);
         };
     }
 

@@ -131,7 +131,7 @@ namespace Skerga.GodotNodeUtilGenerator
 
         var NewMethodSourceCode = $$"""
         private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("{{scene.Uid}}");
-        public static {{symbol.Name}} New()
+        public static {{symbol.Name}} Create()
         {
             {{symbol.Name}} obj = SelfRef.Instantiate<{{symbol.Name}}>();
             return obj;

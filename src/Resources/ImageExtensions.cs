@@ -11,16 +11,16 @@ public static class ImageExtensions
 
     public static async Task<Error> LoadImageFromHttpResonseMessage(this Image image, HttpResponseMessage message)
     {
-        if (message.Content.Headers.ContentType is null || message.Content.Headers.ContentType?.MediaType is null)
+        if (message.Content.Headers.ContentType?.MediaType is null)
         {
             return Error.DoesNotExist;
         }
 
-        string mediaType = message.Content.Headers.ContentType.MediaType;
+        var mediaType = message.Content.Headers.ContentType.MediaType;
         if (mediaType is null)
             return default;
 
-        Error error = mediaType switch
+        var error = mediaType switch
         {
             "image/png" => image.LoadPngFromBuffer(await message.Content.ReadAsByteArrayAsync()),
             _ => Error.FileUnrecognized

@@ -12,22 +12,21 @@ public partial class Lobby : Control
 {
     [Signal]
     private delegate void LobbyEnteredViewEventHandler();
-    private bool WasInView = false;
-    public string AppName = string.Empty;
-    public string CreatorName = string.Empty;
-    public Resources.WolfAPI.Lobby LobbySettings;
+    private bool _wasInView;
+    private Resources.WolfAPI.Lobby _lobby;
 #nullable disable
     private Lobby(){}
 #nullable enable
     public static Lobby New(Resources.WolfAPI.Lobby lobby)
     {
-        var obj = New();
-        obj.LobbySettings = lobby;
-        if (lobby?.id is null || lobby?.name is null)
+        var obj = Create();
+        obj._lobby = lobby;
+        if (lobby.Id is null || lobby.Name is null)
             return obj;
 
-        obj.Name = lobby.id;
-        obj.AppName = lobby.name;
+        obj.Name = lobby.Id;
+        obj.AppNameLabel.Text = lobby.Name;
+        obj.CreatorNameLabel.Text = lobby.ProfileId ?? lobby.StartedByProfileId ?? "";
         return obj;
     }
 
@@ -35,10 +34,7 @@ public partial class Lobby : Control
     {
         if (Engine.IsEditorHint())
             return;
-
-        AppNameLabel.Text = AppName;
-        CreatorNameLabel.Text = CreatorName;
-
+        
         LobbyMainButton.Pressed += OpenLobbySubMenu;
         LobbyMainButton.FocusEntered += () => LobbyMenu?.Hide();
 
@@ -50,8 +46,8 @@ public partial class Lobby : Control
 
         LobbyEnteredView += async () =>
         {
-            if (LobbySettings.icon_png_path is not null && LobbySettings.icon_png_path != "")
-                LobbyMainButton.Icon = await WolfAPI.GetIcon(LobbySettings.icon_png_path);
+            if (_lobby.IconPngPath is not null && _lobby.IconPngPath != "")
+                LobbyMainButton.Icon = await WolfApi.GetIcon(_lobby.IconPngPath);
         };
     }
 
@@ -60,12 +56,10 @@ public partial class Lobby : Control
         if (Engine.IsEditorHint())
             return;
 
-        UserList list = (UserList)Main.Singleton.UserList;
-        if (!WasInView && GetGlobalRect().Intersection(list.GetGlobalRect()).HasArea())
-            {
-                EmitSignalLobbyEnteredView();
-                WasInView = true;
-            }
+        var list = (UserList)Main.Singleton.UserList;
+        if (_wasInView || !GetGlobalRect().Intersection(list.GetGlobalRect()).HasArea()) return;
+        EmitSignalLobbyEnteredView();
+        _wasInView = true;
     }
 
     private void OpenLobbySubMenu()
@@ -78,46 +72,44 @@ public partial class Lobby : Control
     {
         List<int>? pin = null;
 
-        if (LobbySettings.isPinLocked)
+        if (_lobby.IsPinLocked)
         {
             pin = await PinInput.RequestPin();
         }
 
-        var error = await WolfAPI.JoinLobby(Name, WolfAPI.Session_id, pin);
-        if (error is not null && error.success == false)
+        var error = await WolfApi.JoinLobby(Name, WolfApi.SessionId, pin);
+        if (error is null || error.Success) return;
+        GD.Print(error.Error);
+        await QuestionDialogue.OpenDialogue($"{error.Error}", $"Could not Join Lobby:\n{error.Error}.", new Dictionary<string, bool>()
         {
-            GD.Print(error.error);
-            await QuestionDialogue.OpenDialogue<bool>($"{error.error}", $"Could not Join Lobby:\n{error.error}.", new Dictionary<string, bool>()
-            {
-                {"OK", true}
-            });
-        }
+            {"OK", true}
+        });
     }
 
     private async void StopLobby()
     {
-        var profiles = await WolfAPI.GetProfiles();
-        var owner = profiles.FindAll(profile => profile.id == LobbySettings.started_by_profile_id
-                                             || profile.id == LobbySettings.profile_id)
+        var profiles = await WolfApi.GetProfiles();
+        var owner = profiles.FindAll(profile => profile.Id == _lobby.StartedByProfileId
+                                             || profile.Id == _lobby.ProfileId)
                             .FirstOrDefault();
 
-        var lobbies = await WolfAPI.GetLobbies();
-        var lobby = lobbies.Find(lobby => lobby.id == LobbySettings.id);
+        var lobbies = await WolfApi.GetLobbies();
+        var lobby = lobbies.Find(lobby => lobby.Id == _lobby.Id);
 
-        if (lobby is not null && owner?.pin is not null && !lobby.isPinLocked)
+        if (lobby is not null && owner?.Pin is not null && !lobby.IsPinLocked)
         {
             var focus = GetViewport().GuiGetFocusOwner();
-            _ = await QuestionDialogue.OpenDialogue<bool>(
+            _ = await QuestionDialogue.OpenDialogue(
                 "Pin required",
                 "Please enter the Profiles access Pin",
                 new Dictionary<string, bool>
                 {
                     {"OK", false}
                 });
-            List<int> pin = await PinInput.RequestPin();
-            if (!pin.SequenceEqual(owner.pin))
+            var pin = await PinInput.RequestPin();
+            if (!pin.SequenceEqual(owner.Pin))
             {
-                await QuestionDialogue.OpenDialogue<bool>(
+                await QuestionDialogue.OpenDialogue(
                     "Incorrect Pin",
                     "The entered Pin is incorrect",
                     new Dictionary<string, bool>
@@ -127,9 +119,9 @@ public partial class Lobby : Control
                 focus.GrabFocus();
                 return;
             }
-            await WolfAPI.StopLobby(Name);
+            await WolfApi.StopLobby(Name);
         }
-        else if (lobby is not null && lobby.isPinLocked)
+        else if (lobby is not null && lobby.IsPinLocked)
         {
             var focus = GetViewport().GuiGetFocusOwner();
             _ = await QuestionDialogue.OpenDialogue<bool>(
@@ -139,12 +131,14 @@ public partial class Lobby : Control
                 {
                     {"OK", false}
                 });
-            List<int> pin = await PinInput.RequestPin();
-            await WolfAPI.StopLobby(Name, pin);
+            var pin = await PinInput.RequestPin();
+            if(IsInstanceValid(focus))
+                focus.GrabFocus();
+            await WolfApi.StopLobby(Name, pin);
         }
         else
         {
-            await WolfAPI.StopLobby(Name);
+            await WolfApi.StopLobby(Name);
         }
     }
 }

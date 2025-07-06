@@ -1,10 +1,9 @@
 using System;
 using System.Runtime.Caching;
 
-
 namespace Resources.WolfAPI;
 
-public partial class WolfAPI
+public partial class WolfApi
 {
     private static readonly MemoryCache _cache = MemoryCache.Default;
 

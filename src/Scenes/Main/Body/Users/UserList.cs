@@ -59,7 +59,7 @@ public partial class UserList : Control
 		foreach (var child in UserContainer.GetChildren())
 			child.QueueFree();
 
-		var profiles = await WolfAPI.GetProfiles();
+		var profiles = await WolfApi.GetProfiles();
 		if (profiles is null)
 			return;
 
@@ -68,11 +68,11 @@ public partial class UserList : Control
 			User userNode = User.New(profile);
 			userNode.Pressed += async () =>
 			{
-				if (profile.pin is not null)
+				if (profile.Pin is not null)
 				{
 					var focus = GetViewport().GuiGetFocusOwner();
 					List<int> pin = await PinInput.RequestPin();
-					if (!pin.SequenceEqual(profile.pin))
+					if (!pin.SequenceEqual(profile.Pin))
 					{
 						await QuestionDialogue.OpenDialogue<bool>(
 							"Incorrect Pin",
@@ -86,7 +86,7 @@ public partial class UserList : Control
 					}
 				}
 
-				WolfAPI.Profile = profile;
+				WolfApi.Profile = profile;
 
 				if(Main.Singleton.AppList is AppList appmenu)
 					appmenu.Visible = true;
@@ -104,15 +104,15 @@ public partial class UserList : Control
 	private void EditorMockupReady()
 	{
 		List<Profile> UserList = new(){
-			new(){ name = "One" },
-			new(){ name = "Two" },
-			new(){ name = "Three" },
-			new(){ name = "Four" },
-			new(){ name = "Five" },
-			new(){ name = "Six" },
-			new(){ name = "Seven" },
-			new(){ name = "Eight" },
-			new(){ name = "Nine" }
+			new(){ Name = "One" },
+			new(){ Name = "Two" },
+			new(){ Name = "Three" },
+			new(){ Name = "Four" },
+			new(){ Name = "Five" },
+			new(){ Name = "Six" },
+			new(){ Name = "Seven" },
+			new(){ Name = "Eight" },
+			new(){ Name = "Nine" }
 		};
 		foreach(var usr in UserList)
 		{
