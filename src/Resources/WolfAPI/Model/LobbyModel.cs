@@ -35,6 +35,8 @@ public partial class Lobby
     public VideoSettings? VideoSettings { get; set; }
     [JsonInclude, JsonPropertyName("audio_settings"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public AudioSettings? AudioSettings { get; set; }
+    [JsonInclude, JsonPropertyName("connected_sessions")]
+    public List<string>? ConnectedSessions { get; set; }
 }
 
 public class LobbyJoin

@@ -42,17 +42,35 @@ public partial class Lobby : Control
         JoinButton.Pressed += JoinLobby;
         StopButton.Pressed += StopLobby;
 
+        
+        
         LobbyMenu?.Hide();
 
-        PlayerCountLabel.Text = "1";
+        PlayerCountLabel.Text = _lobby?.ConnectedSessions?.Count.ToString() ?? "1";
 
+        WolfApi.Singleton.LobbyJoinEvent += OnJoinLobby;
+        WolfApi.Singleton.LobbyLeaveEvent += OnLeaveLobby;
+        
         LobbyEnteredView += async () =>
         {
-            if (_lobby.IconPngPath is not null && _lobby.IconPngPath != "")
+            if (_lobby?.IconPngPath is not null && _lobby.IconPngPath != "")
                 LobbyMainButton.Icon = await WolfApi.GetIcon(_lobby.IconPngPath);
         };
     }
 
+    private void OnJoinLobby(string lobbyId)
+    {
+        GD.Print(lobbyId);
+        if(lobbyId != _lobby?.Id) return;
+        PlayerCountLabel.Text = $"{int.Parse(PlayerCountLabel.Text) + 1}";
+    }
+    
+    private void OnLeaveLobby(string lobbyId)
+    {
+        if(lobbyId != _lobby?.Id) return;
+        PlayerCountLabel.Text = $"{int.Parse(PlayerCountLabel.Text) - 1}";
+    }
+    
     public override void _Process(double delta)
     {
         if (Engine.IsEditorHint())

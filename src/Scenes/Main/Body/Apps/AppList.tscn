@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://brs0ic67iu2en" path="res://Scenes/Main/Body/Apps/AppList.cs" id="1_wixkc"]
 
-[node name="AppList" type="Control" node_paths=PackedStringArray("AppContainer")]
+[node name="AppList" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,6 @@ size_flags_horizontal = 6
 size_flags_vertical = 3
 mouse_filter = 1
 script = ExtResource("1_wixkc")
-AppContainer = NodePath("AppScrollContainer/MarginContainer/AppGrid")
 
 [node name="AppScrollContainer" type="ScrollContainer" parent="."]
 unique_name_in_owner = true

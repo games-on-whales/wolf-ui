@@ -100,8 +100,8 @@ public partial class WolfApi : Resource
             { "wolf::core::events::ResumeStreamEvent", (_)=>{}},
             { "wolf::core::events::PauseStreamEvent", (_)=>{}},
             { "wolf::core::events::SwitchStreamProducerEvents", (_)=>{}},
-            //{ "wolf::core::events::JoinLobbyEvent", (_)=>{}},
-            //{ "wolf::core::events::LeaveLobbyEvent", (_)=>{}},
+            { "wolf::core::events::JoinLobbyEvent", InvokeLobbyJoin},
+            { "wolf::core::events::LeaveLobbyEvent", InvokeLobbyLeave},
             { "wolf::core::events::CreateLobbyEvent", InvokeLobbyCreated },
             { "wolf::core::events::StopLobbyEvent", InvokeLobbyStopped },
         };
@@ -119,6 +119,8 @@ public partial class WolfApi : Resource
 
         void InvokeLobbyCreated(string dataJson) => InvokeEvent(LobbyCreatedEvent, dataJson);
         void InvokeLobbyStopped(string dataJson) => LobbyStoppedEvent?.Invoke(this, dataJson.TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\"}"));
+        void InvokeLobbyJoin(string dataJson) => EmitSignalLobbyJoinEvent(dataJson[..dataJson.LastIndexOf(',')].TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\""));
+        void InvokeLobbyLeave(string dataJson) => EmitSignalLobbyLeaveEvent(dataJson[..dataJson.LastIndexOf(',')].TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\""));
     }
 
     
@@ -170,34 +172,6 @@ public partial class WolfApi : Resource
         return;
 
         void EmitSignalApiEventDeferred(string eventType, string data) => CallDeferred(GodotObject.MethodName.EmitSignal, SignalName.ApiEvent, eventType, data);
-    }
-    
-    public static async Task<List<Client>> GetClients()
-    {
-        var wolfClients = await GetAsync<ClientsRequest>($"{Api}/clients");
-
-        if (wolfClients?.Success == true)
-            return wolfClients.Clients ?? [];
-        return [];
-    }
-    public static async Task StartRunner(Runner runner, bool joinable = false)
-    {
-        var starter = new Starter()
-        {
-            StopStreamWhenOver = false,
-            SessionId = SessionId,
-            Runner = runner
-        };
-        var result = await PostAsync("/runners/start", starter);
-    }
-    
-    public static async Task<List<Profile>> GetProfiles()
-    {
-        var profiles = await GetAsync<ProfilesResponse>($"{Api}/profiles");
-
-        if (profiles?.Profiles is not null && profiles.Success) return profiles.Profiles;
-        Logger.LogError("Error retrieving Profiles");
-        return [];
     }
     
     private static async Task<string?> PostAsync<T>(string url, T obj)
@@ -264,4 +238,9 @@ public partial class WolfApi : Resource
     public delegate void ImageAlreadyUptoDateEventHandler(string imageName);
     [Signal]
     public delegate void ImagePullProgressEventHandler(string imageName, double progress);
+
+    [Signal]
+    public delegate void LobbyJoinEventEventHandler(string lobbyId);    
+    [Signal]
+    public delegate void LobbyLeaveEventEventHandler(string lobbyId);
 }
