@@ -11,7 +11,6 @@ namespace WolfUI;
 [Tool, GlobalClass, SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class AppList : Control
 {
-    private static readonly ILogger<AppList> Logger = WolfUI.Main.GetLogger<AppList>();
     public event EventHandler<Resources.WolfAPI.Lobby>? LobbyCreatedEvent;
     public event EventHandler<string>? LobbyStoppedEvent;
 
@@ -25,23 +24,9 @@ public partial class AppList : Control
 			return;
 		}
 		
-		if (Main.Singleton?.controllerMap is not null)
+		if (Main.Singleton.controllerMap is not null)
 		{
-			// Ensure at least one element is focused when switching to controller.
-			Main.Singleton.controllerMap.UsedControllerChanged += (controller) =>
-			{
-				if (!Visible)
-					return;
-
-				var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
-				if (focus is not null || Main.Singleton.TopLayer.GetChildCount() > 0) 
-					return;
-				var ctrl = (App?)AppGrid.GetChildren().ToList<Node>().Find(c => c is App);
-				ctrl?.GrabFocus();
-				if (ctrl is null)
-					Main.Singleton.OptionsButton.GrabFocus();
-
-			};
+			Main.Singleton.controllerMap.UsedControllerChanged += OnControllerChanged;
 		}
 
 		VisibilityChanged += RebuildAppList;
@@ -51,6 +36,27 @@ public partial class AppList : Control
 		WolfApi.Singleton.LobbyStoppedEvent += OnLobbyStopped;
 	}
 
+	public override void _ExitTree()
+	{
+		WolfApi.Singleton.LobbyCreatedEvent -= OnLobbyStarted;
+		WolfApi.Singleton.LobbyStoppedEvent -= OnLobbyStopped;
+	}
+	
+	private void OnControllerChanged(ControllerMap.ControllerType  controllerType)
+	{
+		if (!Visible) return;
+		
+		// Ensure at least one element is focused when switching to controller.
+		var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
+		if (focus is not null || Main.Singleton.TopLayer.GetChildCount() > 0) return;
+
+		if (AppGrid.GetChildren().Select(n => n as App).FirstOrDefault(n => n is not null) is { } ctrl)
+			ctrl.GrabFocus();	
+		else
+			Main.Singleton.OptionsButton.GrabFocus();
+
+	}
+	
 	private async void RebuildAppList()
 	{
 		if (!Visible)
@@ -66,11 +72,10 @@ public partial class AppList : Control
 		var lobbies = await WolfApi.GetLobbies();
 		lobbies.ForEach(l => OnLobbyStarted(this, l));
 
-		var ctrl = (App?)AppGrid.GetChildren().ToList<Node>().Find(c => c is App);
-		ctrl?.GrabFocus();
-		if (ctrl is null)
+		if (AppGrid.GetChildren().Select(n => n as App).FirstOrDefault(n => n is not null) is { } ctrl)
+			ctrl.GrabFocus();	
+		else
 			Main.Singleton.OptionsButton.GrabFocus();
-
 	}
 
 	private void OnLobbyStopped(object? caller, string lobbyId)
@@ -83,8 +88,7 @@ public partial class AppList : Control
 
 	private void OnLobbyStarted(object? sender, Resources.WolfAPI.Lobby? lobby)
 	{
-		if (!Visible)
-			return;
+		if (!Visible) return;
 
 		if (lobby?.ProfileId != WolfApi.ActiveProfile.Id &&
 		    lobby?.StartedByProfileId != WolfApi.ActiveProfile.Id) return;
@@ -109,7 +113,7 @@ public partial class AppList : Control
 	private async Task LoadAppList()
 	{
 		Main.Singleton.OptionsButton.Visible = true;
-		Main.Singleton.HeaderLabel.Text = "Select Application";
+		Main.Singleton.HeaderLabel.Text = "Loading...";
 
 		foreach (var child in AppGrid.GetChildren())
 			child.QueueFree();
@@ -139,6 +143,8 @@ public partial class AppList : Control
 				AppScrollContainer.ScrollVertical = (int)AppScrollContainer.GetChildren().Cast<Control>().First().Size.X;
 			};
 		});
+		
+		Main.Singleton.HeaderLabel.Text = "Select Application";
 	}
 
 	private void EditorMockupReady()
@@ -176,11 +182,11 @@ public partial class AppList : Control
 
 		if (appEntryCount < gridColumns) return;
 		var aboveApp = gridContainer.GetChild<App>(appEntryCount - gridColumns);
-		newApp.FocusNeighborTop = aboveApp.GetFocusPath();
+		newApp.FocusNeighborTop = aboveApp.GetPath();
 
 		if (appEntryCount % gridColumns != 0) return;
 		var app = gridContainer.GetChild<App>(appEntryCount - 1);
-		app.FocusNeighborRight = gridContainer.GetChild<App>(-1).GetFocusPath();
-		gridContainer.GetChild<App>(-1).FocusNeighborLeft = app.GetFocusPath();
+		app.FocusNeighborRight = gridContainer.GetChild<App>(-1).GetPath();
+		gridContainer.GetChild<App>(-1).FocusNeighborLeft = app.GetPath();
 	}
 }

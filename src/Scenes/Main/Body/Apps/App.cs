@@ -31,14 +31,10 @@ public partial class App : MarginContainer, IRestorable<App>
 	}
 	private Resources.WolfAPI.Lobby? _runningLobby;
 	//private Resources.WolfAPI.AppEntry _appEntry;
-	private static readonly ILogger<WolfApi> Logger = Main.GetLogger<WolfApi>();
 	private bool _isImageOnDisc = true;
 	
-#nullable disable
 	private App() { }
-#nullable enable
-
-
+	
 	public static App Restore()
 	{
 		return Create();
@@ -92,10 +88,11 @@ public partial class App : MarginContainer, IRestorable<App>
 
 		State = AppState.OK;
 
-		var appList = Main.Singleton.GetNode<AppList>("%AppList");
-		appList.LobbyCreatedEvent += OnLobbyCreatedEvent;
-		appList.LobbyStoppedEvent += OnLobbyStoppedEvent;
-
+		if (Main.Singleton.AppList is AppList appList)
+		{
+			appList.LobbyCreatedEvent += OnLobbyCreatedEvent;
+			appList.LobbyStoppedEvent += OnLobbyStoppedEvent;
+		}
 
 		AppRunning += () =>
 		{
@@ -126,48 +123,35 @@ public partial class App : MarginContainer, IRestorable<App>
 			return;
 		}
 
-		var appList = Main.Singleton.GetNode<AppList>("%AppList");
+		if (Main.Singleton.AppList is not AppList appList) return;
 		appList.LobbyCreatedEvent -= OnLobbyCreatedEvent;
 		appList.LobbyStoppedEvent -= OnLobbyStoppedEvent;
 	}
 
 	private void OnLobbyCreatedEvent(object? caller, Resources.WolfAPI.Lobby lobby)
 	{
-		if (!IsInstanceValid(this))
-			return;
-		if (IsAlreadyRunning(lobby))
-		{
-			_runningLobby = lobby;
-			EmitSignalAppRunning();
-		}
+		if (!IsInstanceValid(this) || !IsAlreadyRunning(lobby)) return;
+		_runningLobby = lobby;
+		EmitSignalAppRunning();
 	}
 
 	private void OnLobbyStoppedEvent(object? caller, string lobbyId)
 	{
-		if (!IsInstanceValid(this))
-			return;
-		if (lobbyId != _runningLobby?.Id) return;
+		if (!IsInstanceValid(this) || lobbyId != _runningLobby?.Id) return;
 		_runningLobby = null;
 		EmitSignalAppStopped();
 	}
 
 	private void OnImageUpdated(string image)
 	{
-		if (!IsInstanceValid(this))
-			return;
-		if (Runner?.Image is null || image != Runner.Image)
-			return;
-
+		if (!IsInstanceValid(this) || Runner?.Image != image) return;
 		State = _runningLobby is null ? AppState.OK : AppState.PLAYING;
 	}
 
 	private void OnImagePullProgress(string image, double progress)
 	{
-		if (Runner?.Image is null || image != Runner.Image)
-			return;
-
-		if (!IsInstanceValid(ProgressBar) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator))
-			return;
+		if (Runner?.Image is null || image != Runner.Image) return;
+		if (!IsInstanceValid(ProgressBar) || !IsInstanceValid(AppButton) || !IsInstanceValid(DisabledIndicator)) return;
 
 		State = AppState.DOWNLOADING;
 
@@ -190,11 +174,14 @@ public partial class App : MarginContainer, IRestorable<App>
 			return;
 		}
 
-		if (!_wasInView && GetGlobalRect().Intersection(Main.Singleton.GetNode<Control>("%AppList").GetGlobalRect()).HasArea())
+		if (!_wasInView 
+		    && Main.Singleton.AppList is AppList appList 
+		    && GetGlobalRect().Intersection(appList.GetGlobalRect()).HasArea())
 		{
 			EmitSignalAppEnteredView();
 			_wasInView = true;
 		}
+
 
 		if (AppMenu.Visible && !(
 				MenuButtonCancle.HasFocus() ||
@@ -212,87 +199,93 @@ public partial class App : MarginContainer, IRestorable<App>
 			AppButton.GrabFocus();
 		}
 
-		if (Runner?.Image is not null && State != AppState.DOWNLOADING)
-		{
-			_isImageOnDisc = await WolfApi.IsImageOnDisk(Runner.Image);
-			State = _isImageOnDisc ? _runningLobby is null ? AppState.OK : AppState.PLAYING : AppState.NOTONDISK;
-		}
+		if (Runner?.Image is null || State == AppState.DOWNLOADING) return;
+		_isImageOnDisc = await WolfApi.IsImageOnDisk(Runner.Image);
+		State = _isImageOnDisc ? _runningLobby is null ? AppState.OK : AppState.PLAYING : AppState.NOTONDISK;
 	}
 
 	private void OnStateChanged()
 	{
-		if (State == AppState.OK)
+		switch (State)
 		{
-			DownloadHint.Visible = false;
-			PlayingHint.Visible = false;
-			OkHint.Visible = true;
+			case AppState.OK:
+				DownloadHint.Visible = false;
+				PlayingHint.Visible = false;
+				OkHint.Visible = true;
 
-			DisabledIndicator.Visible = false;
-			ProgressBar.Visible = false;
+				DisabledIndicator.Visible = false;
+				ProgressBar.Visible = false;
 
-			AppButton.Disabled = false;
-			ProgressBar.Value = 0;
+				AppButton.Disabled = false;
+				ProgressBar.Value = 0;
 
-			MenuButtonStart.Text = "Start";
-			MenuButtonStop.Visible = false;
-			MenuButtonCoop.Disabled = false;
-			MenuButtonUpdate.Disabled = false;
+				MenuButtonStart.Text = "Start";
+				MenuButtonStop.Visible = false;
+				MenuButtonCoop.Disabled = false;
+				MenuButtonUpdate.Disabled = false;
 
-			MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
-			MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
+				MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
+				MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
 
-			MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
-			MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
-		}
-		else if (State == AppState.PLAYING)
-		{
-			DownloadHint.Visible = false;
-			PlayingHint.Visible = true;
-			OkHint.Visible = false;
-			ProgressBar.Value = 0;
+				MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
+				MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
+				break;
+			
+			case AppState.PLAYING:
+				DownloadHint.Visible = false;
+				PlayingHint.Visible = true;
+				OkHint.Visible = false;
+				ProgressBar.Value = 0;
 
-			if (_runningLobby is not null && !_runningLobby.MultiUser)
-			{
-				MenuButtonStart.Text = "Connect";
-				MenuButtonStop.Visible = true;
-			}
+				if (_runningLobby is not null && !_runningLobby.MultiUser)
+				{
+					MenuButtonStart.Text = "Connect";
+					MenuButtonStop.Visible = true;
+				}
 
-			MenuButtonCoop.Disabled = true;
+				MenuButtonCoop.Disabled = true;
 
-			MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
-			MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
+				MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
+				MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
 
-			MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
-			MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
+				MenuButtonStop.FocusPrevious = MenuButtonStart.GetPath();
+				MenuButtonStop.FocusNeighborTop = MenuButtonStart.GetPath();
 
-			MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
-			MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
+				MenuButtonStop.FocusNeighborBottom = MenuButtonCoop.GetPath();
+				MenuButtonStop.FocusNext = MenuButtonCoop.GetPath();
 
-			MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
-			MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
-		}
-		else if (State == AppState.NOTONDISK)
-		{
-			DownloadHint.Visible = true;
-			PlayingHint.Visible = false;
-			OkHint.Visible = false;
-			ProgressBar.Value = 0;
+				MenuButtonCoop.FocusPrevious = MenuButtonStop.GetPath();
+				MenuButtonCoop.FocusNeighborTop = MenuButtonStop.GetPath();
+				break;
+			
+			case AppState.NOTONDISK:
+				DownloadHint.Visible = true;
+				PlayingHint.Visible = false;
+				OkHint.Visible = false;
+				ProgressBar.Value = 0;
 
-			MenuButtonCoop.Disabled = true;
-			MenuButtonUpdate.Disabled = true;
-			MenuButtonStart.Text = "Download";
+				MenuButtonCoop.Disabled = true;
+				MenuButtonUpdate.Disabled = true;
+				MenuButtonStart.Text = "Download";
 
-			DisabledIndicator.Visible = true;
-		}
-		else if (State == AppState.DOWNLOADING)
-		{
-			DownloadHint.Visible = true;
-			PlayingHint.Visible = false;
-			OkHint.Visible = false;
+				DisabledIndicator.Visible = true;
+				break;
+			
+			case AppState.DOWNLOADING:
+				DownloadHint.Visible = true;
+				PlayingHint.Visible = false;
+				OkHint.Visible = false;
 
-			ProgressBar.Visible = true;
-			AppButton.Disabled = true;
-			DisabledIndicator.Visible = true;
+				ProgressBar.Visible = true;
+				AppButton.Disabled = true;
+				DisabledIndicator.Visible = true;
+				break;
+			
+			case AppState.NONE:
+				break;
+			
+			default:
+				throw new ArgumentOutOfRangeException();
 		}
 	}
 
@@ -311,7 +304,7 @@ public partial class App : MarginContainer, IRestorable<App>
 				return null;
 
 			var name = Runner.Image.TrimPrefix("ghcr.io/games-on-whales/");
-			int idx = name.LastIndexOf(':');
+			var idx = name.LastIndexOf(':');
 			if (idx >= 0)
 				name = name[..idx];
 
@@ -326,10 +319,9 @@ public partial class App : MarginContainer, IRestorable<App>
 
 	private async void OnStartPressed()
 	{
-		//TODO: check if user already has a open singleplayer lobby for the chosen app and if yes re-join.
+		//TODO: check if user already has a open singleplayer lobby for the chosen ap or folder and if yes re-join.
 
-		if (Runner?.Name is null)
-			return;
+		if (Runner?.Name is null) return;
 
 		MenuButtonStart.Disabled = true;
 
@@ -339,7 +331,6 @@ public partial class App : MarginContainer, IRestorable<App>
 			GrabFocus();
 			return;
 		}
-
 
 		var lobby = _runningLobby;
 
@@ -385,7 +376,7 @@ public partial class App : MarginContainer, IRestorable<App>
 			var response = await WolfApi.JoinLobby(lobbyId, WolfApi.SessionId);
 			if (response?.Success == false)
 			{
-				await QuestionDialogue.OpenDialogue<bool>("Lobby full", "The Lobby you tried joining is Full.", new Dictionary<string, bool>()
+				await QuestionDialogue.OpenDialogue("Lobby full", "The Lobby you tried joining is Full.", new Dictionary<string, bool>()
 				{
 					{"OK", true}
 				});
@@ -400,7 +391,7 @@ public partial class App : MarginContainer, IRestorable<App>
 
 	private async void OnStopPressed()
 	{
-		if (_runningLobby is null || _runningLobby.Id is null)
+		if (_runningLobby?.Id is null)
 			return;
 
 
@@ -465,7 +456,7 @@ public partial class App : MarginContainer, IRestorable<App>
 			}
 		))
 		{
-			List<int> pin = await PinInput.RequestPin();
+			var pin = await PinInput.RequestPin();
 			lobby.Pin = pin;
 		}
 
@@ -484,14 +475,7 @@ public partial class App : MarginContainer, IRestorable<App>
 	{
 		State = AppState.DOWNLOADING;
 		AppButton.GrabFocus();
-		if (Runner is null || Runner.Image is null)
-			return;
-
+		if (Runner?.Image is null) return;
 		WolfApi.PullImage(Runner.Image);
-	}
-
-	public string GetFocusPath()
-	{
-		return GetPath();
 	}
 }

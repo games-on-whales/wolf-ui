@@ -10,9 +10,9 @@ public partial class DynamicTheme : Theme
         MergeWith(DefaultTheme);
     }
 
-    public DynamicTheme(Godot.Theme Base)
+    public DynamicTheme(Theme @base)
     {
-        MergeWith(Base);
+        MergeWith(@base);
     }
 
     public void Save(string path)

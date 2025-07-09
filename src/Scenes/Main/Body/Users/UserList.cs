@@ -18,9 +18,7 @@ public partial class UserList : Control
 			EditorMockupReady();
 			return;
 		}
-
-		var Main = GetNode<Main>("/root/Main");
-
+		
 		await LoadUsers();
 
 		Visible = true;
@@ -40,19 +38,18 @@ public partial class UserList : Control
 		{
 			return;
 		}
-		if (Visible)
-		{
-			var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
-			if (focus is not null || Main.Singleton.TopLayer.GetChildCount() > 0) return;
-			var ctrl = (Control?)UserContainer.GetChildren().ToList<Node>().Find(c => c is Control);
-			ctrl?.GrabFocus();
-		}
-    }
+
+		if (!Visible) return;
+		var focus = Main.Singleton.GetViewport().GuiGetFocusOwner();
+		if (focus is not null || Main.Singleton.TopLayer.GetChildCount() > 0) return;
+		var ctrl = (Control?)UserContainer.GetChildren().ToList<Node>().Find(c => c is Control);
+		ctrl?.GrabFocus();
+	}
 
 	private async Task LoadUsers()
 	{
-		GetNode<Control>("%OptionsButton").Visible = false;
-		GetNode<Label>("%HeaderLabel").Text = "Select User";
+		Main.Singleton.OptionsButton.Visible = false;
+		Main.Singleton.HeaderLabel.Text = "Loading...";
 
 		foreach (var child in UserContainer.GetChildren())
 			child.QueueFree();
@@ -69,6 +66,7 @@ public partial class UserList : Control
 		{
 			b.CallDeferred(Control.MethodName.GrabFocus);
 		}
+		Main.Singleton.HeaderLabel.Text = "Select User";
 	}
 
 	private void EditorMockupReady()

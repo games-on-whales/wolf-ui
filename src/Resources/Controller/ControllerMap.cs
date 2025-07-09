@@ -27,10 +27,7 @@ public partial class ControllerMap : Resource
     private ControllerType _controller = ControllerType.None;
     private ControllerType UsedController
     {
-        get
-        {
-            return _controller;
-        }
+        get => _controller;
         set
         {
             if (value != _controller)
@@ -38,13 +35,7 @@ public partial class ControllerMap : Resource
             _controller = value;
         }
     }
-    public ControllerType Controller
-    {
-        get
-        {
-            return UsedController;
-        }
-    }
+    public ControllerType Controller => UsedController;
 
 #nullable disable // Export Variables are Godots Job
     public ControllerMap()
@@ -53,7 +44,7 @@ public partial class ControllerMap : Resource
     }
 #nullable enable
 
-    private void JoyConnectionChanged(long deviceID, bool connected)
+    private void JoyConnectionChanged(long deviceId, bool connected)
     {
         /*
         GD.Print(Input.GetJoyName((int)deviceID));
@@ -70,8 +61,7 @@ public partial class ControllerMap : Resource
 
         if (connected)
         {
-
-            UsedController = Input.GetJoyName((int)deviceID) switch
+            UsedController = Input.GetJoyName((int)deviceId) switch
             {
                 "Xbox 360 Controller" => ControllerType.XBox,
                 "Wolf X-Box One (virtual) pad" => ControllerType.XBox,
@@ -83,19 +73,14 @@ public partial class ControllerMap : Resource
         }
         if (!connected)
         {
-            var ConnectedController = Input.GetConnectedJoypads();
-            if (ConnectedController.Count == 0)
-            {
-                UsedController = ControllerType.None;
-            }
+            var connectedController = Input.GetConnectedJoypads();
+            if (connectedController.Count == 0) UsedController = ControllerType.None;
         }
 
-        if (UsedController != oldController)
-        {
-            Logger.LogInformation("{0} detected", Input.GetJoyName((int)deviceID));
-            EmitSignalIconSetChanged();
-        }
-
+        if (UsedController == oldController) return;
+        
+        Logger.LogInformation("{0} detected", Input.GetJoyName((int)deviceId));
+        EmitSignalIconSetChanged();
     }
 
     public Texture2D GetIcon(ControllerButton button)
@@ -109,24 +94,29 @@ public partial class ControllerMap : Resource
             ControllerButton.Left => Left[UsedController],
             ControllerButton.Right => Right[UsedController],
             ControllerButton.Back => Back[UsedController],
-            // Should never be callable but VSCode wont be fine without it
-            _ => new(),
+            // Should never be callable but VSCode won't be fine without it
+            _ => new Texture2D(),
         };
     }
 
     public void SetController(InputEvent @event)
     {
         var oldController = UsedController;
-        if (@event is InputEventMouseMotion || @event is InputEventMouseButton || @event is InputEventKey)
+        switch (@event)
         {
-            UsedController = ControllerType.None;
+            case InputEventMouseMotion or InputEventMouseButton or InputEventKey:
+            {
+                UsedController = ControllerType.None;
+                break;
+            }
+            case InputEventJoypadButton or InputEventJoypadMotion:
+            {
+                var connectedController = Input.GetConnectedJoypads();
+                JoyConnectionChanged(connectedController[@event.Device], true);
+                return;
+            }
         }
-        if (@event is InputEventJoypadButton || @event is InputEventJoypadMotion)
-        {
-            var ConnectedController = Input.GetConnectedJoypads();
-            JoyConnectionChanged(ConnectedController[@event.Device], true);
-            return;
-        }
+
         if (UsedController != oldController)
             EmitSignalIconSetChanged();
     }

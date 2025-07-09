@@ -10,8 +10,8 @@ public partial class ExitButton : Button
         {
             Engine.PrintErrorMessages = false;
 
-		    bool AutoupdateEnable = (System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE") ?? "False") == "True";
-            if (AutoupdateEnable)
+		    var autoupdateEnable = (System.Environment.GetEnvironmentVariable("WOLF_UI_AUTOUPDATE") ?? "False") == "True";
+            if (autoupdateEnable)
             {
                 WolfApi.StopSession(WolfApi.SessionId);
             }
