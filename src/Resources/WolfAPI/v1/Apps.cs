@@ -19,7 +19,7 @@ public partial class WolfApi
         foreach (var profile in profiles)
         {
             if (profile.Id is not null && usedProfile.Id is not null && profile.Id == usedProfile.Id)
-                return profile.Apps ?? [];
+                return profile.Apps ?? (List<App>)[];
         }
         Logger.LogError("Profile: {0} not found", usedProfile.Name ?? "NULL");
         return [];

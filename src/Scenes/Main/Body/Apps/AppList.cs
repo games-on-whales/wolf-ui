@@ -86,8 +86,8 @@ public partial class AppList : Control
 		if (!Visible)
 			return;
 
-		if (lobby?.ProfileId != WolfApi.Profile.Id &&
-		    lobby?.StartedByProfileId != WolfApi.Profile.Id) return;
+		if (lobby?.ProfileId != WolfApi.ActiveProfile.Id &&
+		    lobby?.StartedByProfileId != WolfApi.ActiveProfile.Id) return;
 		if (lobby is null)
 			return;
 		LobbyCreatedEvent?.Invoke(this, lobby);
@@ -114,7 +114,7 @@ public partial class AppList : Control
 		foreach (var child in AppGrid.GetChildren())
 			child.QueueFree();
 		
-		var enumerator = (await WolfApi.GetApps(WolfApi.Profile))
+		var enumerator = (await WolfApi.GetApps(WolfApi.ActiveProfile))
 			.Select((value, i) => (value, i));
 		
 		foreach (var vi in enumerator)

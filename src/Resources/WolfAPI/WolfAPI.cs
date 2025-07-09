@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json.Serialization;
 using WolfUI.Misc;
 
 namespace Resources.WolfAPI;
@@ -40,7 +42,7 @@ public partial class WolfApi : Resource
     public static string SessionId { get; private set; } = "";
 
 #nullable disable
-    public static Profile Profile { get; set; } = null;
+    public static Profile ActiveProfile { get; set; } = null;
     private static WolfApi _singleton = null;
 #nullable enable
 
@@ -67,10 +69,30 @@ public partial class WolfApi : Resource
             SessionId = "123456789";
         }
         ApiEvent += FilterApiEvents;
-        JsonOptions.Converters.Add(new StaticFactoryConverter<App>());
+        
+        //Find all Classes implementing IRestorable and register them to use the StaticFactoryConverter for Deserialization
+        var interfaceType = typeof(IRestorable<>);
+        var implementations = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(s => s.GetTypes())
+            .Where(t => t.GetInterface(interfaceType.Name) != null)
+            .Where(t => t is { IsAbstract: false, IsInterface: false });    
+        foreach (var implementation in implementations)
+        {
+            var a = typeof(StaticFactoryConverter<>).MakeGenericType(implementation);
+            var obj = Activator.CreateInstance(a);
+            var ab = obj as JsonConverter;
+            if(obj is JsonConverter castedObj)
+                JsonOptions.Converters.Add(castedObj);
+        }
+        
         StartListenToApiEvents();
     }
 
+    private void Register<T>(Type type)
+    {
+        
+    }
+    
     private void InvokeEvent<T>(EventHandler<T>? handler, string jsonArgs)
     {
         var argObj = JsonSerializer.Deserialize<T>(jsonArgs, JsonOptions);

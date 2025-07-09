@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using WolfUI;
 
 namespace Resources.WolfAPI;
 

@@ -1,9 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://i2pa0j4ijr4s"]
 
-[ext_resource type="Script" uid="uid://co6uuhwci2mbc" path="res://Scenes/Main/Body/Users/User.cs" id="1_3my2o"]
-[ext_resource type="Texture2D" uid="uid://jm7amjpwndkb" path="res://Icons/default_profile_icon.png" id="1_o4fnf"]
+[ext_resource type="Texture2D" uid="uid://jm7amjpwndkb" path="res://Icons/default_profile_icon.png" id="1_3fp83"]
+[ext_resource type="Script" uid="uid://co6uuhwci2mbc" path="res://Scenes/Main/Body/Users/Profile.cs" id="2_0h5hp"]
 
-[node name="User" type="Button"]
+[node name="Profile" type="Button"]
 custom_minimum_size = Vector2(180, 240)
 anchors_preset = -1
 anchor_left = 0.429688
@@ -14,9 +14,9 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
-icon = ExtResource("1_o4fnf")
+icon = ExtResource("1_3fp83")
 expand_icon = true
-script = ExtResource("1_3my2o")
+script = ExtResource("2_0h5hp")
 metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]

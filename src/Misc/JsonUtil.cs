@@ -10,6 +10,11 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace WolfUI.Misc;
 
+public interface IRestorable<out T>
+{
+    public static abstract T Restore();
+}
+
 public sealed class OptInJsonTypeInfoResolver : DefaultJsonTypeInfoResolver
 {
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
@@ -29,10 +34,11 @@ public sealed class OptInJsonTypeInfoResolver : DefaultJsonTypeInfoResolver
     }
 }
 
-public class StaticFactoryConverter<T>(string factoryMethodName = "Restore") : JsonConverter<T>
+public class StaticFactoryConverter<T> : JsonConverter<T>
 {
-    private readonly MethodInfo _factoryMethod = typeof(T).GetMethod(factoryMethodName, BindingFlags.Public | BindingFlags.Static)
-                                                 ?? throw new ArgumentException($"No static method named {factoryMethodName} found in type {typeof(T).Name}");
+    private const string FactoryMethodName = "Restore";
+    private readonly MethodInfo _factoryMethod = typeof(T).GetMethod(FactoryMethodName, BindingFlags.Public | BindingFlags.Static)
+                                                 ?? throw new ArgumentException($"No static method named {FactoryMethodName} found in type {typeof(T).Name}");
 
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

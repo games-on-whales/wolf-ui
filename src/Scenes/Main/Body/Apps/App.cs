@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using Godot;
 using Resources.WolfAPI;
 using Skerga.GodotNodeUtilGenerator;
+using WolfUI.Misc;
 
 namespace WolfUI;
 
 [GlobalClass, Tool, SceneAutoConfigure]
-public partial class App : MarginContainer
+public partial class App : MarginContainer, IRestorable<App>
 {
 	private enum AppState
 	{
@@ -59,7 +60,7 @@ public partial class App : MarginContainer
 		if (lobby.Name == Title)
 			return true;
 		//check if this app uses the same folder as the lobby 
-		if (Runner?.Name is null || lobby.RunnerStateFolder == $"profile-data/{WolfApi.Profile.Id}/{Runner.Name}")
+		if (Runner?.Name is null || lobby.RunnerStateFolder == $"profile-data/{WolfApi.ActiveProfile.Id}/{Runner.Name}")
 			return true;
 
 		return false;
@@ -351,12 +352,12 @@ public partial class App : MarginContainer
 
 			lobby = new Resources.WolfAPI.Lobby
 			{
-				ProfileId = WolfApi.Profile.Id,
+				ProfileId = WolfApi.ActiveProfile.Id,
 				Name = Title,
 				MultiUser = false,
 				IconPngPath = GetIconPath(),
 				StopWhenEveryoneLeaves = false,
-				RunnerStateFolder = $"profile-data/{WolfApi.Profile.Id}/{Runner.Name}",
+				RunnerStateFolder = $"profile-data/{WolfApi.ActiveProfile.Id}/{Runner.Name}",
 				Runner = Runner,
 				VideoSettings = new VideoSettings
 				{
@@ -430,12 +431,12 @@ public partial class App : MarginContainer
 
 		Resources.WolfAPI.Lobby lobby = new()
 		{
-			ProfileId = WolfApi.Profile.Id,
+			ProfileId = WolfApi.ActiveProfile.Id,
 			Name = Title,
 			MultiUser = true,
 			IconPngPath = GetIconPath(),
 			StopWhenEveryoneLeaves = false,
-			RunnerStateFolder = $"profile-data/{WolfApi.Profile.Id}/{Runner.Name}",
+			RunnerStateFolder = $"profile-data/{WolfApi.ActiveProfile.Id}/{Runner.Name}",
 			Runner = Runner,
 			VideoSettings = new VideoSettings
 			{
