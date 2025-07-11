@@ -10,7 +10,7 @@ theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 script = ExtResource("1_j3sfj")
 
-[node name="Button" type="Button" parent="."]
+[node name="BackgroundButton" type="Button" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
 

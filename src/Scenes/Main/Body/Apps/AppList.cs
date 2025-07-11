@@ -114,9 +114,13 @@ public partial class AppList : Control
 	{
 		Main.Singleton.OptionsButton.Visible = true;
 		Main.Singleton.HeaderLabel.Text = "Loading...";
-
+		
+		
 		foreach (var child in AppGrid.GetChildren())
+		{
 			child.QueueFree();
+			AppGrid.RemoveChild(child);
+		}
 		
 		var enumerator = (await WolfApi.GetApps(WolfApi.ActiveProfile))
 			.Select((value, i) => (value, i));
@@ -127,22 +131,25 @@ public partial class AppList : Control
 			AddAppEntry(vi.value);
 		}
 		
-		AppGrid.GetChildren()[..AppGrid.Columns].OfType<App>().ToList().ForEach(child =>
+		var firstChildren = AppGrid.GetChildren()[..AppGrid.Columns].OfType<App>();
+		foreach(var child in firstChildren)
 		{
 			child.AppButton.FocusEntered += () =>
 			{
 				AppScrollContainer.ScrollVertical = 0;
 			};
-		});
+		};
+		
 		var remainder = AppGrid.GetChildCount() % AppGrid.Columns;
 		var idx = AppGrid.GetChildCount() - (remainder == 0 ? AppGrid.Columns : remainder);
-		AppGrid.GetChildren()[idx..].OfType<App>().ToList().ForEach(child =>
+		var lastChildren = AppGrid.GetChildren()[idx..].OfType<App>();
+		foreach(var child in lastChildren)
 		{
 			child.AppButton.FocusEntered += () =>
 			{
 				AppScrollContainer.ScrollVertical = (int)AppScrollContainer.GetChildren().Cast<Control>().First().Size.X;
 			};
-		});
+		};
 		
 		Main.Singleton.HeaderLabel.Text = "Select Application";
 	}

@@ -176,22 +176,26 @@ public class SourceGenerationHelper
         }
 
         var newMethodSourceCode = $$"""
-        private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("{{scene.Uid}}");
-        public static {{symbol.Name}} Create()
-        {
-            {{symbol.Name}} obj = SelfRef.Instantiate<{{symbol.Name}}>();
-            return obj;
-        }
+                private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("{{scene.Uid}}");
+                public static {{symbol.Name}} Create()
+                {
+                    {{symbol.Name}} obj = SelfRef.Instantiate<{{symbol.Name}}>();
+                    return obj;
+                }
         """;
 
+        var namespaceText = symbol.ToDisplayString().Length > (symbol.Name.Length + 1)
+            ? $"namespace {symbol.ToDisplayString().Substring(0, symbol.ToDisplayString().Length - symbol.Name.Length - 1)}"
+            : "";
+        
         return $$"""
         using Godot;
-
-        namespace {{symbol.ToDisplayString().Substring(0, symbol.ToDisplayString().Length - symbol.Name.Length - 1)}}
+        
+        {{namespaceText}}
         {
             public partial class {{symbol.Name}}
             {
-        {{builder.ToString()}}
+        {{builder}}
 
         {{(skipNewGeneration ? "" : newMethodSourceCode)}}
 

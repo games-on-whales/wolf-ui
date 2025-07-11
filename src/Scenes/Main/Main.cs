@@ -1,8 +1,6 @@
 using Godot;
 using Resources.WolfAPI;
-using System.IO;
 using Skerga.GodotNodeUtilGenerator;
-using System.Text;
 
 namespace WolfUI;
 
@@ -51,19 +49,14 @@ public partial class Main : Control
 		SelfUpdateAsync();
 
 		Logger.LogInformation("This session's id: {0}", WolfApi.SessionId);
-	}
-
-	public override void _EnterTree()
-	{
-		base._EnterTree();
-		//GetTree().Root.Theme = ResourceLoader.Load<Theme>("uid://v418qqxvwy87");
-    }
-
+	} 
+	
+	/*
 	public void LoadTheme(string themeName)
 	{
-		string user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
+		var user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
 		user = user == "root" ? "retro" : user;
-		string filepath = $"/home/{user}/.wolf-ui/{themeName}.tres";
+		var filepath = $"/home/{user}/.wolf-ui/{themeName}.tres";
 
 		if (File.Exists(filepath))
 		{
@@ -86,7 +79,8 @@ public partial class Main : Control
 
 		//GetTree().Root.Theme;
 	}
-
+	*/
+	
 	public override void _Input(InputEvent @event)
 	{
 		controllerMap?.SetController(@event);

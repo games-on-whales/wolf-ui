@@ -1,64 +1,47 @@
 using Godot;
+using Skerga.GodotNodeUtilGenerator;
 
+namespace WolfUI;
+
+[SceneAutoConfigure]
 public partial class ColorSelector : MarginContainer
 {
-    Button button;
-    Slider RSlider;
-    Label RLabel;
-    Slider GSlider;
-    Label GLabel;
-    Slider BSlider;
-    Label BLabel;
-    ColorRect FeedbackColor;
-    Label ElementName;
-
     [Signal]
     public delegate void ValueChangedEventHandler();
-    private Color _Value;
-    public Color Value
-    {
-        get
-        {
-            return _Value;
-        }
-        set
-        {
-            _Value = value;
-        }
-    }
+    public Color Value { get; set; }
 
-    private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://dr7lejj7fdlux");
+    //private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://dr7lejj7fdlux");
 
 #nullable disable
     private ColorSelector() { }
 #nullable enable
 
-    public static ColorSelector Create()
+    public static ColorSelector CreateDefault()
     {
         return Create(Colors.Black);
     }
 
     public static ColorSelector Create(Color color)
     {
-        ColorSelector obj = SelfRef.Instantiate<ColorSelector>();
+        var obj = Create();
         obj.Value = color;
         return obj;
     }
 
     public override void _Ready()
     {
-        button = GetNode<Button>("%Button");
+        //button = GetNode<Button>("%Button");
 
-        RSlider = GetNode<Slider>("%RSlider");
-        GSlider = GetNode<Slider>("%GSlider");
-        BSlider = GetNode<Slider>("%BSlider");
+        //RSlider = GetNode<Slider>("%RSlider");
+        //GSlider = GetNode<Slider>("%GSlider");
+        //BSlider = GetNode<Slider>("%BSlider");
 
-        RLabel = GetNode<Label>("%RLabel");
-        GLabel = GetNode<Label>("%GLabel");
-        BLabel = GetNode<Label>("%BLabel");
+        //RLabel = GetNode<Label>("%RLabel");
+        //GLabel = GetNode<Label>("%GLabel");
+        //BLabel = GetNode<Label>("%BLabel");
 
-        FeedbackColor = GetNode<ColorRect>("%FeedbackColor");
-        ElementName = GetNode<Label>("%ElementName");
+        //FeedbackColor = GetNode<ColorRect>("%FeedbackColor");
+        //ElementName = GetNode<Label>("%ElementName");
 
         ElementName.Text = Name;
 
@@ -71,9 +54,6 @@ public partial class ColorSelector : MarginContainer
 
         FeedbackColor.Color = Color.Color8((byte)RSlider.Value, (byte)GSlider.Value, (byte)BSlider.Value);
 
-        void OnRSliderMoved(double value) => OnSliderMoved(value, RLabel);
-        void OnGSliderMoved(double value) => OnSliderMoved(value, GLabel);
-        void OnBSliderMoved(double value) => OnSliderMoved(value, BLabel);
         RSlider.ValueChanged += OnRSliderMoved;
         GSlider.ValueChanged += OnGSliderMoved;
         BSlider.ValueChanged += OnBSliderMoved;
@@ -81,14 +61,19 @@ public partial class ColorSelector : MarginContainer
         if (Engine.IsEditorHint())
             return;
 
-        button.Pressed += () => RSlider.GrabFocus();
+        BackgroundButton.Pressed += () => RSlider.GrabFocus();
+        return;
+
+        void OnBSliderMoved(double value) => OnSliderMoved(value, BLabel);
+        void OnGSliderMoved(double value) => OnSliderMoved(value, GLabel);
+        void OnRSliderMoved(double value) => OnSliderMoved(value, RLabel);
     }
 
     private void OnSliderMoved(double value, Label label)
     {
         label.Text = $"{(int)value}";
         FeedbackColor.Color = Color.Color8((byte)RSlider.Value, (byte)GSlider.Value, (byte)BSlider.Value);
-        _Value = FeedbackColor.Color;
+        Value = FeedbackColor.Color;
         EmitSignalValueChanged();
     }
 }

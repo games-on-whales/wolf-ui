@@ -1,6 +1,8 @@
 using Godot;
 using System.Collections.Generic;
+using WolfUI;
 
+//TODO Theme config and settings are still WIP.
 public partial class ThemeSettings : Control
 {
     private static readonly PackedScene SelfRef = ResourceLoader.Load<PackedScene>("uid://bf1rpu61x753h");
@@ -62,7 +64,7 @@ public partial class ThemeSettings : Control
 
     public void InitColor(Node parent, string elementName, string colorName)
     {
-        var selector = ColorSelector.Create();
+        var selector = ColorSelector.CreateDefault();
         selector.Name = colorName;
         selector.Value = ModifyableTheme.GetColor(colorName, elementName);
         selector.ValueChanged += () => ModifyableTheme.SetColor(colorName, elementName, selector.Value);

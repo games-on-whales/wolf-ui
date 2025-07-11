@@ -37,7 +37,7 @@ public partial class VisibilitySwitcher : Control
 		var children = GetChildren();
 		foreach(var child in children)
 		{
-			if(child is Control control && control.Visible)
+			if(child is Control { Visible: true })
 			{
 				return;
 			}
