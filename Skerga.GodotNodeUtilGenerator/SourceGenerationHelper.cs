@@ -185,25 +185,19 @@ public class SourceGenerationHelper
         """;
 
         var namespaceText = symbol.ToDisplayString().Length > (symbol.Name.Length + 1)
-            ? $"namespace {symbol.ToDisplayString().Substring(0, symbol.ToDisplayString().Length - symbol.Name.Length - 1)}"
+            ? $"namespace {symbol.ToDisplayString().Substring(0, symbol.ToDisplayString().Length - symbol.Name.Length - 1)};"
             : "";
         
         return $$"""
         using Godot;
         
         {{namespaceText}}
+        
+        public partial class {{symbol.Name}}
         {
-            public partial class {{symbol.Name}}
-            {
         {{builder}}
 
         {{(skipNewGeneration ? "" : newMethodSourceCode)}}
-
-                public static void Yell()
-                {
-                    GD.Print("Injected");
-                }
-            }
         }
         """;
     }
