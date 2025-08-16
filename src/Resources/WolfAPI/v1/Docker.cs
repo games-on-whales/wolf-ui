@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -21,7 +22,7 @@ public partial class WolfApi
         }
         if (response.StatusCode == HttpStatusCode.OK)
         {
-
+            //GD.Print(message);
         }
         return;
     }
@@ -32,7 +33,7 @@ public partial class WolfApi
 
         if (_cache.Contains(cacheKey))
         {
-            return _cache.Get(cacheKey) as string != "";
+            return _cache.Get(cacheKey) as string != string.Empty;
         }
 
         if (retryCount >= 5)
@@ -46,7 +47,7 @@ public partial class WolfApi
             var response = await _httpClient.GetAsync(cacheKey);
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                _cache.Add(cacheKey, "", WolfAPICachePolicy);
+                _cache.Add(cacheKey, string.Empty, WolfAPICachePolicy);
                 return false;
             }
             var str = await response.Content.ReadAsStringAsync();

@@ -99,14 +99,17 @@ public partial class AppList : Control
 
 	public override void _Process(double delta)
 	{
+		if (!Visible) return;
+		
 		if (Engine.IsEditorHint())
 		{
 			return;
 		}
 
-		if (Input.IsActionJustPressed("ui_select") && Main.Singleton.UserList is Control userList)
+		if (InputActions.IsActionJustPressed("ui_select") && Main.Singleton.UserList is Control userList)
 		{
-			userList.Visible = false;
+			userList.Visible = true;
+			SoundEffects.PlayAcceptSound();
 		}
 	}
 

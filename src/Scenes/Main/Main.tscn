@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cj111e8qqvul4"]
+[gd_scene load_steps=22 format=3 uid="uid://cj111e8qqvul4"]
 
 [ext_resource type="Script" uid="uid://duwpj7xjak0bd" path="res://Scenes/Main/Main.cs" id="1_xobeq"]
 [ext_resource type="Resource" uid="uid://badu7abuxt6we" path="res://Resources/Controller/ControllerMap.tres" id="4_hkvnm"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://b4qkc5ost514t" path="res://Scenes/Main/Body/Apps/AppList.tscn" id="11_epx8f"]
 [ext_resource type="AudioStream" uid="uid://csnwuih5mmn5g" path="res://Audio/accept.ogg" id="11_hdjvh"]
 [ext_resource type="Texture2D" uid="uid://5ljg2ifn2pfm" path="res://Icons/Controller/PS5/PS5_Right_Stick.png" id="11_udh0u"]
+[ext_resource type="Script" uid="uid://cb2p4w2ipyjw2" path="res://Misc/InputActions.cs" id="11_xd21n"]
 [ext_resource type="PackedScene" uid="uid://8c0yr4763825" path="res://Scenes/Main/Body/Settings/Settings.tscn" id="11_xggvw"]
 [ext_resource type="Texture2D" uid="uid://bqmbshokjcw3n" path="res://Icons/Controller/Keyboard/Keyboard_Black_Enter.png" id="12_epx8f"]
 [ext_resource type="Script" uid="uid://bj71nhnsgexja" path="res://Scenes/Main/Footer/ControllerIcon.cs" id="13_epx8f"]
@@ -121,6 +122,7 @@ layout_mode = 1
 [node name="Settings" parent="Content/Body/VisibilitySwitcher" instance=ExtResource("11_xggvw")]
 visible = false
 layout_mode = 1
+SwitchSzene = null
 
 [node name="Footer" type="PanelContainer" parent="Content"]
 layout_mode = 2
@@ -132,9 +134,12 @@ theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Content/Footer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Content/Footer/MarginContainer" node_paths=PackedStringArray("_cancelContainer", "_backContainer")]
 layout_mode = 2
 size_flags_horizontal = 8
+script = ExtResource("11_xd21n")
+_cancelContainer = NodePath("CancelHint")
+_backContainer = NodePath("BackHint")
 
 [node name="ScrollHint" type="HBoxContainer" parent="Content/Footer/MarginContainer/HBoxContainer"]
 visible = false
@@ -163,6 +168,7 @@ expand_mode = 3
 stretch_mode = 6
 script = ExtResource("13_epx8f")
 controllerMap = ExtResource("4_hkvnm")
+buttonIcon = null
 
 [node name="TextureRect" type="TextureRect" parent="Content/Footer/MarginContainer/HBoxContainer/ScrollHint/Control"]
 layout_mode = 1
@@ -196,8 +202,10 @@ expand_mode = 3
 stretch_mode = 6
 script = ExtResource("13_epx8f")
 controllerMap = ExtResource("4_hkvnm")
+buttonIcon = null
 
 [node name="CancelHint" type="HBoxContainer" parent="Content/Footer/MarginContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="Spacer" type="Control" parent="Content/Footer/MarginContainer/HBoxContainer/CancelHint"]
@@ -223,6 +231,7 @@ metadata/_custom_type_script = "uid://bj71nhnsgexja"
 
 [node name="BackHint" type="HBoxContainer" parent="Content/Footer/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 
 [node name="Spacer" type="Control" parent="Content/Footer/MarginContainer/HBoxContainer/BackHint"]
@@ -233,7 +242,7 @@ layout_mode = 2
 layout_mode = 2
 text = "Back"
 
-[node name="Cancel" type="TextureRect" parent="Content/Footer/MarginContainer/HBoxContainer/BackHint"]
+[node name="Back" type="TextureRect" parent="Content/Footer/MarginContainer/HBoxContainer/BackHint"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8

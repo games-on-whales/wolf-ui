@@ -20,18 +20,24 @@ public partial class Main
 
         WolfApi.Singleton.ImageUpdated += async (img) =>
         {
-            if (wolfUi?.Runner?.Image is null || img != wolfUi?.Runner.Image) return;
-            if (!await QuestionDialogue.OpenDialogue<bool>("Restart", "Wolf-UI has been updated, please restart.",
+            if (wolfUi?.Runner?.Image is null || img != wolfUi.Runner.Image) return;
+            if (!await QuestionDialogue.OpenDialogue("Restart", "Wolf-UI has been updated, please restart.",
                     new Dictionary<string, bool>
                     {
                         { "Restart", true },
                         { "Later", false }
                     })) return;
-            await WolfApi.StartRunner(wolfUi.Runner);
-            await Task.Delay(500);
+            //await WolfApi.StartRunner(wolfUi.Runner);
+            //await Task.Delay(500);
             GetTree().Quit();
         };
+        
+
+
         if (wolfUi?.Runner?.Image is not null)
+        {
             WolfApi.PullImage(wolfUi.Runner.Image);
+        }
+
     }
 }

@@ -15,6 +15,15 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 theme_type_variation = &"AppCard"
 script = ExtResource("1_u3jln")
+IconPngPath = ""
+StartVirtualCompositor = false
+Title = ""
+Id = ""
+RenderNode = ""
+State = 4
+_state = 4
+_isImageOnDisc = true
+_wasInView = false
 metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
