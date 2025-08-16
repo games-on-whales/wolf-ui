@@ -12,7 +12,7 @@ public partial class WolfApi
 {
     public static async Task<Texture2D?> GetIcon(App app, double hCacheDuration = 1.0, int retry = 0)
     {
-        if (app.IconPngPath is not null) // no image set, get default from GitHub
+        if (app.IconPngPath is not null && app.IconPngPath != "") // image set, get image from wolf
             return await GetIcon(app.IconPngPath, hCacheDuration, retry);
 
         if (app.Runner?.Image is null || !app.Runner.Image.Contains("ghcr.io/games-on-whales/"))
@@ -36,7 +36,7 @@ public partial class WolfApi
         user = user == "root" ? "retro" : user;
 
         var filepath = $"/home/{user}/.wolf-ui/tmp/icons/{iconPath}.png";
-
+        filepath = filepath.Replace("\\", "/").Replace("//", "/");
 
         if (File.Exists(filepath))
         {

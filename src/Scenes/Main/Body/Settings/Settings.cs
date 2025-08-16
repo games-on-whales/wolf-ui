@@ -57,6 +57,6 @@ public partial class Settings : Control
 
     private void Init()
     {
-        //ProfileSettings.AddChild(ThemeSettings.Create());
+        ProfileSettings.AddChild(ThemeSettings.Create());
     }
 }

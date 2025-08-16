@@ -194,7 +194,7 @@ public partial class App : MarginContainer, IRestorable<App>
 			AppMenu.Hide();
 		}
 
-		if (AppMenu.Visible && Input.IsActionPressed("ui_cancel"))
+		if (AppMenu.Visible && InputActions.IsActionJustPressed("ui_cancel"))
 		{
 			AppButton.GrabFocus();
 		}
@@ -452,7 +452,7 @@ public partial class App : MarginContainer, IRestorable<App>
 			},
 			new Dictionary<string, Func<bool>>
 			{
-				{"No", () => Input.IsActionJustPressed("ui_cancel") }
+				{"No", () => InputActions.IsActionJustPressed("ui_cancel") }
 			}
 		))
 		{
