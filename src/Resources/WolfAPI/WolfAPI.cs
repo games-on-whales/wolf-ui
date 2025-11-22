@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using WolfUI.Misc;
 
 namespace Resources.WolfAPI;
@@ -27,17 +28,52 @@ public partial class WolfApi : Resource
     public event EventHandler<Lobby>? LobbyCreatedEvent;
     public event EventHandler<string>? LobbyStoppedEvent;
     
-    private static readonly System.Net.Http.HttpClient _httpClient = new(new SocketsHttpHandler
-    {
-        ConnectCallback = async (context, token) =>
-        {
-            var endpointPath = System.Environment.GetEnvironmentVariable("WOLF_SOCKET_PATH") ?? "/etc/wolf/cfg/wolf.sock";
-            var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-            var endpoint = new UnixDomainSocketEndPoint(endpointPath);
-            await socket.ConnectAsync(endpoint);
-            return new NetworkStream(socket, ownsSocket: true);
-        }
-    });
+    // private static readonly System.Net.Http.HttpClient _httpClient = new(new SocketsHttpHandler
+    // {
+    //     ConnectCallback = async (context, token) =>
+    //     {
+    //         var endpointPath = System.Environment.GetEnvironmentVariable("WOLF_SOCKET_PATH") ?? "/etc/wolf/cfg/wolf.sock";
+    //         var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+    //         var endpoint = new UnixDomainSocketEndPoint(endpointPath);
+    //         await socket.ConnectAsync(endpoint);
+    //         return new NetworkStream(socket, ownsSocket: true);
+    //     }
+    // });
+    
+    private static readonly TokenBucketRateLimiterOptions RateLimiterOptions = new()
+    { 
+        TokenLimit = 8, 
+        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+        QueueLimit = 3, 
+        ReplenishmentPeriod = TimeSpan.FromMilliseconds(1), 
+        TokensPerPeriod = 2, 
+        AutoReplenishment = true
+    };
+    
+    private static readonly System.Net.Http.HttpClient HttpClient = new(
+        handler: new ClientSideRateLimitedHandler(
+            limiter: new TokenBucketRateLimiter(RateLimiterOptions),
+            httpMessageHandler: new SocketsHttpHandler
+            {
+                ConnectCallback = async (_, token) =>
+                {
+                    var endpointPath = System.Environment.GetEnvironmentVariable("WOLF_SOCKET_PATH") ??
+                                       "/etc/wolf/cfg/wolf.sock";
+
+                    if (!Path.Exists(endpointPath))
+                    {
+                        throw new FileNotFoundException(endpointPath);
+                    }
+
+                    var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+                    var endpoint = new UnixDomainSocketEndPoint(endpointPath);
+                    await socket.ConnectAsync(endpoint, token);
+                    return new NetworkStream(socket, ownsSocket: true);
+                }
+            }
+        )
+    );
+    
     private static readonly ILogger<WolfApi> Logger = Main.GetLogger<WolfApi>();
     public static string SessionId { get; private set; } = "";
 
@@ -159,7 +195,7 @@ public partial class WolfApi : Resource
             {
                 try
                 {
-                    var stream = await _httpClient.GetStreamAsync($"{Api}/events");
+                    var stream = await HttpClient.GetStreamAsync($"{Api}/events");
                     var eventType = string.Empty;
                     using var reader = new StreamReader(stream);
                     while (!reader.EndOfStream)
@@ -213,7 +249,7 @@ public partial class WolfApi : Resource
 
             Logger.LogDebug("API call POST: {0} - {1}", url, data);
             StringContent content = new(data);
-            var result = await _httpClient.PostAsync($"{Api}{url}", content);
+            var result = await HttpClient.PostAsync($"{Api}{url}", content);
             var returnData = await result.Content.ReadAsStringAsync();
             Logger.LogDebug("API answer from: {0} - {1}", url, returnData);
             return returnData;
@@ -237,7 +273,7 @@ public partial class WolfApi : Resource
     {
         try
         {
-            var result = await _httpClient.GetStringAsync(url);
+            var result = await HttpClient.GetStringAsync(url);
             Logger.LogDebug("API call GET: {0} - {1}", url, result);
             var data = JsonSerializer.Deserialize<T>(result, JsonOptions);
             if (data is not null) return data;

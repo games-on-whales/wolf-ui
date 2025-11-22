@@ -63,7 +63,7 @@ public partial class App : MarginContainer, IRestorable<App>
 	}
 
 	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		if (Engine.IsEditorHint())
 		{
@@ -112,6 +112,15 @@ public partial class App : MarginContainer, IRestorable<App>
 		{
 			AppIcon.Texture = await WolfApi.GetIcon(this);
 		};
+		
+		_isImageOnDisc = await WolfApi.IsImageOnDisk(Runner.Image);
+		
+		async void onTimeout()
+		{
+			_isImageOnDisc = await WolfApi.IsImageOnDisk(Runner.Image);
+			GetTree().CreateTimer(15.0, true).Timeout += onTimeout;
+		};
+		GetTree().CreateTimer(15.0, true).Timeout += onTimeout;
 	}
 
 	public override void _ExitTree()
@@ -200,7 +209,7 @@ public partial class App : MarginContainer, IRestorable<App>
 		}
 
 		if (Runner?.Image is null || State == AppState.DOWNLOADING) return;
-		_isImageOnDisc = await WolfApi.IsImageOnDisk(Runner.Image);
+		
 		State = _isImageOnDisc ? _runningLobby is null ? AppState.OK : AppState.PLAYING : AppState.NOTONDISK;
 	}
 
@@ -220,6 +229,7 @@ public partial class App : MarginContainer, IRestorable<App>
 				ProgressBar.Value = 0;
 
 				MenuButtonStart.Text = "Start";
+				MenuButtonStart.Disabled = false;
 				MenuButtonStop.Visible = false;
 				MenuButtonCoop.Disabled = false;
 				MenuButtonUpdate.Disabled = false;

@@ -37,7 +37,7 @@ public partial class WolfApi
                          """;
             Logger.LogDebug("API call POST: {0} - {1}", url, data);
             StringContent content = new(data);
-            var result = await _httpClient.PostAsync(url, content);
+            var result = await HttpClient.PostAsync(url, content);
             var returnData = await result.Content.ReadAsStringAsync();
             Logger.LogDebug("API answer from: {0} - {1}", url, returnData);
         }

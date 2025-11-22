@@ -62,7 +62,7 @@ public partial class WolfApi
          """;
 
         StringContent content = new(json);
-        var result = await _httpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
+        var result = await HttpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
         Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
     }
     

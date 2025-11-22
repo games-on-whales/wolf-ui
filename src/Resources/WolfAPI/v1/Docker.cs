@@ -15,7 +15,7 @@ public partial class WolfApi
     //TODO Create Class for the Inspect return. 
     public static async Task InspectImage(string imageName)
     {
-        var response = await _httpClient.GetAsync($"{Api}/docker/images/inspect?image_name={imageName}");
+        var response = await HttpClient.GetAsync($"{Api}/docker/images/inspect?image_name={imageName}");
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
             return;
@@ -39,24 +39,32 @@ public partial class WolfApi
         if (retryCount >= 5)
         {
             Logger.LogError("Api call failed 5 times: /docker/images/inspect?image_name={0}, {1}... ABORT", imageName);
+            _cache.Add(cacheKey, string.Empty, WolfAPICachePolicy);
             return false;
         }
 
         try
         {
-            var response = await _httpClient.GetAsync(cacheKey);
+            var response = await HttpClient.GetAsync(cacheKey);
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 _cache.Add(cacheKey, string.Empty, WolfAPICachePolicy);
                 return false;
             }
+
             var str = await response.Content.ReadAsStringAsync();
             _cache.Add(cacheKey, str, WolfAPICachePolicy);
             return true;
         }
         catch (HttpRequestException e)
         {
-            Logger.LogWarning("Api call failed: /docker/images/inspect?image_name={0}, {1}... Retrying", imageName, e.Message);
+            Logger.LogWarning("Api call failed: /docker/images/inspect?image_name={0}, {1}... Retrying", imageName,
+                e.Message);
+            return await IsImageOnDisk(imageName, retryCount + 1);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
             return await IsImageOnDisk(imageName, retryCount + 1);
         }
     }
@@ -92,7 +100,7 @@ public partial class WolfApi
                 Content = new StringContent(json)
             };
 
-            var response = await _httpClient.SendAsync(reqMsg, HttpCompletionOption.ResponseHeadersRead);
+            var response = await HttpClient.SendAsync(reqMsg, HttpCompletionOption.ResponseHeadersRead);
             Logger.LogInformation("Pull request: {0}", response.StatusCode);
             if (response.StatusCode != HttpStatusCode.OK)
             {
