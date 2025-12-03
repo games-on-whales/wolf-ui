@@ -9,15 +9,6 @@ namespace Resources.WolfAPI;
 
 public partial class WolfApi
 {
-    private class StopLobbyRecord
-    {
-        [JsonInclude, JsonPropertyName("lobby_id")]
-        public required string LobbyId { get; set; }
-
-        [JsonInclude, JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<int>? Pin { get; set; }
-    }
-    
     public static async Task<List<Lobby>> GetLobbies()
     {
         var lobbies = await GetAsync<LobbiesResponse>("http://localhost/api/v1/lobbies");
@@ -42,28 +33,48 @@ public partial class WolfApi
     
     public static async Task<ErrorResponse?> JoinLobby(string lobbyId, string sessionId, List<int>? pin = null)
     {
-        var lobby = new LobbyJoin()
+        var joinLobby = new JoinLobbyRecord()
         {
             LobbyId = lobbyId,
             MoonlightSessionId = sessionId,
             Pin = pin
         };
 
-        var result = await PostAsync("/lobbies/join", lobby);
+        var result = await PostAsync("/lobbies/join", joinLobby);
         return result is null ? null : JsonSerializer.Deserialize<ErrorResponse>(result, JsonOptions);
     }
+
     public static async Task LeaveLobby(string lobbyId, string sessionId)
     {
-        var json = $$"""
-         {
-             "lobby_id": "{{lobbyId}}",
-             "moonlight_session_id": "{{sessionId}}"
-         }
-         """;
+        var leaveLobby = new LeaveLobbyRecord()
+        {
+            LobbyId = lobbyId,
+            MoonlightSessionId = sessionId
+        };
 
-        StringContent content = new(json);
-        var result = await HttpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
-        Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
+        var result = await PostAsync("/lobbies/leave", leaveLobby);
+    }
+    
+    public static async Task PauseLobby(string lobbyId, List<int>? pin = null)
+    {
+        var pauseLobby = new PauseLobbyRecord()
+        {
+            LobbyId = lobbyId,
+            Pin = pin
+        };
+
+        var result = await PostAsync("/lobbies/pause", pauseLobby);
+    }
+    
+    public static async Task ResumeLobby(string lobbyId, List<int>? pin = null)
+    {
+        var resumeLobby = new ResumeLobbyRecord()
+        {
+            LobbyId = lobbyId,
+            Pin = pin
+        };
+
+        var result = await PostAsync("/lobbies/resume", resumeLobby);
     }
     
     public static async Task StopLobby(string lobbyId, List<int>? pin = null)

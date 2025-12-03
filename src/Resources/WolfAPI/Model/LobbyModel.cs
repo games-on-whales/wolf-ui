@@ -39,13 +39,45 @@ public partial class Lobby
     public List<string>? ConnectedSessions { get; set; }
 }
 
-public class LobbyJoin
+public class JoinLobbyRecord
 {
     [JsonInclude, JsonPropertyName("lobby_id")]
     public string? LobbyId { get; set; }
     [JsonInclude, JsonPropertyName("moonlight_session_id")]
     public string? MoonlightSessionId { get; set; }
     [JsonInclude, JsonPropertyName("pin")][JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<int>? Pin { get; set; }
+}
+
+public class LeaveLobbyRecord
+{
+    [JsonInclude, JsonPropertyName("lobby_id")]
+    public string? LobbyId { get; set; }
+    [JsonInclude, JsonPropertyName("moonlight_session_id")]
+    public string? MoonlightSessionId { get; set; }
+}
+
+public class StopLobbyRecord
+{
+    [JsonInclude, JsonPropertyName("lobby_id")]
+    public required string LobbyId { get; set; }
+    [JsonInclude, JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<int>? Pin { get; set; }
+}
+
+public class PauseLobbyRecord
+{
+    [JsonInclude, JsonPropertyName("lobby_id")]
+    public required string LobbyId { get; set; }
+    [JsonInclude, JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<int>? Pin { get; set; }
+}
+
+public class ResumeLobbyRecord
+{
+    [JsonInclude, JsonPropertyName("lobby_id")]
+    public required string LobbyId { get; set; }
+    [JsonInclude, JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<int>? Pin { get; set; }
 }
 

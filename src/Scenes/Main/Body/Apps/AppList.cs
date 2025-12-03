@@ -11,8 +11,10 @@ namespace WolfUI;
 [Tool, GlobalClass, SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class AppList : Control
 {
-    public event EventHandler<Resources.WolfAPI.Lobby>? LobbyCreatedEvent;
-    public event EventHandler<string>? LobbyStoppedEvent;
+	public event EventHandler<Resources.WolfAPI.Lobby>? LobbyCreatedEvent;
+	public event EventHandler<string>? LobbyPausedEvent;
+	public event EventHandler<Resources.WolfAPI.Lobby>? LobbyResumedEvent;
+	public event EventHandler<string>? LobbyStoppedEvent;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -33,12 +35,16 @@ public partial class AppList : Control
 		ThemeChanged += RebuildAppList;
 
 		WolfApi.Singleton.LobbyCreatedEvent += OnLobbyStarted;
+		WolfApi.Singleton.LobbyPausedEvent += OnLobbyPaused;
+		WolfApi.Singleton.LobbyResumedEvent += OnLobbyResumed;
 		WolfApi.Singleton.LobbyStoppedEvent += OnLobbyStopped;
 	}
 
 	public override void _ExitTree()
 	{
 		WolfApi.Singleton.LobbyCreatedEvent -= OnLobbyStarted;
+		WolfApi.Singleton.LobbyPausedEvent -= OnLobbyPaused;
+		WolfApi.Singleton.LobbyResumedEvent -= OnLobbyResumed;
 		WolfApi.Singleton.LobbyStoppedEvent -= OnLobbyStopped;
 	}
 	
@@ -86,12 +92,30 @@ public partial class AppList : Control
 		LobbyStoppedEvent?.Invoke(this, lobbyId);
 	}
 
+	private void OnLobbyResumed(object? sender, Resources.WolfAPI.Lobby? lobby)
+	{
+		if (!Visible)
+			return;
+		if (lobby is null)
+			return;
+
+		LobbyResumedEvent?.Invoke(this, lobby);
+	}
+
+	private void OnLobbyPaused(object? caller, string lobbyId)
+	{
+		if (!Visible)
+			return;
+
+		LobbyPausedEvent?.Invoke(this, lobbyId);
+	}
+
 	private void OnLobbyStarted(object? sender, Resources.WolfAPI.Lobby? lobby)
 	{
 		if (!Visible) return;
 
 		if (lobby?.ProfileId != WolfApi.ActiveProfile.Id &&
-		    lobby?.StartedByProfileId != WolfApi.ActiveProfile.Id) return;
+			lobby?.StartedByProfileId != WolfApi.ActiveProfile.Id) return;
 		if (lobby is null)
 			return;
 		LobbyCreatedEvent?.Invoke(this, lobby);
