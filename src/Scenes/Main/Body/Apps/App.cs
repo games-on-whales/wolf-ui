@@ -15,6 +15,7 @@ public partial class App : MarginContainer, IRestorable<App>
 		NOTONDISK = 0,
 		DOWNLOADING,
 		PLAYING,
+		PAUSED,
 		OK,
 		NONE
 	}
@@ -46,6 +47,12 @@ public partial class App : MarginContainer, IRestorable<App>
 
 	[Signal]
 	private delegate void AppRunningEventHandler();
+
+	[Signal]
+	private delegate void AppPausedEventHandler();
+
+	[Signal]
+	private delegate void AppResumedEventHandler();
 
 	[Signal]
 	private delegate void AppStoppedEventHandler();
@@ -80,10 +87,12 @@ public partial class App : MarginContainer, IRestorable<App>
 		AppButton.Pressed += OnPressed;
 
 		FocusEntered += AppMenu.Hide;
-		MenuButtonCancle.Pressed += AppButton.GrabFocus; //Hides menu via the FocusEntered above
+		MenuButtonCancel.Pressed += AppButton.GrabFocus; //Hides menu via the FocusEntered above
 		MenuButtonUpdate.Pressed += PullImage;
 		MenuButtonCoop.Pressed += OnCoopPressed;
 		MenuButtonStop.Pressed += OnStopPressed;
+		MenuButtonResume.Pressed += OnResumePressed;
+		MenuButtonPause.Pressed += OnPausePressed;
 		MenuButtonStart.Pressed += OnStartPressed;
 
 		State = AppState.OK;
@@ -91,10 +100,22 @@ public partial class App : MarginContainer, IRestorable<App>
 		if (Main.Singleton.AppList is AppList appList)
 		{
 			appList.LobbyCreatedEvent += OnLobbyCreatedEvent;
+			appList.RunnerPausedEvent += OnRunnerPausedEvent;
+			appList.RunnerResumedEvent += OnRunnerResumedEvent;
 			appList.LobbyStoppedEvent += OnLobbyStoppedEvent;
 		}
 
 		AppRunning += () =>
+		{
+			State = AppState.PLAYING;
+		};
+
+		AppPaused += () =>
+		{
+			State = AppState.PAUSED;
+		};
+
+		AppResumed += () =>
 		{
 			State = AppState.PLAYING;
 		};
@@ -113,11 +134,11 @@ public partial class App : MarginContainer, IRestorable<App>
 			AppIcon.Texture = await WolfApi.GetIcon(this);
 		};
 		
-		_isImageOnDisc = await WolfApi.IsImageOnDisk(Runner.Image);
+		_isImageOnDisc = (Runner?.Image != null) && await WolfApi.IsImageOnDisk(Runner.Image);
 		
 		async void onTimeout()
 		{
-			_isImageOnDisc = await WolfApi.IsImageOnDisk(Runner.Image);
+			_isImageOnDisc = (Runner?.Image != null) && await WolfApi.IsImageOnDisk(Runner.Image);
 			GetTree().CreateTimer(15.0, true).Timeout += onTimeout;
 		};
 		GetTree().CreateTimer(15.0, true).Timeout += onTimeout;
@@ -133,8 +154,22 @@ public partial class App : MarginContainer, IRestorable<App>
 		}
 
 		if (Main.Singleton.AppList is not AppList appList) return;
+		appList.RunnerPausedEvent -= OnRunnerPausedEvent;
+		appList.RunnerResumedEvent -= OnRunnerResumedEvent;
 		appList.LobbyCreatedEvent -= OnLobbyCreatedEvent;
 		appList.LobbyStoppedEvent -= OnLobbyStoppedEvent;
+	}
+
+	private void OnRunnerPausedEvent(object? caller, Runner runner)
+	{
+		if (!IsInstanceValid(this) || runner != _runningLobby?.Runner) return;
+		EmitSignalAppPaused();
+	}
+
+	private void OnRunnerResumedEvent(object? caller, Runner runner)
+	{
+		if (!IsInstanceValid(this) || runner != _runningLobby?.Runner) return;
+		EmitSignalAppResumed();
 	}
 
 	private void OnLobbyCreatedEvent(object? caller, Resources.WolfAPI.Lobby lobby)
@@ -174,7 +209,7 @@ public partial class App : MarginContainer, IRestorable<App>
 		ProgressBar.Value = progress;
 	}
 
-	public override async void _Process(double delta)
+	public override void _Process(double delta)
 	{
 		base._Process(delta);
 
@@ -184,8 +219,8 @@ public partial class App : MarginContainer, IRestorable<App>
 		}
 
 		if (!_wasInView 
-		    && Main.Singleton.AppList is AppList appList 
-		    && GetGlobalRect().Intersection(appList.GetGlobalRect()).HasArea())
+			&& Main.Singleton.AppList is AppList appList 
+			&& GetGlobalRect().Intersection(appList.GetGlobalRect()).HasArea())
 		{
 			EmitSignalAppEnteredView();
 			_wasInView = true;
@@ -193,10 +228,12 @@ public partial class App : MarginContainer, IRestorable<App>
 
 
 		if (AppMenu.Visible && !(
-				MenuButtonCancle.HasFocus() ||
+				MenuButtonCancel.HasFocus() ||
 				MenuButtonUpdate.HasFocus() ||
 				MenuButtonCoop.HasFocus() ||
 				MenuButtonStop.HasFocus() ||
+				MenuButtonResume.HasFocus() ||
+				MenuButtonPause.HasFocus() ||
 				MenuButtonStart.HasFocus())
 			)
 		{
@@ -220,6 +257,7 @@ public partial class App : MarginContainer, IRestorable<App>
 			case AppState.OK:
 				DownloadHint.Visible = false;
 				PlayingHint.Visible = false;
+				PausedHint.Visible = false;
 				OkHint.Visible = true;
 
 				DisabledIndicator.Visible = false;
@@ -230,6 +268,8 @@ public partial class App : MarginContainer, IRestorable<App>
 
 				MenuButtonStart.Text = "Start";
 				MenuButtonStart.Disabled = false;
+				MenuButtonPause.Visible = false;
+				MenuButtonResume.Visible = false;
 				MenuButtonStop.Visible = false;
 				MenuButtonCoop.Disabled = false;
 				MenuButtonUpdate.Disabled = false;
@@ -240,10 +280,40 @@ public partial class App : MarginContainer, IRestorable<App>
 				MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
 				MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
 				break;
+
 			
+			case AppState.PAUSED:
+				DownloadHint.Visible = false;
+				PlayingHint.Visible = false;
+				PausedHint.Visible = true;
+				OkHint.Visible = false;
+				ProgressBar.Value = 0;
+
+				DisabledIndicator.Visible = false;
+				ProgressBar.Visible = false;
+
+				AppButton.Disabled = false;
+				ProgressBar.Value = 0;
+
+				MenuButtonStart.Text = "Start";
+				MenuButtonStart.Visible = false;
+				MenuButtonPause.Visible = false;
+				MenuButtonResume.Visible = true;
+				MenuButtonStop.Visible = false;
+				MenuButtonCoop.Disabled = false;
+				MenuButtonUpdate.Disabled = false;
+
+				MenuButtonStart.FocusNeighborBottom = MenuButtonCoop.GetPath();
+				MenuButtonStart.FocusNext = MenuButtonCoop.GetPath();
+
+				MenuButtonCoop.FocusPrevious = MenuButtonStart.GetPath();
+				MenuButtonCoop.FocusNeighborTop = MenuButtonStart.GetPath();
+				break;
+
 			case AppState.PLAYING:
 				DownloadHint.Visible = false;
 				PlayingHint.Visible = true;
+				PausedHint.Visible = false;
 				OkHint.Visible = false;
 				ProgressBar.Value = 0;
 
@@ -254,6 +324,8 @@ public partial class App : MarginContainer, IRestorable<App>
 				}
 
 				MenuButtonCoop.Disabled = true;
+				MenuButtonPause.Visible = true;
+				MenuButtonResume.Visible = false;
 
 				MenuButtonStart.FocusNeighborBottom = MenuButtonStop.GetPath();
 				MenuButtonStart.FocusNext = MenuButtonStop.GetPath();
@@ -271,6 +343,7 @@ public partial class App : MarginContainer, IRestorable<App>
 			case AppState.NOTONDISK:
 				DownloadHint.Visible = true;
 				PlayingHint.Visible = false;
+				PausedHint.Visible = false;
 				OkHint.Visible = false;
 				ProgressBar.Value = 0;
 
@@ -284,6 +357,7 @@ public partial class App : MarginContainer, IRestorable<App>
 			case AppState.DOWNLOADING:
 				DownloadHint.Visible = true;
 				PlayingHint.Visible = false;
+				PausedHint.Visible = false;
 				OkHint.Visible = false;
 
 				ProgressBar.Visible = true;
@@ -395,6 +469,36 @@ public partial class App : MarginContainer, IRestorable<App>
 
 
 		MenuButtonStart.Disabled = false;
+
+		AppButton.GrabFocus();
+	}
+
+	private async void OnPausePressed()
+	{
+		if (_runningLobby?.Runner is null || _runningLobby?.Runner.ParentSessionId is null)
+			return;
+
+
+		MenuButtonPause.Disabled = true;
+		await WolfApi.PauseRunner(_runningLobby.Runner, _runningLobby.Runner.ParentSessionId);
+		MenuButtonPause.Disabled = false;
+
+		State = AppState.PAUSED;
+
+		AppButton.GrabFocus();
+	}
+
+	private async void OnResumePressed()
+	{
+		if (_runningLobby?.Runner is null || _runningLobby?.Runner.ParentSessionId is null)
+			return;
+
+
+		MenuButtonResume.Disabled = true;
+		await WolfApi.ResumeRunner(_runningLobby.Runner, _runningLobby.Runner.ParentSessionId);
+		MenuButtonResume.Disabled = false;
+
+		State = AppState.PLAYING;
 
 		AppButton.GrabFocus();
 	}

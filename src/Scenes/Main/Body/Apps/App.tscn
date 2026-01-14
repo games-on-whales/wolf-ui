@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://chspw2lt1qcuc"]
+[gd_scene load_steps=7 format=3 uid="uid://chspw2lt1qcuc"]
 
 [ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/Body/Apps/App.cs" id="1_u3jln"]
 [ext_resource type="Texture2D" uid="uid://wpxb54l4wult" path="res://Icons/UI/download-2-circle-svgrepo-com.svg" id="2_is3or"]
 [ext_resource type="Script" uid="uid://dy3vko5i4jvi3" path="res://Scenes/Main/Body/Apps/ThemedSVG.cs" id="3_8t7no"]
 [ext_resource type="Texture2D" uid="uid://d1uaf1ivwb32x" path="res://Icons/UI/play-circle-svgrepo-com.svg" id="4_nooyg"]
 [ext_resource type="Texture2D" uid="uid://cmj2w8tadwl8f" path="res://Icons/UI/check-circle-svgrepo-com.svg" id="5_2ceq8"]
+[ext_resource type="Texture2D" uid="uid://b7a6hf2qcwcv6" path="res://Icons/UI/pause-circle-svgrepo-com.svg" id="5_is3or"]
 
 [node name="App" type="MarginContainer"]
 custom_minimum_size = Vector2(200, 295)
@@ -152,6 +153,20 @@ texture = ExtResource("4_nooyg")
 expand_mode = 4
 script = ExtResource("3_8t7no")
 
+[node name="PausedHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(0.6, 0.565, 0.45, 1)
+custom_minimum_size = Vector2(15, 15)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme_type_variation = &"AppCardStatusIconPaused"
+texture = ExtResource("5_is3or")
+expand_mode = 4
+script = ExtResource("3_8t7no")
+
 [node name="OkHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
 unique_name_in_owner = true
 self_modulate = Color(0.292571, 0.533571, 0.177747, 1)
@@ -201,11 +216,31 @@ size_flags_vertical = 4
 [node name="MenuButtonStart" type="Button" parent="HBoxContainer/AppButton/AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-focus_neighbor_top = NodePath("../MenuButtonCancle")
+focus_neighbor_top = NodePath("../MenuButtonCancel")
 focus_neighbor_bottom = NodePath("../MenuButtonCoop")
 focus_next = NodePath("../MenuButtonCoop")
-focus_previous = NodePath("../MenuButtonCancle")
+focus_previous = NodePath("../MenuButtonCancel")
 text = "Start"
+
+[node name="MenuButtonPause" type="Button" parent="HBoxContainer/AppButton/AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_neighbor_top = NodePath("../MenuButtonCancel")
+focus_neighbor_bottom = NodePath("../MenuButtonCoop")
+focus_next = NodePath("../MenuButtonCoop")
+focus_previous = NodePath("../MenuButtonCancel")
+text = "Pause"
+
+[node name="MenuButtonResume" type="Button" parent="HBoxContainer/AppButton/AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_neighbor_top = NodePath("../MenuButtonCancel")
+focus_neighbor_bottom = NodePath("../MenuButtonCoop")
+focus_next = NodePath("../MenuButtonCoop")
+focus_previous = NodePath("../MenuButtonCancel")
+text = "Resume"
 
 [node name="MenuButtonStop" type="Button" parent="HBoxContainer/AppButton/AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
@@ -230,12 +265,12 @@ text = "Start Co-op"
 unique_name_in_owner = true
 layout_mode = 2
 focus_neighbor_top = NodePath("../MenuButtonCoop")
-focus_neighbor_bottom = NodePath("../MenuButtonCancle")
-focus_next = NodePath("../MenuButtonCancle")
+focus_neighbor_bottom = NodePath("../MenuButtonCancel")
+focus_next = NodePath("../MenuButtonCancel")
 focus_previous = NodePath("../MenuButtonCoop")
 text = "Check for Update"
 
-[node name="MenuButtonCancle" type="Button" parent="HBoxContainer/AppButton/AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="MenuButtonCancel" type="Button" parent="HBoxContainer/AppButton/AppMenu/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_neighbor_top = NodePath("../MenuButtonUpdate")

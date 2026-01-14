@@ -27,6 +27,8 @@ public partial class WolfApi : Resource
     };
     public event EventHandler<Lobby>? LobbyCreatedEvent;
     public event EventHandler<string>? LobbyStoppedEvent;
+    public event EventHandler<Runner>? RunnerPausedEvent;
+    public event EventHandler<Runner>? RunnerResumedEvent;
     
     // private static readonly System.Net.Http.HttpClient _httpClient = new(new SocketsHttpHandler
     // {
@@ -147,7 +149,9 @@ public partial class WolfApi : Resource
             { "wolf::core::events::PlugDeviceEvent", (_)=>{}},
             { "wolf::core::events::UnplugDeviceEvent", (_)=>{}},
             { "wolf::core::events::PairSignal", (_)=>{}},
-            { "wolf::core::events::StartRunner", (_)=>{}},
+            { "wolf::core::events::StartRunnerEvent", (_)=>{}},
+            { "wolf::core::events::PauseRunnerEvent", InvokeRunnerPaused },
+            { "wolf::core::events::ResumeRunnerEvent", InvokeRunnerResumed },
             { "wolf::core::events::StreamSession", (_)=>{}},
             { "wolf::core::events::StopStreamEvent", (_)=>{}},
             { "wolf::core::events::VideoSession", (_)=>{}},
@@ -158,8 +162,8 @@ public partial class WolfApi : Resource
             { "wolf::core::events::ResumeStreamEvent", (_)=>{}},
             { "wolf::core::events::PauseStreamEvent", (_)=>{}},
             { "wolf::core::events::SwitchStreamProducerEvents", (_)=>{}},
-            { "wolf::core::events::JoinLobbyEvent", InvokeLobbyJoin},
-            { "wolf::core::events::LeaveLobbyEvent", InvokeLobbyLeave},
+            { "wolf::core::events::JoinLobbyEvent", InvokeLobbyJoin },
+            { "wolf::core::events::LeaveLobbyEvent", InvokeLobbyLeave },
             { "wolf::core::events::CreateLobbyEvent", InvokeLobbyCreated },
             { "wolf::core::events::StopLobbyEvent", InvokeLobbyStopped },
         };
@@ -175,6 +179,8 @@ public partial class WolfApi : Resource
         value(data);
         return;
 
+        void InvokeRunnerPaused(string dataJson) => InvokeEvent(RunnerPausedEvent, dataJson);
+        void InvokeRunnerResumed(string dataJson) => InvokeEvent(RunnerResumedEvent, dataJson);
         void InvokeLobbyCreated(string dataJson) => InvokeEvent(LobbyCreatedEvent, dataJson);
         void InvokeLobbyStopped(string dataJson) => LobbyStoppedEvent?.Invoke(this, dataJson.TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\"}"));
         void InvokeLobbyJoin(string dataJson) => EmitSignalLobbyJoinEvent(dataJson[..dataJson.LastIndexOf(',')].TrimPrefix("{\"lobby_id\":\"").TrimSuffix("\""));

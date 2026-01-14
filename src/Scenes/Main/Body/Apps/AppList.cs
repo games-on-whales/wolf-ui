@@ -11,8 +11,11 @@ namespace WolfUI;
 [Tool, GlobalClass, SceneAutoConfigure(GenerateNewMethod = false)]
 public partial class AppList : Control
 {
-    public event EventHandler<Resources.WolfAPI.Lobby>? LobbyCreatedEvent;
-    public event EventHandler<string>? LobbyStoppedEvent;
+	public event EventHandler<Resources.WolfAPI.Runner>? RunnerPausedEvent;
+	public event EventHandler<Resources.WolfAPI.Runner>? RunnerResumedEvent;
+	
+	public event EventHandler<Resources.WolfAPI.Lobby>? LobbyCreatedEvent;
+	public event EventHandler<string>? LobbyStoppedEvent;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -32,12 +35,18 @@ public partial class AppList : Control
 		VisibilityChanged += RebuildAppList;
 		ThemeChanged += RebuildAppList;
 
+		WolfApi.Singleton.RunnerPausedEvent += OnRunnerPaused;
+		WolfApi.Singleton.RunnerResumedEvent += OnRunnerResumed;
+		
 		WolfApi.Singleton.LobbyCreatedEvent += OnLobbyStarted;
 		WolfApi.Singleton.LobbyStoppedEvent += OnLobbyStopped;
 	}
 
 	public override void _ExitTree()
 	{
+		WolfApi.Singleton.RunnerPausedEvent -= OnRunnerPaused;
+		WolfApi.Singleton.RunnerResumedEvent -= OnRunnerResumed;
+		
 		WolfApi.Singleton.LobbyCreatedEvent -= OnLobbyStarted;
 		WolfApi.Singleton.LobbyStoppedEvent -= OnLobbyStopped;
 	}
@@ -78,6 +87,26 @@ public partial class AppList : Control
 			Main.Singleton.OptionsButton.GrabFocus();
 	}
 
+	private void OnRunnerResumed(object? sender, Resources.WolfAPI.Runner? runner)
+	{
+		if (!Visible)
+			return;
+		if (runner is null)
+			return;
+
+		RunnerResumedEvent?.Invoke(this, runner);
+	}
+
+	private void OnRunnerPaused(object? caller, Resources.WolfAPI.Runner? runner)
+	{
+		if (!Visible)
+			return;
+		if (runner is null)
+			return;
+
+		RunnerPausedEvent?.Invoke(this, runner);
+	}
+
 	private void OnLobbyStopped(object? caller, string lobbyId)
 	{
 		if (!Visible)
@@ -91,7 +120,7 @@ public partial class AppList : Control
 		if (!Visible) return;
 
 		if (lobby?.ProfileId != WolfApi.ActiveProfile.Id &&
-		    lobby?.StartedByProfileId != WolfApi.ActiveProfile.Id) return;
+			lobby?.StartedByProfileId != WolfApi.ActiveProfile.Id) return;
 		if (lobby is null)
 			return;
 		LobbyCreatedEvent?.Invoke(this, lobby);

@@ -5,16 +5,18 @@ ARG GODOT_VERSION=4.4.1
 ##################### build wolf-ui ###########################################################
 ###############################################################################################
 # hadolint ignore=DL3006
-FROM ubuntu:24.10 AS builder
+FROM ubuntu:25.10 AS builder
 ARG GODOT_VERSION
 
 RUN <<_INSTALL_DOTNET
 set -e
 
-apt-get update -y
-apt-get install -y dotnet-sdk-8.0 unzip build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev \
+apt-get update
+apt-get install -y --no-install-recommends dotnet-sdk-8.0 unzip build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev \
     libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libfreetype6-dev libudev-dev libxi-dev \
     libxrandr-dev yasm wget libfontconfig
+
+rm -rf /var/lib/apt/lists/*
 
 wget -O Godot.zip https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_mono_linux_x86_64.zip
 unzip Godot.zip -d /usr/local/bin
@@ -47,12 +49,14 @@ _INSTALL_PACKAGES
 
 FROM ${BASE_APP_IMAGE}
 
-RUN <<_INSTALL_REQIREMENTS
+RUN <<_INSTALL_REQUIREMENTS
 set -e
-apt-get update -y
-apt-get install -y libicu-dev
+apt-get update
+apt-get install -y --no-install-recommends libicu-dev
 
-_INSTALL_REQIREMENTS
+rm -rf /var/lib/apt/lists/*
+
+_INSTALL_REQUIREMENTS
 
 ENV PUID=0 \
     PGID=0 \
