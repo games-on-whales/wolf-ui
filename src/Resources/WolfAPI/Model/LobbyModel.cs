@@ -65,22 +65,6 @@ public class StopLobbyRecord
     public List<int>? Pin { get; set; }
 }
 
-public class PauseLobbyRecord
-{
-    [JsonInclude, JsonPropertyName("lobby_id")]
-    public required string LobbyId { get; set; }
-    [JsonInclude, JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<int>? Pin { get; set; }
-}
-
-public class ResumeLobbyRecord
-{
-    [JsonInclude, JsonPropertyName("lobby_id")]
-    public required string LobbyId { get; set; }
-    [JsonInclude, JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<int>? Pin { get; set; }
-}
-
 public class LobbiesResponse
 {
     [JsonInclude, JsonPropertyName("success")]

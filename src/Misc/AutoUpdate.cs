@@ -27,7 +27,7 @@ public partial class Main
                         { "Restart", true },
                         { "Later", false }
                     })) return;
-            //await WolfApi.StartRunner(wolfUi.Runner);
+            //await WolfApi.StartRunnerEvent(wolfUi.Runner);
             //await Task.Delay(500);
             GetTree().Quit();
         };

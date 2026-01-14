@@ -37,3 +37,21 @@ public class Runner
     [JsonInclude, JsonPropertyName("run_cmd"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? RunCmd { get; set; }
 }
+
+public class PauseRunnerRecord
+{
+    [JsonInclude, JsonPropertyName("runner")]
+    public required Runner Runner { get; set; }
+
+    [JsonInclude, JsonPropertyName("session_id"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? SessionId { get; set; }
+}
+
+public class ResumeRunnerRecord
+{
+    [JsonInclude, JsonPropertyName("runner")]
+    public required Runner Runner { get; set; }
+
+    [JsonInclude, JsonPropertyName("session_id"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? SessionId { get; set; }
+}

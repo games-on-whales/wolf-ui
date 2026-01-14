@@ -55,28 +55,6 @@ public partial class WolfApi
         var result = await PostAsync("/lobbies/leave", leaveLobby);
     }
     
-    public static async Task PauseLobby(string lobbyId, List<int>? pin = null)
-    {
-        var pauseLobby = new PauseLobbyRecord()
-        {
-            LobbyId = lobbyId,
-            Pin = pin
-        };
-
-        var result = await PostAsync("/lobbies/pause", pauseLobby);
-    }
-    
-    public static async Task ResumeLobby(string lobbyId, List<int>? pin = null)
-    {
-        var resumeLobby = new ResumeLobbyRecord()
-        {
-            LobbyId = lobbyId,
-            Pin = pin
-        };
-
-        var result = await PostAsync("/lobbies/resume", resumeLobby);
-    }
-    
     public static async Task StopLobby(string lobbyId, List<int>? pin = null)
     {
         var stopLobby = new StopLobbyRecord()

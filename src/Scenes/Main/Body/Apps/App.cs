@@ -100,8 +100,8 @@ public partial class App : MarginContainer, IRestorable<App>
 		if (Main.Singleton.AppList is AppList appList)
 		{
 			appList.LobbyCreatedEvent += OnLobbyCreatedEvent;
-			appList.LobbyPausedEvent += OnLobbyPausedEvent;
-			appList.LobbyResumedEvent += OnLobbyResumedEvent;
+			appList.RunnerPausedEvent += OnRunnerPausedEvent;
+			appList.RunnerResumedEvent += OnRunnerResumedEvent;
 			appList.LobbyStoppedEvent += OnLobbyStoppedEvent;
 		}
 
@@ -154,10 +154,22 @@ public partial class App : MarginContainer, IRestorable<App>
 		}
 
 		if (Main.Singleton.AppList is not AppList appList) return;
+		appList.RunnerPausedEvent -= OnRunnerPausedEvent;
+		appList.RunnerResumedEvent -= OnRunnerResumedEvent;
 		appList.LobbyCreatedEvent -= OnLobbyCreatedEvent;
-		appList.LobbyPausedEvent -= OnLobbyPausedEvent;
-		appList.LobbyResumedEvent -= OnLobbyResumedEvent;
 		appList.LobbyStoppedEvent -= OnLobbyStoppedEvent;
+	}
+
+	private void OnRunnerPausedEvent(object? caller, Runner runner)
+	{
+		if (!IsInstanceValid(this) || runner != _runningLobby?.Runner) return;
+		EmitSignalAppPaused();
+	}
+
+	private void OnRunnerResumedEvent(object? caller, Runner runner)
+	{
+		if (!IsInstanceValid(this) || runner != _runningLobby?.Runner) return;
+		EmitSignalAppResumed();
 	}
 
 	private void OnLobbyCreatedEvent(object? caller, Resources.WolfAPI.Lobby lobby)
@@ -165,20 +177,6 @@ public partial class App : MarginContainer, IRestorable<App>
 		if (!IsInstanceValid(this) || !IsAlreadyRunning(lobby)) return;
 		_runningLobby = lobby;
 		EmitSignalAppRunning();
-	}
-
-	private void OnLobbyPausedEvent(object? caller, string lobbyId)
-	{
-		if (!IsInstanceValid(this) || lobbyId != _runningLobby?.Id) return;
-		_runningLobby = null;
-		EmitSignalAppPaused();
-	}
-
-	private void OnLobbyResumedEvent(object? caller, Resources.WolfAPI.Lobby lobby)
-	{
-		if (!IsInstanceValid(this) || !IsAlreadyRunning(lobby)) return;
-		_runningLobby = lobby;
-		EmitSignalAppResumed();
 	}
 
 	private void OnLobbyStoppedEvent(object? caller, string lobbyId)
@@ -477,12 +475,12 @@ public partial class App : MarginContainer, IRestorable<App>
 
 	private async void OnPausePressed()
 	{
-		if (_runningLobby?.Id is null)
+		if (_runningLobby?.Runner is null || _runningLobby?.Runner.ParentSessionId is null)
 			return;
 
 
 		MenuButtonPause.Disabled = true;
-		await WolfApi.PauseLobby(_runningLobby.Id);
+		await WolfApi.PauseRunner(_runningLobby.Runner, _runningLobby.Runner.ParentSessionId);
 		MenuButtonPause.Disabled = false;
 
 		State = AppState.PAUSED;
@@ -492,12 +490,12 @@ public partial class App : MarginContainer, IRestorable<App>
 
 	private async void OnResumePressed()
 	{
-		if (_runningLobby?.Id is null)
+		if (_runningLobby?.Runner is null || _runningLobby?.Runner.ParentSessionId is null)
 			return;
 
 
 		MenuButtonResume.Disabled = true;
-		await WolfApi.ResumeLobby(_runningLobby.Id);
+		await WolfApi.ResumeRunner(_runningLobby.Runner, _runningLobby.Runner.ParentSessionId);
 		MenuButtonResume.Disabled = false;
 
 		State = AppState.PLAYING;

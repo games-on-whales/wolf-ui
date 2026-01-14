@@ -107,25 +107,31 @@ public partial class Lobby : Control
 		});
 	}
 
-	private async void PauseLobby()
+	private async void PauseRunner()
 	{
+		if (_lobby.Runner == null || _lobby.Runner.ParentSessionId == null)
+			return;
+
 		var pin = await FetchPin();
 
 		// null pin accepted but not empty
 		if (pin == null || pin.Count != 0)
 		{
-			await WolfApi.PauseLobby(Name, pin);
+			await WolfApi.PauseRunner(_lobby.Runner, _lobby.Runner.ParentSessionId);
 		}
 	}
 
-	private async void ResumeLobby()
+	private async void ResumeRunner()
 	{
+		if (_lobby.Runner == null || _lobby.Runner.ParentSessionId == null)
+			return;
+
 		var pin = await FetchPin();
 
 		// null pin accepted but not empty
 		if (pin == null || pin.Count != 0)
 		{
-			await WolfApi.ResumeLobby(Name, pin);
+			await WolfApi.ResumeRunner(_lobby.Runner, _lobby.Runner.ParentSessionId);
 		}
 	}
 
