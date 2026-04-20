@@ -20,7 +20,7 @@ public partial class WolfApi
     
     public static async Task<List<Lobby>> GetLobbies()
     {
-        var lobbies = await GetAsync<LobbiesResponse>("http://localhost/api/v1/lobbies");
+        var lobbies = await GetAsync<LobbiesResponse>("/lobbies");
         if (lobbies is null) return [];
         if (lobbies.Success) return lobbies.Lobbies ?? [];
         return [];
@@ -59,10 +59,10 @@ public partial class WolfApi
              "lobby_id": "{{lobbyId}}",
              "moonlight_session_id": "{{sessionId}}"
          }
-         """;
+        """;
 
         StringContent content = new(json);
-        var result = await HttpClient.PostAsync("http://localhost/api/v1/lobbies/leave", content);
+        var result = await HttpClient.PostAsync($"{Api}/lobbies/leave", content);
         Logger.LogInformation("{0}", await result.Content.ReadAsStringAsync());
     }
     

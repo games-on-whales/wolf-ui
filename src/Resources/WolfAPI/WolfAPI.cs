@@ -273,8 +273,12 @@ public partial class WolfApi : Resource
     {
         try
         {
-            var result = await HttpClient.GetStringAsync(url);
-            Logger.LogDebug("API call GET: {0} - {1}", url, result);
+            var resolvedUrl = url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                              url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                ? url
+                : $"{Api}{url}";
+            var result = await HttpClient.GetStringAsync(resolvedUrl);
+            Logger.LogDebug("API call GET: {0} - {1}", resolvedUrl, result);
             var data = JsonSerializer.Deserialize<T>(result, JsonOptions);
             if (data is not null) return data;
             Logger.LogError("Could not Deserialize {0} to {1}", result, typeof(T));

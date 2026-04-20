@@ -56,7 +56,7 @@ public partial class WolfApi
         HttpResponseMessage message;
         try
         {
-            message = await HttpClient.GetAsync($"http://localhost/api/v1/utils/get-icon?icon_path={iconPath}");
+            message = await HttpClient.GetAsync($"{Api}/utils/get-icon?icon_path={iconPath}");
         }
         catch (HttpRequestException e)
         {
