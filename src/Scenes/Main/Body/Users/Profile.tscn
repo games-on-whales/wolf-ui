@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://co6uuhwci2mbc" path="res://Scenes/Main/Body/Users/Profile.cs" id="2_0h5hp"]
 
 [node name="Profile" type="Button"]
-custom_minimum_size = Vector2(180, 240)
+custom_minimum_size = Vector2(270, 360)
 anchors_preset = -1
 anchor_left = 0.429688
 anchor_top = 0.333333

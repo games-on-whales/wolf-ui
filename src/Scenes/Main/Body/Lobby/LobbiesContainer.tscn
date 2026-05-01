@@ -3,8 +3,11 @@
 [ext_resource type="Script" uid="uid://ba5e67ap55vwb" path="res://Scenes/Main/Body/Lobby/LobbiesContainer.cs" id="1_4f5y8"]
 
 [node name="LobbiesContainer" type="VBoxContainer"]
-offset_right = 951.0
+anchors_preset = 10
+anchor_right = 1.0
 offset_bottom = 283.0
+grow_horizontal = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_4f5y8")
 

@@ -1,13 +1,13 @@
-[gd_scene load_steps=6 format=3 uid="uid://chspw2lt1qcuc"]
+[gd_scene load_steps=7 format=3 uid="uid://chspw2lt1qcuc"]
 
 [ext_resource type="Script" uid="uid://cvdic2x7x65qx" path="res://Scenes/Main/Body/Apps/App.cs" id="1_u3jln"]
+[ext_resource type="Theme" uid="uid://v418qqxvwy87" path="res://Themes/OLED_theme.tres" id="2_8t7no"]
 [ext_resource type="Texture2D" uid="uid://wpxb54l4wult" path="res://Icons/UI/download-2-circle-svgrepo-com.svg" id="2_is3or"]
 [ext_resource type="Script" uid="uid://dy3vko5i4jvi3" path="res://Scenes/Main/Body/Apps/ThemedSVG.cs" id="3_8t7no"]
 [ext_resource type="Texture2D" uid="uid://d1uaf1ivwb32x" path="res://Icons/UI/play-circle-svgrepo-com.svg" id="4_nooyg"]
 [ext_resource type="Texture2D" uid="uid://cmj2w8tadwl8f" path="res://Icons/UI/check-circle-svgrepo-com.svg" id="5_2ceq8"]
 
 [node name="App" type="MarginContainer"]
-custom_minimum_size = Vector2(200, 295)
 anchors_preset = -1
 anchor_right = 0.1625
 anchor_bottom = 0.409722
@@ -31,30 +31,33 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="SpacerLeft" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="AppButton" type="Button" parent="HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 295)
+custom_minimum_size = Vector2(300, 475)
 layout_mode = 2
 expand_icon = true
 
 [node name="Panel" type="Panel" parent="HBoxContainer/AppButton"]
-layout_mode = 2
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 199.0
-offset_bottom = 294.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_type_variation = &"AppCardBackground"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/AppButton"]
-layout_mode = 2
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 199.0
-offset_bottom = 294.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 0
 
 [node name="Control" type="Control" parent="HBoxContainer/AppButton/VBoxContainer"]
@@ -64,9 +67,14 @@ mouse_filter = 2
 
 [node name="AppIcon" type="TextureRect" parent="HBoxContainer/AppButton/VBoxContainer/Control"]
 unique_name_in_owner = true
-layout_mode = 2
-offset_right = 198.0
-offset_bottom = 270.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 0.5
+offset_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_vertical = 3
 expand_mode = 4
 stretch_mode = 6
@@ -99,19 +107,18 @@ show_percentage = false
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-size_flags_vertical = 8
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 10
+theme = ExtResource("2_8t7no")
+theme_type_variation = &"AppLabel"
 text = "NAME"
 horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="AppCardCorner" type="PanelContainer" parent="HBoxContainer/AppButton"]
 layout_mode = 2
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 36.0
-offset_bottom = 36.0
+offset_left = -0.5
+offset_top = -0.5
+offset_right = 65.5
+offset_bottom = 64.5
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_type_variation = &"AppCardCorner"
@@ -119,10 +126,10 @@ theme_type_variation = &"AppCardCorner"
 [node name="LoadingMargin" type="MarginContainer" parent="HBoxContainer/AppButton/AppCardCorner"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 7
-theme_override_constants/margin_top = 7
-theme_override_constants/margin_right = 13
-theme_override_constants/margin_bottom = 13
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
 
 [node name="DownloadHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
 unique_name_in_owner = true
@@ -130,12 +137,11 @@ visible = false
 self_modulate = Color(0.757453, 0.0663632, 0, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
 mouse_filter = 2
 theme_type_variation = &"AppCardStatusIconDownload"
 texture = ExtResource("2_is3or")
-expand_mode = 4
+expand_mode = 2
+stretch_mode = 4
 script = ExtResource("3_8t7no")
 
 [node name="PlayingHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
@@ -144,12 +150,11 @@ visible = false
 self_modulate = Color(0.773325, 0.641663, 0.178565, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
 mouse_filter = 2
 theme_type_variation = &"AppCardStatusIconPlaying"
 texture = ExtResource("4_nooyg")
-expand_mode = 4
+expand_mode = 2
+stretch_mode = 4
 script = ExtResource("3_8t7no")
 
 [node name="OkHint" type="TextureRect" parent="HBoxContainer/AppButton/AppCardCorner/LoadingMargin"]
@@ -157,17 +162,15 @@ unique_name_in_owner = true
 self_modulate = Color(0.292571, 0.533571, 0.177747, 1)
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
 mouse_filter = 2
 theme_type_variation = &"AppCardStatusIconOk"
 texture = ExtResource("5_2ceq8")
-expand_mode = 4
+expand_mode = 2
+stretch_mode = 4
 script = ExtResource("3_8t7no")
 
 [node name="AppMenu" type="CenterContainer" parent="HBoxContainer/AppButton"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -188,10 +191,10 @@ layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/AppButton/AppMenu/PanelContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/AppButton/AppMenu/PanelContainer/MarginContainer"]
 layout_mode = 2
@@ -245,6 +248,7 @@ focus_previous = NodePath("../MenuButtonUpdate")
 text = "Cancel"
 
 [node name="SpacerRight" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2

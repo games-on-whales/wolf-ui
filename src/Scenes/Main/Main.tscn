@@ -67,7 +67,7 @@ layout_mode = 2
 
 [node name="OptionsButton" type="Button" parent="Content/Header/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
 focus_neighbor_right = NodePath("../ExitButton")
 theme_type_variation = &"NavButtons"
@@ -81,12 +81,14 @@ script = ExtResource("7_qdkat")
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 1
 text = "Select User"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ExitButton" type="Button" parent="Content/Header/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0

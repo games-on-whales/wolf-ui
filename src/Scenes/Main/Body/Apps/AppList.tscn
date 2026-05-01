@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b4qkc5ost514t"]
+[gd_scene load_steps=3 format=3 uid="uid://b4qkc5ost514t"]
 
 [ext_resource type="Script" uid="uid://brs0ic67iu2en" path="res://Scenes/Main/Body/Apps/AppList.cs" id="1_wixkc"]
+[ext_resource type="Theme" uid="uid://v418qqxvwy87" path="res://Themes/OLED_theme.tres" id="2_l355r"]
 
 [node name="AppList" type="Control"]
 layout_mode = 3
@@ -38,5 +39,6 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 2
+theme = ExtResource("2_l355r")
 theme_type_variation = &"AppListGrid"
 columns = 5

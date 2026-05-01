@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=8 format=3 uid="uid://v418qqxvwy87"]
+[gd_resource type="Theme" load_steps=9 format=3 uid="uid://v418qqxvwy87"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rhp46"]
 bg_color = Color(0.103744, 0.103744, 0.103743, 1)
@@ -32,7 +32,12 @@ border_width_bottom = 2
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tte3r"]
 corner_detail = 1
 
+[sub_resource type="SystemFont" id="SystemFont_f7dxq"]
+font_names = PackedStringArray("Fantasy")
+
 [resource]
+default_font = SubResource("SystemFont_f7dxq")
+default_font_size = 24
 AppCardBackground/base_type = &"Panel"
 AppCardBackground/styles/panel = SubResource("StyleBoxFlat_rhp46")
 AppCardCorner/base_type = &"PanelContainer"
@@ -43,6 +48,10 @@ AppCardStatusIconOk/base_type = &"Label"
 AppCardStatusIconOk/colors/font_color = Color(0.292571, 0.533571, 0.177747, 1)
 AppCardStatusIconPlaying/base_type = &"Label"
 AppCardStatusIconPlaying/colors/font_color = Color(0.773325, 0.641663, 0.178565, 1)
+AppLabel/base_type = &"Label"
+AppLabel/colors/font_outline_color = Color(0, 0, 0, 1)
+AppLabel/constants/outline_size = 5
+AppLabel/font_sizes/font_size = 25
 AppListGrid/base_type = &"GridContainer"
 AppListGrid/constants/columns = 5
 AppListGrid/constants/v_separation = 24

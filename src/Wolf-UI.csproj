@@ -21,7 +21,8 @@
 
   <ItemGroup>
      <!--  <AdditionalFiles Include="*/*/*.tscn" /> -->
-      <EmbeddedResource Include="**/*.tscn" Visible="false" />
+      <EmbeddedResource Include="**/*.tscn" Visible="true" />
+      <None Include="**/*.tres" />
   </ItemGroup>
 
 </Project>
