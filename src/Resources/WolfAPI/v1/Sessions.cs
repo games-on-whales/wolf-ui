@@ -9,7 +9,7 @@ public partial class WolfApi
 {
     public static async Task<Session?> GetSession()
     {
-        var sessions = await WolfApi.GetAsync<SessionsResponse>("http://localhost/api/v1/sessions");
+        var sessions = await WolfApi.GetAsync<SessionsResponse>("/sessions");
         if (sessions?.Sessions is null) return null;
         var currSession = sessions.Sessions.FirstOrDefault(session => session.ClientId == SessionId);
         if (currSession is not null) return currSession;
@@ -27,7 +27,7 @@ public partial class WolfApi
     
     public static async void StopSession(string sessionId)
     {
-        var url = "http://localhost/api/v1/session/stop";
+        var url = "/session/stop";
         try
         {
             var data = $$"""
@@ -37,7 +37,7 @@ public partial class WolfApi
                          """;
             Logger.LogDebug("API call POST: {0} - {1}", url, data);
             StringContent content = new(data);
-            var result = await HttpClient.PostAsync(url, content);
+            var result = await HttpClient.PostAsync($"{Api}{url}", content);
             var returnData = await result.Content.ReadAsStringAsync();
             Logger.LogDebug("API answer from: {0} - {1}", url, returnData);
         }

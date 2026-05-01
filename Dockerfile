@@ -5,14 +5,14 @@ ARG GODOT_VERSION=4.4.1
 ##################### build wolf-ui ###########################################################
 ###############################################################################################
 # hadolint ignore=DL3006
-FROM ubuntu:24.10 AS builder
+FROM mcr.microsoft.com/dotnet/sdk:8.0-noble AS builder
 ARG GODOT_VERSION
 
 RUN <<_INSTALL_DOTNET
 set -e
 
 apt-get update -y
-apt-get install -y dotnet-sdk-8.0 unzip build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev \
+apt-get install -y unzip build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev \
     libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libfreetype6-dev libudev-dev libxi-dev \
     libxrandr-dev yasm wget libfontconfig
 
