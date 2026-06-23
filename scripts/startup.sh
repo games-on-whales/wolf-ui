@@ -13,4 +13,5 @@ done
 
 gow_log "Starting Wolf-UI"
 source /opt/gow/launch-comp.sh
-launcher wolf-ui -f -t
+opts=( $WOLF_UI_ARGS )
+launcher wolf-ui -f -t "${opts[@]}"
