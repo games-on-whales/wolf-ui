@@ -58,8 +58,20 @@ ENV PUID=0 \
     PGID=0 \
     UNAME="root"
 
+# Unprivileged system user for rootless mode (see scripts/entrypoint.sh). Fixed
+# IDs so host-side ownership stays stable across image builds. No home: GOW's
+# 10-setup_user.sh runs `userdel -r` on a clashing user, and Wolf mounts the
+# app state folder on /home/retro anyway.
+ARG WOLF_UI_UID=990
+ARG WOLF_UI_GID=990
+RUN groupadd --system --gid $WOLF_UI_GID wolf-ui && \
+    useradd --system --uid $WOLF_UI_UID --gid $WOLF_UI_GID --no-create-home \
+    --home-dir /nonexistent --shell /usr/sbin/nologin wolf-ui
+
 COPY --from=builder /project/src/bin /usr/local/bin
 COPY --chmod=777 scripts/startup.sh /opt/gow/startup-app.sh
+COPY --chmod=755 scripts/entrypoint.sh /opt/gow/wolf-ui-entrypoint.sh
+ENTRYPOINT ["/opt/gow/wolf-ui-entrypoint.sh"]
 
 ENV XDG_RUNTIME_DIR=/tmp/.X11-unix
 
