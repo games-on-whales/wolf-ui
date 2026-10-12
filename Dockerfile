@@ -62,6 +62,9 @@ COPY --from=builder /project/src/bin /usr/local/bin
 COPY --chmod=777 scripts/startup.sh /opt/gow/startup-app.sh
 
 ENV XDG_RUNTIME_DIR=/tmp/.X11-unix
+# Wolf usually overrides XDG_RUNTIME_DIR with its own mounted runtime dir.
+# Otherwise GOW's 10-setup_user.sh chowns it for UNAME and fails if it's missing.
+RUN install -d -m 1777 "$XDG_RUNTIME_DIR"
 
 ARG IMAGE_SOURCE
 LABEL org.opencontainers.image.source=$IMAGE_SOURCE
