@@ -10,6 +10,39 @@ namespace Resources.WolfAPI;
 
 public partial class WolfApi
 {
+    private static string? _iconCacheDir;
+    private static string IconCacheDir => _iconCacheDir ??= ResolveIconCacheDir();
+
+    // Wolf mounts the app state folder on /home/retro, so cache there to keep icons
+    // across sessions. When that isn't writable (e.g. rootless, where nobody chowns it
+    // for us) fall back to $HOME, then Godot's user dir. An empty string disables the cache.
+    private static string ResolveIconCacheDir()
+    {
+        var user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
+        user = user == "root" ? "retro" : user;
+
+        string?[] homes = [$"/home/{user}", System.Environment.GetEnvironmentVariable("HOME"), OS.GetUserDataDir()];
+        foreach (var home in homes)
+        {
+            if (string.IsNullOrEmpty(home))
+                continue;
+
+            var dir = Path.Combine(home, ".wolf-ui/tmp/icons");
+            try
+            {
+                Directory.CreateDirectory(dir);
+                return dir;
+            }
+            catch (Exception e) when (e is UnauthorizedAccessException or IOException)
+            {
+                Logger.LogDebug("Icon cache {0} not usable: {1}", dir, e.Message);
+            }
+        }
+
+        Logger.LogWarning("No writable icon cache directory, icons won't be cached");
+        return "";
+    }
+
     public static async Task<Texture2D?> GetIcon(App app, double hCacheDuration = 1.0, int retry = 0)
     {
         if (app.IconPngPath is not null && app.IconPngPath != "") // image set, get image from wolf
@@ -32,22 +65,23 @@ public partial class WolfApi
             Logger.LogError("Failed Loading {0} 5 times, skipping", iconPath);
             return null;
         }
-        var user = System.Environment.GetEnvironmentVariable("USER") ?? "retro";
-        user = user == "root" ? "retro" : user;
+        var filepath = IconCacheDir == "" ? null : $"{IconCacheDir}/{iconPath}.png".Replace("\\", "/").Replace("//", "/");
 
-        var filepath = $"/home/{user}/.wolf-ui/tmp/icons/{iconPath}.png";
-        filepath = filepath.Replace("\\", "/").Replace("//", "/");
-
-        if (File.Exists(filepath))
+        if (filepath is not null && File.Exists(filepath))
         {
             if (File.GetCreationTime(filepath).AddHours(hCacheDuration).CompareTo(DateTime.Now) >= 0)
             {
                 var image = Image.LoadFromFile(filepath);
                 return ImageTexture.CreateFromImage(image);
             }
-            else
+
+            try
             {
                 File.Delete(filepath);
+            }
+            catch (Exception e) when (e is UnauthorizedAccessException or IOException)
+            {
+                Logger.LogWarning("Could not remove stale icon {0}: {1}", filepath, e.Message);
             }
         }
 
@@ -82,11 +116,19 @@ public partial class WolfApi
                 return await GetIcon(iconPath, hCacheDuration, retry + 1);
             }
 
-            var directoryPath = Path.GetDirectoryName(filepath);
-            if (directoryPath is not null)
+            if (filepath is not null && Path.GetDirectoryName(filepath) is { } directoryPath)
             {
-                Directory.CreateDirectory(directoryPath);
-                image.SavePng(filepath);
+                try
+                {
+                    Directory.CreateDirectory(directoryPath);
+                    var saveError = image.SavePng(filepath);
+                    if (saveError != Error.Ok)
+                        Logger.LogWarning("Could not cache icon {0}: {1}", filepath, saveError);
+                }
+                catch (Exception e) when (e is UnauthorizedAccessException or IOException)
+                {
+                    Logger.LogWarning("Could not cache icon {0}: {1}", filepath, e.Message);
+                }
             }
             var texture = ImageTexture.CreateFromImage(image);
             return texture;
