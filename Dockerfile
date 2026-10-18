@@ -1,4 +1,4 @@
-ARG BASE_APP_IMAGE=ghcr.io/games-on-whales/base-app:edge
+ARG BASE_APP_IMAGE=ghcr.io/games-on-whales/base-app:fedora-44
 ARG GODOT_VERSION=4.4.1
 
 ###############################################################################################
