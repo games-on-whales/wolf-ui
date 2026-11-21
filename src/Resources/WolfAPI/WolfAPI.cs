@@ -44,7 +44,7 @@ public partial class WolfApi : Resource
     { 
         TokenLimit = 8, 
         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-        QueueLimit = 3, 
+        QueueLimit = int.MaxValue, 
         ReplenishmentPeriod = TimeSpan.FromMilliseconds(1), 
         TokensPerPeriod = 2, 
         AutoReplenishment = true
