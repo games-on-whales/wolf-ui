@@ -91,6 +91,14 @@ public partial class WolfApi
             var texture = ImageTexture.CreateFromImage(image);
             return texture;
         }
+
+        if (message.StatusCode == HttpStatusCode.TooManyRequests || (int)message.StatusCode >= 500)
+        {
+            Logger.LogWarning("Icon {0} could not be accessed: {1} Retrying", iconPath, message.StatusCode);
+            await Task.Delay(TimeSpan.FromMilliseconds(250 * (retry + 1)));
+            return await GetIcon(iconPath, hCacheDuration, retry + 1);
+        }
+
         Logger.LogError("Could not access image: {0}: {1}", iconPath, message.StatusCode);
         return null;
     }

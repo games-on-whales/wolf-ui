@@ -38,8 +38,7 @@ public partial class WolfApi
 
         if (retryCount >= 5)
         {
-            Logger.LogError("Api call failed 5 times: /docker/images/inspect?image_name={0}, {1}... ABORT", imageName);
-            _cache.Add(cacheKey, string.Empty, WolfAPICachePolicy);
+            Logger.LogError("Api call failed 5 times: /docker/images/inspect?image_name={0}... ABORT", imageName);
             return false;
         }
 
@@ -50,6 +49,15 @@ public partial class WolfApi
             {
                 _cache.Add(cacheKey, string.Empty, WolfAPICachePolicy);
                 return false;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // retry and never cache errors
+                Logger.LogWarning("Api call failed: /docker/images/inspect?image_name={0}, {1}... Retrying", imageName,
+                    response.StatusCode);
+                await Task.Delay(TimeSpan.FromMilliseconds(250 * (retryCount + 1)));
+                return await IsImageOnDisk(imageName, retryCount + 1);
             }
 
             var str = await response.Content.ReadAsStringAsync();
